@@ -79,7 +79,10 @@ export default function CodeEntry() {
         variant="quiet"
         onPress={() => router.replace({ pathname: "/onboarding/phone", params: { phone } })}
       />
-      {__DEV__ && devCode ? (
+      {/* The server only sends dev_code when OTP_MOCK is on (production
+          force-disables it), so the value itself is the gate — showing it in
+          non-dev builds is what makes deployed test builds sign-in-able. */}
+      {devCode ? (
         <View
           style={{ backgroundColor: c.primarySoft, borderRadius: radius.md, padding: space.l, gap: space.s }}
         >

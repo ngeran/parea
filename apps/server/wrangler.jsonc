@@ -1,0 +1,64 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "together-api",
+  "main": "src/index.ts",
+  // Matches the newest date the TEST-RUNTIME workerd supports (miniflare,
+  // pinned by @cloudflare/vitest-pool-workers). Bump this together with the
+  // wrangler/miniflare toolchain — never ahead of it, or tests cannot start.
+  "compatibility_date": "2026-08-22",
+  "compatibility_flags": ["nodejs_compat"],
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+
+  // Development defaults. Deploy production with:
+  //   wrangler d1 create together            → put the real id below
+  //   wrangler r2 bucket create together-photos
+  //   wrangler secret put OTP_PEPPER  (+ TWILIO_* before real launch)
+  // and remove OTP_MOCK (or set it to "0").
+  "vars": {
+    "ENVIRONMENT": "development",
+    "OTP_MOCK": "1",
+    "ALLOWED_ORIGINS": "http://localhost:8081,http://localhost:19006"
+  },
+
+  // database_id is a placeholder for LOCAL DEV ONLY — replace with the real id
+  // from `wrangler d1 create together` before deploying.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "together",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "together-photos" }],
+
+  "durable_objects": {
+    "bindings": [
+      { "name": "CHAT_ROOM", "class_name": "ChatRoom" },
+      { "name": "USER_EVENTS", "class_name": "UserEvents" }
+    ]
+  },
+
+  // SQLite-backed Durable Objects (required for new DO classes).
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ChatRoom", "UserEvents"] }],
+
+  // UTC crons. The daily reminder fires at 16:00 UTC ≈ 18:00 Greece time (EET).
+  "triggers": {
+    "crons": ["*/15 * * * *", "30 * * * *", "0 16 * * *"]
+  },
+
+  // The admin dashboard (apps/admin, `npm run build:admin`) is served by this
+  // Worker under /admin. run_worker_first sends every request through the
+  // Worker so the API keeps priority; src/index.ts forwards /admin paths to
+  // this binding. The checked-in dist/.gitkeep keeps `wrangler dev` happy
+  // before the first admin build.
+  "assets": {
+    "directory": "../admin/dist",
+    "binding": "ASSETS",
+    "run_worker_first": true
+  }
+}

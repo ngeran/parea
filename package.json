@@ -1,0 +1,19 @@
+{
+  "name": "together",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "dev:server": "npm run dev -w @together/server",
+    "dev:client": "npm run start -w @together/client",
+    "dev:admin": "npm run dev -w @together/admin",
+    "build:admin": "npm run build -w @together/admin"
+  }
+}

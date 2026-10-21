@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    // Keeps wrangler honest about using the checked-in generated types.
+    "types": ["@cloudflare/vitest-pool-workers"]
+  },
+  "include": ["src/**/*.ts", "test/**/*.ts", "worker-configuration.d.ts"],
+  // "files" bypasses the default node_modules exclude. This ambient
+  // declaration provides the `cloudflare:test` module types for the tests.
+  "files": ["../../node_modules/@cloudflare/vitest-pool-workers/types/cloudflare-test.d.ts"]
+}

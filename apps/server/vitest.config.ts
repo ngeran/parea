@@ -24,7 +24,13 @@ export default defineConfig(async () => {
       cloudflareTest({
         wrangler: { configPath: "./wrangler.jsonc" },
         miniflare: {
-          bindings: { TEST_MIGRATIONS: migrations },
+          bindings: {
+            TEST_MIGRATIONS: migrations,
+            // vitest-pool-workers picks up the gitignored .dev.vars when it
+            // exists, which would make tests pass locally but fail on CI.
+            // Inject a fixed, non-secret pepper so the suite is hermetic.
+            OTP_PEPPER: "test-only-pepper",
+          },
         },
       }),
     ],

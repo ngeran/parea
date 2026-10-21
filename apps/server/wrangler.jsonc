@@ -13,6 +13,11 @@
 		"enabled": true,
 		"head_sampling_rate": 1
 	},
+	// Serve the public https://parea-api.<subdomain>.workers.dev URL. Newer
+	// wrangler leaves it disabled by default, so say it explicitly.
+	"workers_dev": true,
+	// No per-version preview URLs — the API only needs its one public route.
+	"preview_urls": false,
 	// Development defaults. Deploy production with:
 	//   wrangler d1 create parea            → put the real id below
 	//   wrangler r2 bucket create parea-photos

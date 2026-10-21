@@ -1,4 +1,4 @@
-# Together — Store Listings (Phase 7 template)
+# Parea — Store Listings (Phase 7 template)
 
 Everything the App Store and Google Play consoles will ask for, ready to
 paste. Placeholders `<...>` to decide at submission. Both stores require the
@@ -8,8 +8,8 @@ privacy policy (docs/PRIVACY-POLICY.md) hosted at a public URL.
 
 | Field | Value |
 |---|---|
-| Bundle ID / package | `gr.together.app` — **replace if you don't control this domain** (docs/DEPLOY.md §5) |
-| App name | Together (both stores, both locales) |
+| Bundle ID / package | `gr.parea.app` — **replace if you don't control this domain** (docs/DEPLOY.md §5) |
+| App name | Parea (both stores, both locales) |
 | Primary category | iOS: Social Networking · Android: Social |
 | Secondary | Lifestyle |
 | Expected rating | 12+ iOS / Teen Android (UGC with moderation, reporting, blocking in place — answer the UGC questions "yes", moderation "yes") |
@@ -26,7 +26,7 @@ privacy policy (docs/PRIVACY-POLICY.md) hosted at a public URL.
 
 **Description**
 - EN:
-  > Together helps you find company for everyday things — a coffee, a walk,
+  > Parea helps you find company for everyday things — a coffee, a walk,
   > the market — with people who live near you.
   >
   > MADE FOR 65+
@@ -54,7 +54,7 @@ privacy policy (docs/PRIVACY-POLICY.md) hosted at a public URL.
   > No advertising. No trackers. Your data is never sold. Export or delete
   > everything yourself, right in the app.
 - EL:
-  > Το Together σας βοηθά να βρίσκετε συντροφιά για καθημερινές στιγμές — έναν
+  > Το Parea σας βοηθά να βρίσκετε συντροφιά για καθημερινές στιγμές — έναν
   > καφέ, μια βόλτα, την αγορά — με ανθρώπους που μένουν κοντά σας.
   >
   > ΦΤΙΑΓΜΕΝΟ ΓΙΑ 65+

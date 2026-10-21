@@ -2,7 +2,7 @@
 // contact; the "I'm safe" check-in closes the loop after the meeting.
 
 import { Hono } from "hono";
-import { planCreateSchema, planUpdateSchema, pushText, smsText, type Lang } from "@together/shared";
+import { planCreateSchema, planUpdateSchema, pushText, smsText, type Lang } from "@parea/shared";
 import { AppError } from "../errors";
 import { emitToUser } from "../lib/events";
 import { formatWhen } from "../lib/format";
@@ -50,7 +50,7 @@ async function notifyOtherPlanChanged(
     payload: { plan: planDto(plan) },
   });
   pushToUser(env, ctx, watcherId, {
-    title: "Together",
+    title: "Parea",
     body: pushText.planChanged(lang, plan.place_name),
     data: { plan_id: plan.id },
   });

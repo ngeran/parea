@@ -1,7 +1,7 @@
 // Human-readable date formatting for SMS and push texts. The launch market
 // is Greece, so Athens time is used — device time zones never reach the server.
 
-import type { Lang } from "@together/shared";
+import type { Lang } from "@parea/shared";
 
 export function formatWhen(iso: string, lang: Lang): string {
   return new Date(iso).toLocaleString(lang === "el" ? "el-GR" : "en-GB", {

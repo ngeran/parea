@@ -2,7 +2,7 @@
 // no category, no status — it's a suggestion box, not a ticket queue.
 
 import { Hono } from "hono";
-import { feedbackCreateSchema } from "@together/shared";
+import { feedbackCreateSchema } from "@parea/shared";
 import { requireAuth } from "../middleware/auth";
 import type { AppEnv } from "../types";
 

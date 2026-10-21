@@ -1,5 +1,5 @@
 {
-  "name": "@together/server",
+  "name": "@parea/server",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -9,8 +9,8 @@
     "typecheck": "wrangler types && tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "db:migrate": "wrangler d1 migrations apply together --local",
-    "db:seed": "wrangler d1 execute together --local --file=seed.sql",
+    "db:migrate": "wrangler d1 migrations apply parea --local",
+    "db:seed": "wrangler d1 execute parea --local --file=seed.sql",
     "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed",
     "deploy": "wrangler deploy"
   },

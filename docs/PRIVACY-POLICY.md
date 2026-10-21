@@ -1,4 +1,4 @@
-# Together — Privacy Policy (template, v2026-10)
+# Parea — Privacy Policy (template, v2026-10)
 
 > **Template — fill in the placeholders (`<…>`) and host publicly before
 > submitting to the stores.** Have it reviewed by a lawyer before launch;
@@ -12,7 +12,7 @@
 
 ## English
 
-**Who we are.** Together ("the app") is operated by <legal entity / name>,
+**Who we are.** Parea ("the app") is operated by <legal entity / name>,
 <address>, <email>. We help people aged 65+ find nearby company for everyday
 activities. This policy explains what we collect, why, and the rights you have.
 
@@ -59,7 +59,7 @@ protection authority (in Greece: Αρχή Προστασίας Δεδομένω�
 session tokens are stored only as hashes; chat and moderation systems watch
 for scams; blocks are enforced in both directions.
 
-**Children.** Together is for adults 65+. We do not knowingly collect data
+**Children.** Parea is for adults 65+. We do not knowingly collect data
 from anyone under 18.
 
 **Changes.** We will tell you in the app before material changes take
@@ -69,7 +69,7 @@ effect; you will be asked to agree again to any new consent version.
 
 ## Ελληνικά
 
-**Ποιοι είμαστε.** Το Together («η εφαρμογή») λειτουργείται από
+**Ποιοι είμαστε.** Το Parea («η εφαρμογή») λειτουργείται από
 <νομικό πρόσωπο / όνομα>, <διεύθυνση>, <email>. Βοηθάμε ανθρώπους 65+ να
 βρίσκουν συντροφιά για καθημερινές δραστηριότητες. Η πολιτική αυτή εξηγεί
 τι συλλέγουμε, γιατί, και ποια δικαιώματα έχετε.
@@ -116,7 +116,7 @@ effect; you will be asked to agree again to any new consent version.
 συνεδρίες αποθηκεύονται μόνο ως hash· συστήματα εντοπισμού απάτων στις
 συνομιλίες· οι αποκλεισμοί ισχύουν και προς τις δύο κατευθύνσεις.
 
-**Ανήλικοι.** Το Together απευθύνεται σε ενήλικες 65+. Δεν συλλέγουμε
+**Ανήλικοι.** Το Parea απευθύνεται σε ενήλικες 65+. Δεν συλλέγουμε
 γνωστά δεδομένα από ανηλίκους.
 
 **Αλλαγές.** Θα σας ενημερώνουμε μέσα στην εφαρμογή πριν από ουσιώδεις

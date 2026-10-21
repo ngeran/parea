@@ -1,4 +1,4 @@
-# Together — Phase 6: Accessibility Audit
+# Parea — Phase 6: Accessibility Audit
 
 Date: 2026-10-21 · Scope: `apps/client` (all 26 screens + shared components).
 Method: programmatic WCAG contrast verification (script, all 3 themes × 15

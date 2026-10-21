@@ -2,7 +2,7 @@
 // involves another user — see §4 of the plan.
 
 import { Hono } from "hono";
-import { reportSchema, smsText, sosSchema } from "@together/shared";
+import { reportSchema, smsText, sosSchema } from "@parea/shared";
 import { AppError } from "../errors";
 import { chatRoomStub } from "../lib/do";
 import { formatWhen } from "../lib/format";
@@ -166,8 +166,8 @@ function namesOf(contacts: TrustedContactRow[]): string[] {
 }
 
 function sosEn(name: string, details: string): string {
-  return `Together SOS: ${name} is asking for urgent help. ${details}`;
+  return `Parea SOS: ${name} is asking for urgent help. ${details}`;
 }
 function sosEl(name: string, details: string): string {
-  return `Together ΣΟΣ: ο/η ${name} ζητά άμεση βοήθεια. ${details}`;
+  return `Parea ΣΟΣ: ο/η ${name} ζητά άμεση βοήθεια. ${details}`;
 }

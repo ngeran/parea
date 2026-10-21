@@ -3,7 +3,7 @@
 // as ApiError. The session token lives in localStorage — an internal tool on
 // a trusted origin, no secure-store ceremony needed.
 
-export const TOKEN_KEY = "together_admin_token";
+export const TOKEN_KEY = "parea_admin_token";
 
 export class ApiError extends Error {
   constructor(
@@ -44,7 +44,7 @@ export async function api<T>(path: string, opts: ApiOptions = {}): Promise<T> {
       body: opts.body !== undefined ? JSON.stringify(opts.body) : undefined,
     });
   } catch {
-    throw new ApiError(0, "network", "Cannot reach the Together API.");
+    throw new ApiError(0, "network", "Cannot reach the Parea API.");
   }
 
   if (!res.ok) {

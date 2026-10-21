@@ -38,7 +38,7 @@ export function Stats({ onOpenReports }: { onOpenReports: () => void }) {
         ))}
       </div>
       <p className="muted">
-        Counters only — no per-user analytics are collected anywhere in Together.
+        Counters only — no per-user analytics are collected anywhere in Parea.
       </p>
     </>
   );

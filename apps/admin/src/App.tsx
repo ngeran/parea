@@ -32,7 +32,7 @@ export function App() {
   return (
     <div className="shell">
       <header className="topbar">
-        <span className="brand">Together — Admin</span>
+        <span className="brand">Parea — Admin</span>
         <nav className="tabs">
           {NAV.map((item) => (
             <button

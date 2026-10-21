@@ -59,8 +59,8 @@ export const pushText = {
   volunteerApproved: (lang: Lang): string =>
     pick(
       lang,
-      `You are now a Together volunteer. Thank you for helping!`,
-      `Είστε πλέον εθελοντής/εθελόντρια του Together. Ευχαριστούμε για τη βοήθεια!`,
+      `You are now a Parea volunteer. Thank you for helping!`,
+      `Είστε πλέον εθελοντής/εθελόντρια του Parea. Ευχαριστούμε για τη βοήθεια!`,
     ),
   warned: (lang: Lang): string =>
     pick(
@@ -73,27 +73,27 @@ export const pushText = {
 /** SMS texts — sent to trusted contacts who may not have the app installed. */
 export const smsText = {
   otp: (code: string): string =>
-    `Together: your code is ${code} / Ο κωδικός σας είναι ${code}`,
+    `Parea: your code is ${code} / Ο κωδικός σας είναι ${code}`,
   planShared: (lang: Lang, userName: string, placeName: string, startsAt: string): string =>
     pick(
       lang,
-      `Together: ${userName} plans to meet someone new: ${placeName}, ${startsAt}. You can ask them about it later.`,
-      `Together: ο/η ${userName} θα συναντήσει νέο γνωστό: ${placeName}, ${startsAt}. Μπορείτε να ρωτήσετε πώς πήγε.`,
+      `Parea: ${userName} plans to meet someone new: ${placeName}, ${startsAt}. You can ask them about it later.`,
+      `Parea: ο/η ${userName} θα συναντήσει νέο γνωστό: ${placeName}, ${startsAt}. Μπορείτε να ρωτήσετε πώς πήγε.`,
     ),
   checkinMissed: (lang: Lang, userName: string, placeName: string, startsAt: string): string =>
     pick(
       lang,
-      `Together ATTENTION: ${userName} did not confirm "I'm safe" after their meeting (${placeName}, ${startsAt}). Please contact them.`,
-      `Together ΠΡΟΣΟΧΗ: ο/η ${userName} δεν επιβεβαίωσε το «Είμαι καλά» μετά τη συνάντηση (${placeName}, ${startsAt}). Παρακαλούμε επικοινωνήστε μαζί του/ης.`,
+      `Parea ATTENTION: ${userName} did not confirm "I'm safe" after their meeting (${placeName}, ${startsAt}). Please contact them.`,
+      `Parea ΠΡΟΣΟΧΗ: ο/η ${userName} δεν επιβεβαίωσε το «Είμαι καλά» μετά τη συνάντηση (${placeName}, ${startsAt}). Παρακαλούμε επικοινωνήστε μαζί του/ης.`,
     ),
   sos: (lang: Lang, userName: string, details: string): string =>
     pick(
       lang,
-      `Together SOS: ${userName} is asking for urgent help. ${details}`,
-      `Together ΣΟΣ: ο/η ${userName} ζητά άμεση βοήθεια. ${details}`,
+      `Parea SOS: ${userName} is asking for urgent help. ${details}`,
+      `Parea ΣΟΣ: ο/η ${userName} ζητά άμεση βοήθεια. ${details}`,
     ),
   // Like the SOS itself, the stand-down is bilingual — any trusted contact may
   // be on the other end. Sends after the senior taps "I'm OK" post-alarm.
   sosOk: (userName: string): string =>
-    `Together: ${userName} says they are OK now. / Together: ο/η ${userName} λέει ότι είναι καλά.`,
+    `Parea: ${userName} says they are OK now. / Parea: ο/η ${userName} λέει ότι είναι καλά.`,
 };

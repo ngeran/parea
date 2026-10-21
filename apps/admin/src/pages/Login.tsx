@@ -72,7 +72,7 @@ export function Login({ onSignedIn }: { onSignedIn: () => void }) {
           else request.mutate();
         }}
       >
-        <h1>Together — Admin</h1>
+        <h1>Parea — Admin</h1>
 
         {!devCode ? (
           <>

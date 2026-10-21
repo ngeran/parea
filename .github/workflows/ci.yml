@@ -17,6 +17,6 @@ jobs:
       # Strict TypeScript across shared, server, client, admin.
       - run: npm run typecheck
       # WCAG contrast gate for all three client themes (Phase 6).
-      - run: npm run check:contrast -w @together/client
+      - run: npm run check:contrast -w @parea/client
       # Worker API incl. the authorization matrix (real D1/DOs via workerd).
-      - run: npm test -w @together/server
+      - run: npm test -w @parea/server

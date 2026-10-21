@@ -2,7 +2,7 @@
 // / "Not now"; swipe optional). A mutual "Yes" opens a chat.
 
 import { Hono } from "hono";
-import { discoverDecisionSchema } from "@together/shared";
+import { discoverDecisionSchema } from "@parea/shared";
 import { AppError } from "../errors";
 import { nearbyProfileRows } from "../lib/geo";
 import { createMatchIfNew, notifyMatch } from "../lib/connections";

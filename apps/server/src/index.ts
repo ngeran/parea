@@ -1,4 +1,4 @@
-// Together API — the single Worker entry point.
+// Parea API — the single Worker entry point.
 // Mounts every route module, adds CORS + uniform error JSON, exposes the
 // /events WebSocket and the cron scheduler, and re-exports the Durable Object
 // classes (they MUST be exported from the entry module for the bindings).

@@ -2,7 +2,7 @@
 // accepted request response both create one row. user_a/user_b are stored in
 // canonical (sorted) order so duplicates are impossible.
 
-import { pushText, type Lang, type PublicProfile } from "@together/shared";
+import { pushText, type Lang, type PublicProfile } from "@parea/shared";
 import { emitToUser } from "./events";
 import { pushToUser, type WaitUntilCtx } from "./push";
 import { publicProfile } from "./serialize";
@@ -63,7 +63,7 @@ export async function notifyMatch(
       payload: { match_id: outcome.matchId, other: otherPublic },
     });
     pushToUser(env, ctx, uid, {
-      title: "Together",
+      title: "Parea",
       body: pushText.matchCreated(lang, other.first_name),
       data: { match_id: outcome.matchId },
     });

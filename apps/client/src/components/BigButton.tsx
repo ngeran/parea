@@ -1,0 +1,113 @@
+// The only button component in the app. Full width, ≥ 64 px tall (96 for the
+// hero action), icon always next to a text label, explicit accessibility
+// role/label/state. One primary button per screen — variants make hierarchy
+// obvious: primary > soft > danger > quiet.
+import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useTheme } from "../theme";
+
+type Variant = "primary" | "soft" | "success" | "danger" | "quiet";
+type Size = "min" | "normal" | "big";
+
+export function BigButton({
+  label,
+  icon,
+  onPress,
+  variant = "primary",
+  size = "normal",
+  disabled = false,
+  busy = false,
+}: {
+  label: string;
+  icon?: string;
+  onPress: () => void;
+  variant?: Variant;
+  size?: Size;
+  disabled?: boolean;
+  busy?: boolean;
+}) {
+  const { c, f, touch, radius, themeName } = useTheme();
+
+  const height = size === "min" ? touch.min : size === "big" ? touch.hero : touch.button;
+  const fontSize = size === "big" ? f.title : f.button;
+  const bg =
+    variant === "primary" ? c.primary
+    : variant === "soft" ? c.primarySoft
+    : variant === "success" ? c.success
+    : variant === "danger" ? c.danger
+    : "transparent";
+  // High contrast flips soft/success fills to white, so their labels come
+  // from tokens that follow the fill (onSoft/onPrimary), never hardcoded.
+  const fg =
+    variant === "primary" || variant === "danger" || variant === "success" ? c.onPrimary
+    : variant === "soft" ? c.onSoft
+    : c.primary;
+
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || busy }}
+      onPress={onPress}
+      disabled={disabled || busy}
+      style={({ pressed }) => ({
+        minHeight: height,
+        borderRadius: radius.pill,
+        backgroundColor: bg,
+        // Plan §4.3: high-contrast theme gives every interactive element a
+        // 3 px border.
+        borderWidth: variant === "quiet" ? (themeName === "contrast" ? 3 : 2) : 0,
+        borderColor: c.primary,
+        alignItems: "center",
+        justifyContent: "center",
+        flexDirection: "row",
+        gap: 12,
+        paddingHorizontal: 24,
+        opacity: disabled || busy ? 0.5 : pressed ? 0.8 : 1,
+      })}
+    >
+      {icon ? <Text style={{ fontSize: fontSize }}>{icon}</Text> : null}
+      <Text
+        style={{
+          color: fg,
+          fontSize,
+          fontWeight: "700",
+          textAlign: "center",
+        }}
+      >
+        {busy ? "…" : label}
+      </Text>
+    </Pressable>
+  );
+}
+
+/** Small labeled icon-only action (read-aloud) — still ≥ 56 px. */
+export function IconAction({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+}) {
+  const { c, f, touch } = useTheme();
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: touch.min,
+        minWidth: touch.min,
+        paddingHorizontal: 8,
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 2,
+        opacity: pressed ? 0.7 : 1,
+      })}
+    >
+      <Text style={{ fontSize: f.title }}>{icon}</Text>
+      <Text style={{ color: c.textSecondary, fontSize: f.label }}>{label}</Text>
+    </Pressable>
+  );
+}

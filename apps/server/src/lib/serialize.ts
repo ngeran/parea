@@ -1,7 +1,7 @@
 // Converters from DB rows to API DTOs. Phones and exact locations never
 // leave the server; photo URLs are relative to the API origin.
 
-import type { Lang, Mobility, PublicProfile, SelfProfile } from "@together/shared";
+import type { Lang, Mobility, PublicProfile, SelfProfile } from "@parea/shared";
 import type { ProfileRow } from "../types";
 
 export function maskPhone(phone: string): string {

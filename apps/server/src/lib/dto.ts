@@ -1,6 +1,6 @@
 // Row → DTO converters for API responses.
 
-import type { MessageDTO, PlanDTO, PublicProfile, RequestDTO } from "@together/shared";
+import type { MessageDTO, PlanDTO, PublicProfile, RequestDTO } from "@parea/shared";
 import { publicProfile } from "./serialize";
 import type { MessageRow, NearbyRequestRow, PlanRow, RequestRow } from "../types";
 

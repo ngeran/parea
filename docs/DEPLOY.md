@@ -1,4 +1,4 @@
-# Together — Deployment & Release Runbook (Phase 7)
+# Parea — Deployment & Release Runbook (Phase 7)
 
 Everything needed to go from this repo to production, in order. Each step is
 copy-pasteable; placeholders you must fill in are marked `<...>`.
@@ -18,15 +18,15 @@ copy-pasteable; placeholders you must fill in are marked `<...>`.
 ```bash
 cd apps/server
 npx wrangler login
-npx wrangler d1 create together                 # → copy the real database_id
-npx wrangler r2 bucket create together-photos
+npx wrangler d1 create parea                 # → copy the real database_id
+npx wrangler r2 bucket create parea-photos
 ```
 
 Put the real `database_id` from the output into `wrangler.jsonc` (replacing
 the zero placeholder), then apply the schema:
 
 ```bash
-npx wrangler d1 migrations apply together --remote
+npx wrangler d1 migrations apply parea --remote
 ```
 
 ## 2. Secrets (Worker)
@@ -75,7 +75,7 @@ placeholder — push registration reads it at runtime).
 
 Decide the **bundle identifiers** before the first store upload (they are
 permanent): `app.json → ios.bundleIdentifier` and `android.package`
-currently `gr.together.app` — change to a reverse-DNS domain you control if
+currently `gr.parea.app` — change to a reverse-DNS domain you control if
 that one isn't yours.
 
 Local test build:
@@ -89,8 +89,8 @@ CI builds on `v*` tags via `.github/workflows/eas-build.yml` (needs the
 
 ## 6. Web + admin URLs
 
-- API + admin dashboard: the Worker (`together-api.<subdomain>.workers.dev/admin`)
-- Web client: Cloudflare Pages project `together-web` (deploy-web.yml)
+- API + admin dashboard: the Worker (`parea-api.<subdomain>.workers.dev/admin`)
+- Web client: Cloudflare Pages project `parea-web` (deploy-web.yml)
 - Custom domain (optional, plan open question 4): add the domain to the Worker
   (`wrangler.jsonc routes`) and Pages, then update `ALLOWED_ORIGINS` and the
   `EXPO_PUBLIC_API_URL` env in `eas.json` (preview/production profiles).

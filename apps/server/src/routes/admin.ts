@@ -2,7 +2,7 @@
 // double-gated: requireAuth + requireAdmin.
 
 import { Hono, type Context } from "hono";
-import { pushText, type Lang } from "@together/shared";
+import { pushText, type Lang } from "@parea/shared";
 import { AppError } from "../errors";
 import { pushToUser } from "../lib/push";
 import { photoUrl } from "../lib/serialize";
@@ -130,7 +130,7 @@ app.post("/reports/:id/action", async (c) => {
       const lang: Lang = target.language === "en" ? "en" : "el";
       if (action === "warn") {
         pushToUser(c.env, c.executionCtx, target.id, {
-          title: "Together",
+          title: "Parea",
           body: pushText.warned(lang),
         });
       } else {
@@ -206,7 +206,7 @@ app.post("/verifications/:id/approve", async (c) => {
     .first<{ language: string }>();
   const lang: Lang = profile?.language === "en" ? "en" : "el";
   pushToUser(c.env, c.executionCtx, sub.user_id, {
-    title: "Together",
+    title: "Parea",
     body: pushText.verified(lang),
   });
   return c.json({ ok: true });
@@ -263,7 +263,7 @@ app.post("/volunteers/:id/approve", async (c) => {
 
   const lang: Lang = target.language === "en" ? "en" : "el";
   pushToUser(c.env, c.executionCtx, target.id, {
-    title: "Together",
+    title: "Parea",
     body: pushText.volunteerApproved(lang),
   });
   return c.json({ ok: true });

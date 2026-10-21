@@ -445,7 +445,7 @@ describe("volunteers and feedback (Phase 8)", () => {
     });
     expect(created.status).toBe(201);
     const before = await call("GET", "/requests/nearby", neighbor.token);
-    const preBadge = (await before.json<{ requests: Array<{ owner: { volunteer: boolean; volunteer_requested?: boolean } }> }>())
+    const preBadge = (await before.json<{ requests: Array<{ owner: { first_name: string; volunteer: boolean; volunteer_requested?: boolean } }> }>())
       .requests.find((r) => r.owner.first_name === "Eleni");
     expect(preBadge?.owner.volunteer).toBe(false);
 
@@ -467,7 +467,7 @@ describe("volunteers and feedback (Phase 8)", () => {
     expect(self.volunteer_requested).toBe(true);
 
     const after = await call("GET", "/requests/nearby", neighbor.token);
-    const postBadge = (await after.json<{ requests: Array<{ owner: { volunteer: boolean } }> }>())
+    const postBadge = (await after.json<{ requests: Array<{ owner: { first_name: string; volunteer: boolean } }> }>())
       .requests.find((r) => r.owner.first_name === "Eleni");
     expect(postBadge?.owner.volunteer).toBe(true);
 

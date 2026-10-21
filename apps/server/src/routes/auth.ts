@@ -3,7 +3,7 @@
 //       POST /otp/verify  → session token (+ new profile on first sign-in)
 
 import { Hono } from "hono";
-import { otpRequestSchema, otpVerifySchema, smsText } from "@together/shared";
+import { otpRequestSchema, otpVerifySchema, smsText } from "@parea/shared";
 import { AppError } from "../errors";
 import { createSession, revokeSession } from "../lib/auth";
 import { hmacHex, randomOtpCode, secretsEqual } from "../lib/crypto";

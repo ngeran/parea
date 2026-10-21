@@ -2,7 +2,7 @@
 // written to D1 first, then fanned out (ChatRoom WebSocket + UserEvents).
 
 import { Hono } from "hono";
-import { messageSendSchema, type MatchDTO } from "@together/shared";
+import { messageSendSchema, type MatchDTO } from "@parea/shared";
 import { AppError } from "../errors";
 import { chatRoomStub } from "../lib/do";
 import { emitToUser } from "../lib/events";

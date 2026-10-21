@@ -10,7 +10,7 @@ import {
   type Lang,
   type PublicProfile,
   type RequestDTO,
-} from "@together/shared";
+} from "@parea/shared";
 import { AppError } from "../errors";
 import { emitToUser } from "../lib/events";
 import { nearbyProfileRows, nearbyRequestRows, distanceKm, snapToGrid } from "../lib/geo";
@@ -261,7 +261,7 @@ app.post("/:id/responses", async (c) => {
       payload: { request_id: request.id, responder: publicProfile(me) },
     });
     pushToUser(c.env, c.executionCtx, owner.id, {
-      title: "Together",
+      title: "Parea",
       body: pushText.responseCreated(lang, me.first_name, activityLabel(request.activity, lang)),
       data: { request_id: request.id },
     });
@@ -318,7 +318,7 @@ app.post("/responses/:id/accept", async (c) => {
     payload: { request_id: row.request_id, match_id: outcome.matchId },
   });
   pushToUser(c.env, c.executionCtx, row.responder_id, {
-    title: "Together",
+    title: "Parea",
     body: pushText.requestAccepted(lang, me.first_name),
     data: { match_id: outcome.matchId },
   });

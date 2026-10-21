@@ -3,7 +3,7 @@
 //   hourly       → maintenance: expire stale requests, trim the OTP IP log
 //   0 16 * * *   → daily plan reminders (16:00 UTC ≈ 18:00 Greece time)
 
-import { pushText, smsText, type Lang } from "@together/shared";
+import { pushText, smsText, type Lang } from "@parea/shared";
 import { formatWhen } from "./lib/format";
 import { pushToUser } from "./lib/push";
 import { sendSms } from "./lib/sms";
@@ -58,7 +58,7 @@ async function sweepCheckins(env: Env, ctx: ExecutionContext): Promise<void> {
       const l = lang(p);
       const when = formatWhen(plan.starts_at, l);
       pushToUser(env, ctx, p.id, {
-        title: "Together",
+        title: "Parea",
         body: pushText.checkinAsk(l),
         data: { plan_id: plan.id },
       });
@@ -106,7 +106,7 @@ async function sendPlanReminders(env: Env, ctx: ExecutionContext): Promise<void>
     for (const p of participants) {
       const l = lang(p);
       pushToUser(env, ctx, p.id, {
-        title: "Together",
+        title: "Parea",
         body: pushText.planReminder(l, plan.place_name, formatWhen(plan.starts_at, l)),
         data: { plan_id: plan.id },
       });

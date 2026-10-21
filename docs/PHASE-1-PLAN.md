@@ -1,9 +1,9 @@
-# Together — Phase 1: Architecture & Design Plan
+# Parea — Phase 1: Architecture & Design Plan
 
 Companionship app for seniors (65+). iOS, Android and web from one codebase.
 Not a dating app — help lonely seniors find nearby people for everyday company and practical help.
 
-Working title: **Together** (repo: `ngeran/together`).
+Working title: **Parea** (repo: `ngeran/together`).
 
 ---
 
@@ -376,7 +376,7 @@ Conventions for every screen: min body 20 px, targets ≥ 56 px, one primary act
 │                                  │
 │               🤝                 │
 │                                  │
-│        Welcome to Together       │        (font.hero)
+│        Welcome to Parea       │        (font.hero)
 │   Find company for everyday      │
 │     things, with people near     │
 │             you.                 │
@@ -633,7 +633,7 @@ Sentry for crash reporting (client + worker), privacy-friendly counters only.
 
 ## 12. Open questions (non-blocking — none stop Phase 2)
 
-1. Brand name/logo — "Together" assumed as working title.
+1. Brand name/logo — "Parea" assumed as working title.
 2. Preferred SMS provider (Twilio assumed).
 3. App Store / Google Play developer accounts exist? (needed only for Phase 7)
 4. Custom domain for the Worker, or `*.workers.dev` for now?

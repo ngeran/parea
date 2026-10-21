@@ -8,7 +8,7 @@ import {
   profilePatchSchema,
   trustedContactSchema,
   type TrustedContactDTO,
-} from "@together/shared";
+} from "@parea/shared";
 import { AppError } from "../errors";
 import { maskPhone, photoUrl, selfProfile } from "../lib/serialize";
 import { storeImage } from "../lib/upload";

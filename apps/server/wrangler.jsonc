@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "together-api",
+  "name": "parea-api",
   "main": "src/index.ts",
   // Matches the newest date the TEST-RUNTIME workerd supports (miniflare,
   // pinned by @cloudflare/vitest-pool-workers). Bump this together with the
@@ -13,8 +13,8 @@
   },
 
   // Development defaults. Deploy production with:
-  //   wrangler d1 create together            → put the real id below
-  //   wrangler r2 bucket create together-photos
+  //   wrangler d1 create parea            → put the real id below
+  //   wrangler r2 bucket create parea-photos
   //   wrangler secret put OTP_PEPPER  (+ TWILIO_* before real launch)
   // and remove OTP_MOCK (or set it to "0").
   "vars": {
@@ -24,17 +24,17 @@
   },
 
   // database_id is a placeholder for LOCAL DEV ONLY — replace with the real id
-  // from `wrangler d1 create together` before deploying.
+  // from `wrangler d1 create parea` before deploying.
   "d1_databases": [
     {
       "binding": "DB",
-      "database_name": "together",
+      "database_name": "parea",
       "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
     }
   ],
 
-  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "together-photos" }],
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "parea-photos" }],
 
   "durable_objects": {
     "bindings": [

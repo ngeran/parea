@@ -6,7 +6,10 @@
 	"name": "parea-web",
 	"compatibility_date": "2026-08-22",
 	"assets": {
-		"directory": "dist"
+		"directory": "dist",
+		// SPA fallback: serve index.html for paths that aren't files, so deep
+		// links (/welcome) and refreshes work — expo-router picks up the path.
+		"not_found_handling": "single-page-application"
 	},
 	"workers_dev": true,
 	"preview_urls": false

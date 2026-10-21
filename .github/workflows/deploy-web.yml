@@ -17,9 +17,9 @@ jobs:
         working-directory: apps/client
         run: npx expo export --platform web
         env:
-          EXPO_PUBLIC_API_URL: https://parea-api.<your-subdomain>.workers.dev
-      - name: Deploy to Cloudflare Pages
+          EXPO_PUBLIC_API_URL: https://parea-api.ngeran.workers.dev
+      - name: Deploy web client (static-assets Worker)
         working-directory: apps/client
-        run: npx wrangler pages deploy dist --project-name parea-web
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}

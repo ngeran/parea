@@ -1,0 +1,13 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	// Static web build (`npx expo export --platform web` → dist/), served as a
+	// plain assets-only Worker — no code, no bindings. Cloudflare folded Pages
+	// into Workers, so this replaces the old `wrangler pages deploy` flow.
+	"name": "parea-web",
+	"compatibility_date": "2026-08-22",
+	"assets": {
+		"directory": "dist"
+	},
+	"workers_dev": true,
+	"preview_urls": false
+}

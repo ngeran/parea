@@ -26,7 +26,7 @@
 	"vars": {
 		"ENVIRONMENT": "development",
 		"OTP_MOCK": "1",
-		"ALLOWED_ORIGINS": "http://localhost:8081,http://localhost:19006"
+		"ALLOWED_ORIGINS": "http://localhost:8081,http://localhost:19006,https://parea-web.ngeran.workers.dev"
 	},
 	"d1_databases": [
 		{

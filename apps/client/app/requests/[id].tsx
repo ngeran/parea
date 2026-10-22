@@ -149,7 +149,7 @@ export default function RequestDetail() {
             {offers.data?.responses.map((offer) => (
               <Card key={offer.id}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: space.l }}>
-                  <Avatar photoUrl={offer.responder.photo_url} name={offer.responder.first_name} size={72} />
+                  <Avatar photoUrl={offer.responder.photo_url} name={offer.responder.first_name} size={56} />
                   <View style={{ flex: 1 }}>
                     <ProfileLine person={offer.responder} lang={language} />
                     <Body muted>{offer.responder.about}</Body>

@@ -45,15 +45,15 @@ export function TextField({
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
-          minHeight: 64,
+          minHeight: 56,
           borderRadius: radius.md,
           // Focused fields get the strong 2 px primary ring (a clear focus
           // indicator matters more than décor); at rest a hairline on a
           // surface fill. High contrast keeps the 3 px outline always.
           borderWidth: themeName === "contrast" ? 3 : focused || error ? 2 : 1,
           borderColor: error ? c.danger : focused ? c.primary : themeName === "contrast" ? c.border : c.hairline,
-          paddingHorizontal: 16,
-          paddingVertical: multiline ? 14 : 0,
+          paddingHorizontal: 14,
+          paddingVertical: multiline ? 12 : 0,
           fontSize: f.body,
           color: c.text,
           backgroundColor: c.surface,
@@ -91,8 +91,8 @@ export function RadioRow({
         flexDirection: "row",
         alignItems: "center",
         gap: space.m,
-        minHeight: 72,
-        paddingHorizontal: space.xl,
+        minHeight: 64,
+        paddingHorizontal: space.l,
         borderRadius: radius.md,
         borderWidth: themeName === "contrast" ? 3 : 2,
         borderColor: selected ? c.primary : c.border,
@@ -114,16 +114,16 @@ export function RadioRow({
       </Text>
       <View
         style={{
-          width: 28,
-          height: 28,
-          borderRadius: 14,
+          width: 24,
+          height: 24,
+          borderRadius: 12,
           borderWidth: 3,
           borderColor: selected ? c.primary : c.border,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        {selected ? <View style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: c.primary }} /> : null}
+        {selected ? <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: c.primary }} /> : null}
       </View>
     </Pressable>
   );
@@ -155,7 +155,7 @@ export function Chip({
         flexDirection: "row",
         alignItems: "center",
         gap: space.s,
-        minHeight: 56,
+        minHeight: 48,
         paddingHorizontal: space.l,
         borderRadius: radius.pill,
         borderWidth: themeName === "contrast" ? 3 : 2,

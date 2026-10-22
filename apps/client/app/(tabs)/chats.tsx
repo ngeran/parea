@@ -47,13 +47,15 @@ export default function Chats() {
               flexDirection: "row",
               alignItems: "center",
               gap: space.l,
-              minHeight: 96,
+              minHeight: 72,
               backgroundColor: pressed ? c.primarySoft : c.surface,
               borderRadius: 16,
               padding: space.l,
+              borderWidth: 1,
+              borderColor: c.hairline,
             })}
           >
-            <Avatar photoUrl={match.other.photo_url} name={match.other.first_name} size={64} />
+            <Avatar photoUrl={match.other.photo_url} name={match.other.first_name} size={52} />
             <View style={{ flex: 1, gap: 4 }}>
               <Text style={{ color: c.text, fontSize: f.body, fontWeight: "700" }}>
                 {match.other.first_name}

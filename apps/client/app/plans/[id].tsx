@@ -123,7 +123,7 @@ export default function PlanDetail() {
         <Text style={{ color: c.text, fontSize: f.body + 2, fontWeight: "700" }}>📍 {p.place_name}</Text>
         <Text style={{ color: c.text, fontSize: f.body }}>📅 {formatWhen(p.starts_at, language)}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
-          <Avatar photoUrl={p.other.photo_url} name={p.other.first_name} size={56} />
+          <Avatar photoUrl={p.other.photo_url} name={p.other.first_name} size={48} />
           <Text style={{ color: c.textSecondary, fontSize: f.body }}>
             {t("planWith", { name: p.other.first_name })}
           </Text>

@@ -124,8 +124,8 @@ export function SettingsRow({
 export function EmptyState({ emoji, text }: { emoji: string; text: string }) {
   const { c, f, space } = useTheme();
   return (
-    <View style={{ alignItems: "center", gap: space.l, paddingVertical: space.xxxl }}>
-      <Text style={{ fontSize: 64 }}>{emoji}</Text>
+    <View style={{ alignItems: "center", gap: space.l, paddingVertical: space.xxl }}>
+      <Text style={{ fontSize: 52 }}>{emoji}</Text>
       <Text style={{ color: c.textSecondary, fontSize: f.body, textAlign: "center", lineHeight: f.body * 1.4 }}>
         {text}
       </Text>
@@ -153,7 +153,7 @@ export function ErrorState({
       accessibilityLiveRegion="assertive"
       style={{ alignItems: "center", gap: space.l, paddingVertical: space.xxl }}
     >
-      <Text style={{ fontSize: 64 }}>⚠️</Text>
+      <Text style={{ fontSize: 52 }}>⚠️</Text>
       <Text style={{ color: c.danger, fontSize: f.body, textAlign: "center", lineHeight: f.body * 1.4 }}>
         {text}
       </Text>

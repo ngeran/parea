@@ -69,7 +69,7 @@ export default function MyDetails() {
       footer={<BigButton label={t("save")} size="big" busy={busy} onPress={() => void save()} />}
     >
       <View style={{ alignItems: "center", gap: 16 }}>
-        <Avatar photoUrl={photoUri ?? profile?.photo_url ?? null} name={firstName || "?"} size={140} />
+        <Avatar photoUrl={photoUri ?? profile?.photo_url ?? null} name={firstName || "?"} size={112} />
         <BigButton
           label={photoUri ? t("changePhoto") : t("addPhoto")}
           icon="📷"

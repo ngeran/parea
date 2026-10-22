@@ -88,7 +88,7 @@ export default function Settings() {
       <Title>{t("settingsTitle")}</Title>
 
       <View style={{ flexDirection: "row", alignItems: "center", gap: space.l }}>
-        <Avatar photoUrl={profile?.photo_url ?? null} name={profile?.first_name ?? "?"} size={96} />
+        <Avatar photoUrl={profile?.photo_url ?? null} name={profile?.first_name ?? "?"} size={72} />
         <View style={{ flex: 1 }}>
           <Title>{profile?.first_name}</Title>
         </View>

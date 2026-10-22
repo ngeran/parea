@@ -129,7 +129,7 @@ export default function ProfileSetup() {
       {step === 1 ? (
         <View style={{ gap: space.xl }}>
           <View style={{ alignItems: "center", gap: space.l }}>
-            <Avatar photoUrl={photoUri} name={firstName || "?"} size={140} />
+            <Avatar photoUrl={photoUri} name={firstName || "?"} size={112} />
             <BigButton
               label={photoUri ? t("changePhoto") : t("addPhoto")}
               icon="📷"

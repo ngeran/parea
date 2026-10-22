@@ -23,15 +23,20 @@ const FIX_TIMEOUT_MS = 10_000;
  * navigator.permissions.query — which throws on Safari and never shows a
  * prompt elsewhere — so we call navigator.geolocation directly instead.
  * getCurrentPosition triggers the browser's native permission prompt the
- * first time; every browser supports it.
+ * first time; every browser supports it. High accuracy matters here: a
+ * coarse WiFi/IP fix can be off by kilometres, which silently empties a
+ * 2 km nearby search — and GPS cold starts need a longer wait than the
+ * native timeout.
  */
+const WEB_FIX_TIMEOUT_MS = 15_000;
+
 function getCoordsWeb(): Promise<Coords | null> {
   return new Promise((resolve) => {
     if (!navigator.geolocation) return resolve(null);
     navigator.geolocation.getCurrentPosition(
       (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
       () => resolve(null),
-      { enableHighAccuracy: false, timeout: FIX_TIMEOUT_MS, maximumAge: 60_000 },
+      { enableHighAccuracy: true, timeout: WEB_FIX_TIMEOUT_MS, maximumAge: 30_000 },
     );
   });
 }

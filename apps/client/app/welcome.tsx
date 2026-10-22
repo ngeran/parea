@@ -27,23 +27,23 @@ export default function Welcome() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.bg }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: 80, paddingBottom: space.xxxl }}
+      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: 48, paddingBottom: space.xxxl }}
     >
       <View style={{ alignItems: "center", gap: space.m }}>
         {/* The emoji sits in a soft tinted circle — a hero mark, not a
             floating glyph. High contrast keeps the 3 px outline (§4.3). */}
         <View
           style={{
-            width: 136,
-            height: 136,
-            borderRadius: 68,
+            width: 112,
+            height: 112,
+            borderRadius: 56,
             backgroundColor: c.primarySoft,
             alignItems: "center",
             justifyContent: "center",
             ...(themeName === "contrast" ? { borderWidth: 3, borderColor: c.border } : {}),
           }}
         >
-          <Text style={{ fontSize: 72 }}>🤝</Text>
+          <Text style={{ fontSize: 56 }}>🤝</Text>
         </View>
         <Title>{t("welcomeTitle")}</Title>
         <Body muted>{t("welcomeBody")}</Body>

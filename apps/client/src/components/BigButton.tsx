@@ -89,8 +89,8 @@ export function BigButton({
           alignItems: "center",
           justifyContent: "center",
           flexDirection: "row",
-          gap: 12,
-          paddingHorizontal: 24,
+          gap: 10,
+          paddingHorizontal: 20,
           opacity: disabled || busy ? 0.5 : pressed ? 0.8 : 1,
         })}
       >

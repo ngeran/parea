@@ -80,15 +80,19 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
 };
 
 // px per text level (plan §4.1). Line-height ≈ 1.4 is applied by consumers.
+// "normal" is a standard mobile scale (17 px body ≈ iOS default) so screens
+// fit without scrolling; "large" ≈ the original plan's minimum (20 px body)
+// and "xlarge" goes further — the accessibility ladder still ends big.
 export const FONT: Record<TextSize, Record<string, number>> = {
-  normal: { body: 20, label: 18, button: 22, title: 28, hero: 34 },
-  large: { body: 23, label: 21, button: 25, title: 32, hero: 39 },
-  xlarge: { body: 26, label: 23, button: 29, title: 36, hero: 44 },
+  normal: { body: 17, label: 15, button: 18, title: 23, hero: 30 },
+  large: { body: 20, label: 17, button: 21, title: 27, hero: 34 },
+  xlarge: { body: 24, label: 20, button: 25, title: 32, hero: 40 },
 };
 
-// Touch sizes (plan §4.2) — absolute floors, never scaled down.
-export const TOUCH = { min: 56, button: 64, row: 88, hero: 96 };
-export const SPACE = { xs: 4, s: 8, m: 16, l: 20, xl: 24, xxl: 32, xxxl: 48 };
+// Touch sizes (plan §4.2) — absolute floors, never scaled down. 48 px is the
+// Material/HIG floor at "normal"; rows and the hero action stay generous.
+export const TOUCH = { min: 48, button: 56, row: 68, hero: 72 };
+export const SPACE = { xs: 4, s: 8, m: 14, l: 18, xl: 20, xxl: 28, xxxl: 40 };
 export const RADIUS = { sm: 12, md: 16, lg: 24, pill: 999 };
 
 /**

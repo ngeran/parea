@@ -17,6 +17,7 @@ export default function Settings() {
   const setProfile = useStore((s) => s.setProfile);
   const textSize = useStore((s) => s.textSize);
   const language = useStore((s) => s.language);
+  const theme = useStore((s) => s.theme);
   const [pushBusy, setPushBusy] = useState(false);
   const [volunteerBusy, setVolunteerBusy] = useState(false);
 
@@ -99,6 +100,20 @@ export default function Settings() {
           label={t("languageSetting")}
           value={langLabel}
           onPress={() => router.push("/settings/language")}
+        />
+        <SettingsRow
+          icon="🌓"
+          label={t("appearanceSetting")}
+          value={
+            theme === "system"
+              ? t("themeSystem")
+              : theme === "dark"
+                ? t("themeDark")
+                : theme === "contrast"
+                  ? t("themeContrast")
+                  : t("themeLight")
+          }
+          onPress={() => router.push("/settings/appearance")}
         />
         <SettingsRow
           icon="📏"

@@ -2,6 +2,7 @@
 // are defined. Three text sizes (user-selectable, minimum 20px body) and
 // three themes. Every color pair here meets WCAG AAA (≥ 7:1) on its
 // background; Phase 6 re-verifies with the audit checklist.
+import { useColorScheme } from "react-native";
 import { useStore } from "./store";
 import type { TextSize, ThemeName } from "@parea/shared";
 
@@ -80,10 +81,23 @@ export const TOUCH = { min: 56, button: 64, row: 88, hero: 96 };
 export const SPACE = { xs: 4, s: 8, m: 16, l: 20, xl: 24, xxl: 32, xxxl: 48 };
 export const RADIUS = { sm: 12, md: 16, lg: 24, pill: 999 };
 
+/**
+ * The concrete theme in effect right now. "system" tracks the OS setting and
+ * re-renders everything the moment it changes; light/dark/contrast are fixed
+ * choices. Re-exported from the store so layout, screens and this module all
+ * resolve identically.
+ */
+export function useResolvedThemeName(): ThemeName {
+  const pref = useStore((s) => s.theme);
+  const scheme = useColorScheme();
+  if (pref === "system") return scheme === "dark" ? "dark" : "light";
+  return pref;
+}
+
 /** Everything a screen needs, already resolved for the user's choices. */
 export function useTheme() {
   const textSize = useStore((s) => s.textSize);
-  const themeName = useStore((s) => s.theme);
+  const themeName = useResolvedThemeName();
   return {
     c: COLORS[themeName],
     f: FONT[textSize],

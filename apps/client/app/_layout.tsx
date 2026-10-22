@@ -12,7 +12,7 @@ import { AccessibilityInfo } from "react-native";
 import type { ServerEvent } from "@parea/shared";
 import { API_BASE, setUnauthorizedHandler } from "../src/lib/api";
 import { connectLive } from "../src/lib/live";
-import { COLORS } from "../src/theme";
+import { COLORS, useResolvedThemeName } from "../src/theme";
 import { useStore } from "../src/store";
 
 const queryClient = new QueryClient({
@@ -89,7 +89,9 @@ function Gate() {
 
 function RootLayout() {
   const hydrate = useStore((s) => s.hydrate);
-  const themeName = useStore((s) => s.theme);
+  // Resolved (system → light/dark) so the status bar and nav background flip
+  // with the OS setting, not just with an explicit choice.
+  const themeName = useResolvedThemeName();
   // Motion rule (plan §4.4): the fade is the only animation in the app, and
   // it goes away completely when the OS asks for reduced motion.
   const [reduceMotion, setReduceMotion] = useState(false);

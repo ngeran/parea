@@ -4,16 +4,31 @@
 // the server, so a new phone starts with the same settings.
 import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
+import { Appearance } from "react-native";
 import type { Lang, SelfProfile, TextSize, ThemeName } from "@parea/shared";
 import { api } from "./lib/api";
 
 const TOKEN_KEY = "together.token";
 const PREFS_KEY = "together.prefs";
 
+/**
+ * The device's theme choice. "system" follows the OS setting and is a
+ * per-device preference only — the profile on the server always stores a
+ * concrete theme (the DB column has a CHECK constraint and "system" means
+ * nothing on another device anyway).
+ */
+export type ThemePref = "system" | ThemeName;
+
+/** Resolve a preference to a concrete theme at this instant. */
+export function resolveTheme(pref: ThemePref): ThemeName {
+  if (pref !== "system") return pref;
+  return Appearance.getColorScheme() === "dark" ? "dark" : "light";
+}
+
 export interface Prefs {
   textSize: TextSize;
   language: Lang;
-  theme: ThemeName;
+  theme: ThemePref;
 }
 
 interface PareaState {
@@ -25,7 +40,7 @@ interface PareaState {
   coords: { lat: number; lng: number } | null;
   textSize: TextSize;
   language: Lang;
-  theme: ThemeName;
+  theme: ThemePref;
 
   hydrate: () => Promise<void>;
   setSession: (token: string, profile: SelfProfile) => Promise<void>;
@@ -51,7 +66,7 @@ export const useStore = create<PareaState>((set, get) => ({
   coords: null,
   textSize: "normal",
   language: "en",
-  theme: "light",
+  theme: "system",
 
   /** App start: restore prefs + token, then confirm the token is still valid. */
   hydrate: async () => {
@@ -62,7 +77,7 @@ export const useStore = create<PareaState>((set, get) => ({
     set({
       textSize: prefs.textSize ?? "normal",
       language: prefs.language ?? "en",
-      theme: prefs.theme ?? "light",
+      theme: prefs.theme ?? "system",
       token,
     });
     if (token) {
@@ -114,7 +129,8 @@ export const useStore = create<PareaState>((set, get) => ({
           body: {
             text_size: current.textSize,
             language: current.language,
-            theme: current.theme,
+            // "system" is device-only; the profile stores a concrete theme.
+            theme: resolveTheme(current.theme),
           },
         });
         set({ profile });

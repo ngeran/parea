@@ -1,6 +1,6 @@
 // Screen 1 of onboarding: hello, text size picker (the whole screen re-renders
 // live as each option is selected) and language. One primary action: Continue.
-import { Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { Body, Card, Title } from "../src/components/ui";
 import { BigButton } from "../src/components/BigButton";
@@ -25,7 +25,10 @@ export default function Welcome() {
   const setPrefs = useStore((s) => s.setPrefs);
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg, padding: space.xl, gap: space.xl, paddingTop: 80 }}>
+    <ScrollView
+      style={{ flex: 1, backgroundColor: c.bg }}
+      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: 80, paddingBottom: space.xxxl }}
+    >
       <View style={{ alignItems: "center", gap: space.m }}>
         <Text style={{ fontSize: 72 }}>🤝</Text>
         <Title>{t("welcomeTitle")}</Title>
@@ -63,6 +66,6 @@ export default function Welcome() {
       </Card>
 
       <BigButton label={t("continue_")} size="big" onPress={() => router.push("/onboarding/phone")} />
-    </View>
+    </ScrollView>
   );
 }

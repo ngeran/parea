@@ -1,7 +1,7 @@
 // Screen 3 of onboarding: the 6-digit SMS code. One big input, clear error
 // on a wrong code, "new code" and "wrong number" always visible — the code
 // is never lost to a typo or a silent timeout.
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { router, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import type { OtpRequestResult, OtpVerifyResult } from "@parea/shared";
@@ -10,6 +10,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body } from "../../src/components/ui";
 import { TextField } from "../../src/components/fields";
 import { api, ApiError, CONSENT_VERSION } from "../../src/lib/api";
+import { toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -50,11 +51,11 @@ export default function CodeEntry() {
     try {
       await api("/otp/request", { body: { phone } });
       setError(null);
-      Alert.alert(t("sendCode"), t("codeSentTo", { phone }));
+      toast(t("codeSentTo", { phone }));
     } catch (e) {
-      Alert.alert(
-        t("genericError"),
+      toast(
         e instanceof ApiError && e.code === "otp_cooldown" ? t("cooldownNote") : t("networkError"),
+        "error",
       );
     } finally {
       setBusy(false);

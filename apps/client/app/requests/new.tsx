@@ -1,7 +1,7 @@
 // Create request — 3 steps + confirm (plan §7.5):
 //   What? (activity) → When? (day + time of day) → Where? (place + radius)
 // Back + Home always visible; the confirm dialog says exactly what happens.
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
@@ -18,6 +18,7 @@ import { Body, Card } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
+import { ackDialog, confirmDialog, toast } from "../../src/lib/notify";
 import { toIso } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
@@ -67,7 +68,7 @@ export default function NewRequest() {
     const starts_at = startsAt();
     const coords = await ensureCoords();
     if (!starts_at || !activity || !placeType || !coords) {
-      Alert.alert(t("genericError"), t("locationNote"));
+      toast(t("locationNote"), "error");
       return;
     }
     setBusy(true);
@@ -83,13 +84,10 @@ export default function NewRequest() {
         },
       });
       // OK moves the screen — never navigate underneath an alert.
-      Alert.alert(t("requestSent"), undefined, [
-        { text: t("ok"), onPress: () => router.replace(`/requests/${result.request.id}`) },
-      ]);
+      ackDialog(t("requestSent"), t("ok"), () => router.replace(`/requests/${result.request.id}`));
     } catch (e) {
       const code = e instanceof ApiError ? e.code : "";
-      Alert.alert(
-        t("genericError"),
+      toast(
         code === "request_limit_open"
           ? t("limitOpen")
           : code === "request_limit_day"
@@ -97,6 +95,7 @@ export default function NewRequest() {
             : code === "location_needed"
               ? t("locationNote")
               : t("networkError"),
+        "error",
       );
     } finally {
       setBusy(false);
@@ -104,10 +103,15 @@ export default function NewRequest() {
   };
 
   const confirmSend = () => {
-    Alert.alert(t("confirmSendTitle"), t("confirmSendBody", { km: radius }), [
-      { text: t("noBack"), style: "cancel" },
-      { text: t("yesSend"), onPress: () => void send() },
-    ]);
+    confirmDialog(
+      {
+        title: t("confirmSendTitle"),
+        body: t("confirmSendBody", { km: radius }),
+        okLabel: t("yesSend"),
+        cancelLabel: t("noBack"),
+      },
+      () => void send(),
+    );
   };
 
   const canNext = step === 1 ? !!activity : step === 2 ? startsAt() !== null : !!placeType;

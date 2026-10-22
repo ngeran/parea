@@ -1,12 +1,13 @@
 // Search distance — how far away people and requests can be. Presets only
 // (no sliders): big taps, no fine motor skills needed.
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { useState } from "react";
 import type { SelfProfile } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
 import { Body } from "../../src/components/ui";
 import { RadioRow } from "../../src/components/fields";
 import { api } from "../../src/lib/api";
+import { toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
 
@@ -27,9 +28,9 @@ export default function RadiusSetting() {
         body: { radius_km: km },
       });
       setProfile(updated);
-      Alert.alert(t("radiusSaved"));
+      toast(t("radiusSaved"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }

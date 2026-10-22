@@ -1,6 +1,6 @@
 // One request. The owner sees who offered and accepts one person; a joiner
 // sees "waiting for their answer"; a newcomer sees "I can join".
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import {
 } from "../../src/components/ui";
 import { Screen } from "../../src/components/Screen";
 import { api } from "../../src/lib/api";
+import { ackDialog, confirmDialog, toast } from "../../src/lib/notify";
 import { formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
@@ -41,52 +42,56 @@ export default function RequestDetail() {
   };
 
   const accept = (responseId: string, name: string) => {
-    Alert.alert(t("accept"), name, [
-      { text: t("no"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("yes"),
-        onPress: () => {
-          void (async () => {
-            setBusy(true);
-            try {
-              const result = await api<{ match_id: string }>(`/requests/responses/${responseId}/accept`, {
-                method: "POST",
-              });
-              await queryClient.invalidateQueries({ queryKey: ["requests", "mine"] });
-              // OK moves the screen — never navigate underneath an alert.
-              Alert.alert(t("matchedToast"), undefined, [
-                { text: t("ok"), onPress: () => router.replace(`/chat/${result.match_id}`) },
-              ]);
-            } catch {
-              Alert.alert(t("genericError"), t("noLongerAvailable"));
-              await refresh();
-            } finally {
-              setBusy(false);
-            }
-          })();
-        },
+        title: t("accept"),
+        body: name,
+        okLabel: t("yes"),
+        cancelLabel: t("no"),
       },
-    ]);
+      () => {
+        void (async () => {
+          setBusy(true);
+          try {
+            const result = await api<{ match_id: string }>(`/requests/responses/${responseId}/accept`, {
+              method: "POST",
+            });
+            await queryClient.invalidateQueries({ queryKey: ["requests", "mine"] });
+            // OK moves the screen — never navigate underneath an alert.
+            ackDialog(t("matchedToast"), t("ok"), () =>
+              router.replace(`/chat/${result.match_id}`),
+            );
+          } catch {
+            toast(t("noLongerAvailable"), "error");
+            await refresh();
+          } finally {
+            setBusy(false);
+          }
+        })();
+      },
+    );
   };
 
   const cancel = () => {
-    Alert.alert(t("confirmCancelTitle"), t("confirmCancelBody"), [
-      { text: t("keepIt"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("yesCancel"),
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            try {
-              await api(`/requests/${id}/cancel`, { method: "POST" });
-              router.back();
-            } catch {
-              Alert.alert(t("genericError"), t("noLongerAvailable"));
-            }
-          })();
-        },
+        title: t("confirmCancelTitle"),
+        body: t("confirmCancelBody"),
+        okLabel: t("yesCancel"),
+        cancelLabel: t("keepIt"),
+        destructive: true,
       },
-    ]);
+      () => {
+        void (async () => {
+          try {
+            await api(`/requests/${id}/cancel`, { method: "POST" });
+            router.back();
+          } catch {
+            toast(t("noLongerAvailable"), "error");
+          }
+        })();
+      },
+    );
   };
 
   if (detail.isLoading) {
@@ -181,9 +186,9 @@ export default function RequestDetail() {
                 await api(`/requests/${id}/responses`, { method: "POST" });
                 await refresh();
               } catch (e) {
-                Alert.alert(
-                  t("genericError"),
+                toast(
                   errCode(e) === "already_responded" ? t("askedToJoin") : t("noLongerAvailable"),
+                  "error",
                 );
                 await refresh();
               }

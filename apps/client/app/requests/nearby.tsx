@@ -1,6 +1,6 @@
 // Nearby requests — open requests within range, nearest first (§7.6).
 // Each card has one primary action: "I can join".
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { Body, EmptyState, ErrorState } from "../../src/components/ui";
 import { Screen } from "../../src/components/Screen";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
+import { toast } from "../../src/lib/notify";
 import { formatDistance, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
@@ -30,20 +31,19 @@ export default function Nearby() {
   const refreshLocation = async () => {
     const got = await ensureCoords();
     if (got) setCoords(got);
-    else Alert.alert(t("locationFailed"));
+    else toast(t("locationFailed"), "error");
   };
 
   const join = async (requestId: string) => {
     setJoining(requestId);
     try {
       await api(`/requests/${requestId}/responses`, { method: "POST" });
-      Alert.alert(t("canJoin"), t("joinSent"));
+      toast(t("joinSent"));
       // The request leaves the list once we refresh (already answered).
       await queryClient.invalidateQueries({ queryKey: ["requests", "nearby"] });
     } catch (e) {
       const code = errCode(e);
-      Alert.alert(
-        t("genericError"),
+      toast(
         code === "already_responded"
           ? t("askedToJoin")
           : code === "response_limit"
@@ -51,6 +51,7 @@ export default function Nearby() {
             : e instanceof ApiError && e.status === 404
               ? t("noLongerAvailable")
               : t("networkError"),
+        "error",
       );
       await queryClient.invalidateQueries({ queryKey: ["requests", "nearby"] });
     } finally {

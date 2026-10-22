@@ -1,7 +1,7 @@
 // Our plan — where, when, with whom; share with the trusted contact; the big
 // green "I'M SAFE" after the meeting (asking harder once the time has passed),
 // and SOS, whose alert carries this plan's place and time to the contacts.
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,6 +9,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body, Card, EmptyState, Avatar } from "../../src/components/ui";
 import { Screen } from "../../src/components/Screen";
 import { api } from "../../src/lib/api";
+import { confirmDialog, toast } from "../../src/lib/notify";
 import { formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
@@ -31,15 +32,20 @@ export default function PlanDetail() {
       await api(`/plans/${id}/share`, { method: "POST" });
       await queryClient.invalidateQueries({ queryKey: ["plan", id] });
       await queryClient.invalidateQueries({ queryKey: ["plans"] });
-      Alert.alert(t("planShared"));
+      toast(t("planShared"));
     } catch (e) {
       if (errCode(e) === "no_trusted_contact") {
-        Alert.alert(t("addContactFirst"), t("addContactBody"), [
-          { text: t("cancel"), style: "cancel" },
-          { text: t("openSettings"), onPress: () => router.push("/settings/contacts") },
-        ]);
+        confirmDialog(
+          {
+            title: t("addContactFirst"),
+            body: t("addContactBody"),
+            okLabel: t("openSettings"),
+            cancelLabel: t("cancel"),
+          },
+          () => router.push("/settings/contacts"),
+        );
       } else {
-        Alert.alert(t("genericError"), t("networkError"));
+        toast(t("networkError"), "error");
       }
     } finally {
       setBusy(false);
@@ -52,33 +58,34 @@ export default function PlanDetail() {
       await api(`/plans/${id}/safe-checkin`, { method: "POST" });
       await queryClient.invalidateQueries({ queryKey: ["plan", id] });
       await queryClient.invalidateQueries({ queryKey: ["plans"] });
-      Alert.alert(t("imSafeDone"));
+      toast(t("imSafeDone"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }
   };
 
   const cancelPlan = () => {
-    Alert.alert(t("confirmCancelPlan"), "", [
-      { text: t("keepIt"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("yesCancel"),
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            try {
-              await api(`/plans/${id}`, { method: "PATCH", body: { status: "cancelled" } });
-              await queryClient.invalidateQueries({ queryKey: ["plans"] });
-              router.back();
-            } catch {
-              Alert.alert(t("genericError"), t("networkError"));
-            }
-          })();
-        },
+        title: t("confirmCancelPlan"),
+        okLabel: t("yesCancel"),
+        cancelLabel: t("keepIt"),
+        destructive: true,
       },
-    ]);
+      () => {
+        void (async () => {
+          try {
+            await api(`/plans/${id}`, { method: "PATCH", body: { status: "cancelled" } });
+            await queryClient.invalidateQueries({ queryKey: ["plans"] });
+            router.back();
+          } catch {
+            toast(t("networkError"), "error");
+          }
+        })();
+      },
+    );
   };
 
   if (plan.isLoading) {

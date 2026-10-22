@@ -3,13 +3,14 @@
 // time. The alert texts every trusted contact switched on for alerts (and,
 // when raised from a plan, the SMS carries the meeting's place and time).
 // From here: "I'm OK" stand-down, or call 112 directly.
-import { AccessibilityInfo, Alert, Linking, Text, View } from "react-native";
+import { AccessibilityInfo, Linking, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Screen } from "../src/components/Screen";
 import { BigButton } from "../src/components/BigButton";
 import { Body } from "../src/components/ui";
 import { api } from "../src/lib/api";
+import { confirmDialog, toast } from "../src/lib/notify";
 import { useT } from "../src/i18n";
 import { useTheme } from "../src/theme";
 
@@ -69,22 +70,24 @@ export default function Sos() {
   const imOk = () => {
     // Standing down an active alert deserves the same Yes/No care as any
     // other irreversible action.
-    Alert.alert(t("sosImOkConfirmTitle"), t("sosImOkConfirmBody"), [
-      { text: t("no"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("yes"),
-        onPress: () => {
-          void (async () => {
-            try {
-              await api("/safety/sos/ok", { method: "POST" });
-              Alert.alert(t("sosOkSent"));
-            } catch {
-              Alert.alert(t("genericError"), t("networkError"));
-            }
-          })();
-        },
+        title: t("sosImOkConfirmTitle"),
+        body: t("sosImOkConfirmBody"),
+        okLabel: t("yes"),
+        cancelLabel: t("no"),
       },
-    ]);
+      () => {
+        void (async () => {
+          try {
+            await api("/safety/sos/ok", { method: "POST" });
+            toast(t("sosOkSent"));
+          } catch {
+            toast(t("networkError"), "error");
+          }
+        })();
+      },
+    );
   };
 
   const call112 = () => void Linking.openURL("tel:112");

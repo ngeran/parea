@@ -3,7 +3,7 @@
 //   2. about + interest chips
 //   3. languages + mobility → Finish
 // Finishing also asks for location (the rounded one — see lib/location).
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -20,6 +20,7 @@ import { Body, Avatar } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader, TextField } from "../../src/components/fields";
 import { api, uploadPhoto } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
+import { toast } from "../../src/lib/notify";
 import { useT, tr } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -86,16 +87,16 @@ export default function ProfileSetup() {
           profile = await api<SelfProfile>("/me", { token });
         } catch {
           // A photo that fails to upload never blocks the account.
-          Alert.alert(t("genericError"), t("photoNote"));
+          toast(t("photoNote"), "error");
         }
       }
       setProfile(profile);
       // Location powers everything nearby; asked once, stored rounded.
       const coords = await ensureCoords();
-      if (!coords) Alert.alert(t("locationNote"));
+      if (!coords) toast(t("locationNote"), "info");
       router.replace("/home");
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }

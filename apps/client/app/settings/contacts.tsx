@@ -1,7 +1,7 @@
 // Trusted contacts — the people we may alert about a plan, a missed
 // check-in or an SOS. Add with a short form, switch alerts per contact,
 // delete with confirmation. Up to 5.
-import { Alert, Switch, Text, View } from "react-native";
+import { Switch, Text, View } from "react-native";
 import { useState } from "react";
 import { phoneSchema, type Relationship, type TrustedContactDTO } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
@@ -9,6 +9,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body, Card, ErrorState } from "../../src/components/ui";
 import { Chip, ChipGrid, TextField } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
+import { confirmDialog, toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -51,7 +52,7 @@ export default function TrustedContacts() {
       });
       await contacts.refetch();
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setTogglingId(null);
     }
@@ -61,7 +62,7 @@ export default function TrustedContacts() {
     const raw = phone.replace(/[\s\-()]/g, "");
     const e164 = raw.startsWith("+") ? raw : `+30${raw}`;
     if (!name.trim() || !phoneSchema.safeParse(e164).success) {
-      Alert.alert(t("invalidContactPhone"));
+      toast(t("invalidContactPhone"), "error");
       return;
     }
     setBusy(true);
@@ -72,32 +73,37 @@ export default function TrustedContacts() {
       setName("");
       setPhone("");
       await contacts.refetch();
-      Alert.alert(t("contactAdded"));
+      toast(t("contactAdded"));
     } catch (e) {
-      Alert.alert(t("genericError"), e instanceof ApiError && e.code === "contact_limit" ? t("contactsNote") : t("networkError"));
+      toast(
+        e instanceof ApiError && e.code === "contact_limit" ? t("contactsNote") : t("networkError"),
+        "error",
+      );
     } finally {
       setBusy(false);
     }
   };
 
   const remove = (contact: TrustedContactDTO) => {
-    Alert.alert(t("deleteContact"), t("confirmDeleteContact", { name: contact.name }), [
-      { text: t("cancel"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("deleteContact"),
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            try {
-              await api(`/me/trusted-contacts/${contact.id}`, { method: "DELETE" });
-              await contacts.refetch();
-            } catch {
-              Alert.alert(t("genericError"), t("networkError"));
-            }
-          })();
-        },
+        title: t("deleteContact"),
+        body: t("confirmDeleteContact", { name: contact.name }),
+        okLabel: t("deleteContact"),
+        cancelLabel: t("cancel"),
+        destructive: true,
       },
-    ]);
+      () => {
+        void (async () => {
+          try {
+            await api(`/me/trusted-contacts/${contact.id}`, { method: "DELETE" });
+            await contacts.refetch();
+          } catch {
+            toast(t("networkError"), "error");
+          }
+        })();
+      },
+    );
   };
 
   return (

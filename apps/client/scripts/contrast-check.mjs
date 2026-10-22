@@ -12,17 +12,17 @@ const THEMES = {
   light: {
     bg: "#FFFFFF", surface: "#F5F7FA", text: "#1A1C1E", textSecondary: "#44474A",
     primary: "#0A4D8C", primarySoft: "#DCEAF8", onPrimary: "#FFFFFF", onSoft: "#1A1C1E",
-    success: "#146038", danger: "#9E1F19", border: "#6A7076",
+    success: "#146038", danger: "#9E1F19", border: "#6A7076", hairline: "#E3E7EC",
   },
   dark: {
     bg: "#101214", surface: "#1C1F22", text: "#FFFFFF", textSecondary: "#D5D8DC",
     primary: "#9CC9F5", primarySoft: "#17324D", onPrimary: "#0A2540", onSoft: "#FFFFFF",
-    success: "#7FD8A4", danger: "#F2A196", border: "#71777D",
+    success: "#7FD8A4", danger: "#F2A196", border: "#71777D", hairline: "#2A2F36",
   },
   contrast: {
     bg: "#000000", surface: "#000000", text: "#FFFFFF", textSecondary: "#FFFFFF",
     primary: "#FFFFFF", primarySoft: "#FFFFFF", onPrimary: "#000000", onSoft: "#000000",
-    success: "#FFFFFF", danger: "#FFFFFF", border: "#FFFFFF",
+    success: "#FFFFFF", danger: "#FFFFFF", border: "#FFFFFF", hairline: "#FFFFFF",
   },
 };
 

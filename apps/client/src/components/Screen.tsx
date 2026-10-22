@@ -25,11 +25,14 @@ export function Screen({
   showHome?: boolean;
   speakText?: string;
 }) {
-  const { c, f, space, touch } = useTheme();
+  const { c, f, space, touch, themeName } = useTheme();
   const t = useT();
   const router = useRouter();
   const lang = useStore((s) => s.language);
   const [reading, setReading] = useState(false);
+  // High contrast keeps the strong white separator; other themes use the
+  // subtle hairline so the header reads as a surface, not a boxed layout.
+  const separator = themeName === "contrast" ? c.border : c.hairline;
 
   return (
     <View style={{ flex: 1, backgroundColor: c.bg }}>
@@ -40,7 +43,7 @@ export function Screen({
           paddingBottom: space.m,
           gap: space.m,
           borderBottomWidth: 1,
-          borderBottomColor: c.surface,
+          borderBottomColor: separator,
         }}
       >
         {back || showHome ? (
@@ -112,7 +115,7 @@ export function Screen({
             padding: space.xl,
             paddingTop: space.m,
             borderTopWidth: 1,
-            borderTopColor: c.surface,
+            borderTopColor: separator,
             backgroundColor: c.bg,
             gap: space.m,
           }}

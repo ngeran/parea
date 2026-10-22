@@ -2,7 +2,8 @@
 // are defined. Three text sizes (user-selectable, minimum 20px body) and
 // three themes. Every color pair here meets WCAG AAA (≥ 7:1) on its
 // background; Phase 6 re-verifies with the audit checklist.
-import { useColorScheme } from "react-native";
+import { AccessibilityInfo, useColorScheme } from "react-native";
+import { useEffect, useState } from "react";
 import { useStore } from "./store";
 import type { TextSize, ThemeName } from "@parea/shared";
 
@@ -19,6 +20,12 @@ export interface ThemeColors {
   success: string;
   danger: string;
   border: string;
+  /**
+   * Decorative 1 px edge for cards, fields and toasts. NOT the interactive
+   * `border` (which must keep ≥ 3:1 per WCAG 1.4.11) — hairline only ever
+   * separates content, so it has no contrast floor.
+   */
+  hairline: string;
 }
 
 export const COLORS: Record<ThemeName, ThemeColors> = {
@@ -38,6 +45,7 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
     // #6A7076 is the darkest gray still ≥ 3:1 on white and surface
     // (WCAG 1.4.11 non-text contrast; #C9CDD2 failed at 1.6:1).
     border: "#6A7076",
+    hairline: "#E3E7EC",
   },
   dark: {
     bg: "#101214",
@@ -52,6 +60,7 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
     danger: "#F2A196",
     // #71777D ≥ 3:1 on bg and surface (#3A3F44 failed at 1.8:1).
     border: "#71777D",
+    hairline: "#2A2F36",
   },
   contrast: {
     bg: "#000000",
@@ -66,6 +75,7 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
     success: "#FFFFFF",
     danger: "#FFFFFF",
     border: "#FFFFFF",
+    hairline: "#FFFFFF",
   },
 };
 
@@ -80,6 +90,46 @@ export const FONT: Record<TextSize, Record<string, number>> = {
 export const TOUCH = { min: 56, button: 64, row: 88, hero: 96 };
 export const SPACE = { xs: 4, s: 8, m: 16, l: 20, xl: 24, xxl: 32, xxxl: 48 };
 export const RADIUS = { sm: 12, md: 16, lg: 24, pill: 999 };
+
+/**
+ * Elevation presets (modern depth). react-native-web turns the shadow*
+ * props into a CSS box-shadow; Android native reads `elevation`. Shadows
+ * are pure decoration — they never carry meaning, so no contrast rules
+ * apply — and the high-contrast theme simply skips them.
+ */
+export const ELEVATION = {
+  sm: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  md: {
+    shadowColor: "#000000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.12,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+} as const;
+
+/**
+ * True while the OS "reduce motion" accessibility setting is on. The motion
+ * rule (plan §4.4): the fade transitions and press animations are the only
+ * motion in the app, and both disappear entirely under this flag.
+ */
+export function useReduceMotion(): boolean {
+  const [reduce, setReduce] = useState(false);
+  useEffect(() => {
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(setReduce)
+      .catch(() => {});
+    const sub = AccessibilityInfo.addEventListener("reduceMotionChanged", setReduce);
+    return () => sub.remove();
+  }, []);
+  return reduce;
+}
 
 /**
  * The concrete theme in effect right now. "system" tracks the OS setting and

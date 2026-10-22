@@ -1,7 +1,7 @@
 // Report a person — and optionally block them. Reached from the chat header.
 // One screen, one primary action: pick a reason (big radio rows), say more
 // if you want, send. Blocking ends the conversation on the server for good.
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { Screen } from "../src/components/Screen";
@@ -9,6 +9,7 @@ import { BigButton } from "../src/components/BigButton";
 import { Body, Card } from "../src/components/ui";
 import { RadioRow, TextField } from "../src/components/fields";
 import { api } from "../src/lib/api";
+import { ackDialog, confirmDialog, toast } from "../src/lib/notify";
 import { useT } from "../src/i18n";
 import { useTheme } from "../src/theme";
 
@@ -42,11 +43,9 @@ export default function Report() {
         await api("/safety/blocks", { body: { blocked_id: targetId } });
       }
       // OK moves the screen — never navigate underneath an alert.
-      Alert.alert(t("reportSent"), undefined, [
-        { text: t("ok"), onPress: () => router.replace("/home") },
-      ]);
+      ackDialog(t("reportSent"), t("ok"), () => router.replace("/home"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }
@@ -56,10 +55,16 @@ export default function Report() {
   // Yes/No even though it's on by default. The report alone doesn't need one.
   const confirmAndSend = () => {
     if (block) {
-      Alert.alert(t("confirmBlockTitle", { name: name ?? "" }), t("confirmBlockBody"), [
-        { text: t("no"), style: "cancel" },
-        { text: t("yes"), style: "destructive", onPress: () => void send() },
-      ]);
+      confirmDialog(
+        {
+          title: t("confirmBlockTitle", { name: name ?? "" }),
+          body: t("confirmBlockBody"),
+          okLabel: t("yes"),
+          cancelLabel: t("no"),
+          destructive: true,
+        },
+        () => void send(),
+      );
     } else {
       void send();
     }

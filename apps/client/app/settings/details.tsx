@@ -1,5 +1,5 @@
 // My details — edit photo, name, about and interests. One Save action.
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { INTEREST_CHIPS, type SelfProfile } from "@parea/shared";
@@ -8,6 +8,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Avatar, Body } from "../../src/components/ui";
 import { Chip, ChipGrid, TextField } from "../../src/components/fields";
 import { api, uploadPhoto } from "../../src/lib/api";
+import { toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
 
@@ -35,7 +36,7 @@ export default function MyDetails() {
 
   const save = async () => {
     if (!firstName.trim()) {
-      Alert.alert(t("nameRequired"));
+      toast(t("nameRequired"), "error");
       return;
     }
     setBusy(true);
@@ -51,9 +52,9 @@ export default function MyDetails() {
         updated = await api<SelfProfile>("/me", { token });
       }
       setProfile(updated);
-      Alert.alert(t("saved"));
+      toast(t("saved"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }

@@ -1,6 +1,6 @@
 // Discover — one big card at a time, two huge buttons (§7.7). A mutual YES
 // opens a chat. "Not now" is equally weighted: saying no must feel fine.
-import { Alert, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,6 +10,7 @@ import { Body, Avatar, EmptyState, ErrorState } from "../src/components/ui";
 import { Screen } from "../src/components/Screen";
 import { api } from "../src/lib/api";
 import { ensureCoords } from "../src/lib/location";
+import { ackDialog, toast } from "../src/lib/notify";
 import { formatDistance } from "../src/lib/time";
 import { useT } from "../src/i18n";
 import { useTheme } from "../src/theme";
@@ -39,14 +40,12 @@ export default function Discover() {
         await queryClient.invalidateQueries({ queryKey: ["matches"] });
         // The OK tap moves the screen — never navigate underneath an alert
         // (screen readers lose the announcement otherwise).
-        Alert.alert(t("mutualToast"), undefined, [
-          { text: t("ok"), onPress: () => router.replace(`/chat/${result.match_id}`) },
-        ]);
+        ackDialog(t("mutualToast"), t("ok"), () => router.replace(`/chat/${result.match_id}`));
       }
     } catch {
       // Fail loudly (Phase 6 rule 5): an unacknowledged "no" must not look
       // like the app ignored the tap.
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
       await queryClient.invalidateQueries({ queryKey: ["discover"] });
     } finally {
       setBusy(false);

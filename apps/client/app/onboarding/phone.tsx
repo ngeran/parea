@@ -1,7 +1,7 @@
 // Screen 2 of onboarding: sign in with the phone number. No passwords —
 // we send a 6-digit code by SMS. The consent tick is required for a new
 // account (GDPR) and is always shown so it is never a surprise.
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useState } from "react";
 import { phoneSchema } from "@parea/shared";
@@ -10,6 +10,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body, Card } from "../../src/components/ui";
 import { TextField } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
+import { toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import type { OtpRequestResult } from "@parea/shared";
@@ -48,10 +49,7 @@ export default function PhoneSignIn() {
       });
     } catch (e) {
       const code = e instanceof ApiError ? e.code : "";
-      Alert.alert(
-        code === "otp_cooldown" ? t("resend") : t("genericError"),
-        code === "otp_cooldown" ? t("cooldownNote") : t("networkError"),
-      );
+      toast(code === "otp_cooldown" ? t("cooldownNote") : t("networkError"), "error");
     } finally {
       setBusy(false);
     }

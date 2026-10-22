@@ -18,7 +18,7 @@ const SIZES: Array<{ value: TextSize; label: "sizeNormal" | "sizeLarge" | "sizeX
 
 export default function Welcome() {
   const t = useT();
-  const { c, f, space } = useTheme();
+  const { c, space, themeName } = useTheme();
   const router = useRouter();
   const textSize = useStore((s) => s.textSize);
   const language = useStore((s) => s.language);
@@ -30,7 +30,21 @@ export default function Welcome() {
       contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: 80, paddingBottom: space.xxxl }}
     >
       <View style={{ alignItems: "center", gap: space.m }}>
-        <Text style={{ fontSize: 72 }}>🤝</Text>
+        {/* The emoji sits in a soft tinted circle — a hero mark, not a
+            floating glyph. High contrast keeps the 3 px outline (§4.3). */}
+        <View
+          style={{
+            width: 136,
+            height: 136,
+            borderRadius: 68,
+            backgroundColor: c.primarySoft,
+            alignItems: "center",
+            justifyContent: "center",
+            ...(themeName === "contrast" ? { borderWidth: 3, borderColor: c.border } : {}),
+          }}
+        >
+          <Text style={{ fontSize: 72 }}>🤝</Text>
+        </View>
         <Title>{t("welcomeTitle")}</Title>
         <Body muted>{t("welcomeBody")}</Body>
       </View>

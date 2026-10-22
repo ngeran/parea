@@ -2,7 +2,6 @@
 // the door to making a plan, and one-tap Report/Block in the header.
 import {
   AccessibilityInfo,
-  Alert,
   FlatList,
   KeyboardAvoidingView,
   Platform,
@@ -18,6 +17,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body, EmptyState, ErrorState } from "../../src/components/ui";
 import { TextField } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
+import { toast } from "../../src/lib/notify";
 import { speak, stopSpeaking } from "../../src/lib/speech";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
@@ -81,7 +81,7 @@ export default function Chat() {
   const send = async (body: string) => {
     const text = body.trim();
     if (!text) {
-      Alert.alert(t("writeFirst"));
+      toast(t("writeFirst"), "info");
       return;
     }
     setSending(true);
@@ -98,9 +98,9 @@ export default function Chat() {
         });
       }
     } catch (e) {
-      Alert.alert(
-        t("genericError"),
+      toast(
         e instanceof ApiError && e.code === "message_blocked" ? t("messageBlocked") : t("networkError"),
+        "error",
       );
     } finally {
       setSending(false);

@@ -1,12 +1,13 @@
 // Home — the big "I'd like company" hero button, the paths to Nearby and
 // Discover, and the user's own open requests. One primary action on screen.
-import { Alert, Pressable, ScrollView, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { activityLabel, placeTypeLabel } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
-import { Body, Card, EmptyState, ErrorState, Title } from "../../src/components/ui";
+import { Body, Card, EmptyState, ErrorState } from "../../src/components/ui";
 import { ensureCoords } from "../../src/lib/location";
+import { toast } from "../../src/lib/notify";
 import { registerPush } from "../../src/lib/push";
 import { formatDistance, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
@@ -16,7 +17,7 @@ import { useMyRequests } from "../../src/lib/queries";
 
 export default function Home() {
   const t = useT();
-  const { c, f, space, touch } = useTheme();
+  const { c, f, space, touch, themeName } = useTheme();
   const router = useRouter();
   const profile = useStore((s) => s.profile);
   const coords = useStore((s) => s.coords);
@@ -34,9 +35,9 @@ export default function Home() {
     const got = await ensureCoords();
     if (got) {
       setCoords(got);
-      Alert.alert(t("locationShared"));
+      toast(t("locationShared"));
     } else {
-      Alert.alert(t("locationFailed"));
+      toast(t("locationFailed"), "error");
     }
   };
 
@@ -47,7 +48,14 @@ export default function Home() {
       style={{ flex: 1, backgroundColor: c.bg }}
       contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
     >
-      <Title>{t("hi", { name: profile?.first_name ?? "" })}</Title>
+      {/* Hero-size greeting — the home screen's own "top of the hierarchy". */}
+      <Text
+        accessible
+        accessibilityRole="header"
+        style={{ color: c.text, fontSize: f.hero, lineHeight: f.hero * 1.25, fontWeight: "800" }}
+      >
+        {t("hi", { name: profile?.first_name ?? "" })}
+      </Text>
 
       {needsLocation ? (
         <Card>
@@ -117,6 +125,10 @@ export default function Home() {
                 padding: space.xl,
                 gap: space.s,
                 minHeight: touch.row,
+                // Same card language as <Card>: hairline edge (3 px white
+                // outline in the high-contrast theme, §4.3).
+                borderWidth: themeName === "contrast" ? 3 : 1,
+                borderColor: themeName === "contrast" ? c.border : c.hairline,
               })}
             >
               <Text style={{ color: c.text, fontSize: f.body, fontWeight: "700" }}>

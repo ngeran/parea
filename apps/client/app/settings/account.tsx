@@ -4,12 +4,12 @@
 // to the phone's share sheet, so it can be saved or emailed.
 import * as Sharing from "expo-sharing";
 import { File, Paths } from "expo-file-system";
-import { Alert } from "react-native";
 import { useState } from "react";
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
 import { Body, Card } from "../../src/components/ui";
 import { api } from "../../src/lib/api";
+import { confirmDialog, toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
 
@@ -20,10 +20,15 @@ export default function Account() {
   const [busy, setBusy] = useState(false);
 
   const logout = () => {
-    Alert.alert(t("confirmLogout"), "", [
-      { text: t("cancel"), style: "cancel" },
-      { text: t("logout"), style: "destructive", onPress: () => void signOut() },
-    ]);
+    confirmDialog(
+      {
+        title: t("confirmLogout"),
+        okLabel: t("logout"),
+        cancelLabel: t("cancel"),
+        destructive: true,
+      },
+      () => void signOut(),
+    );
   };
 
   // GDPR export: fetch everything, write a temp JSON file, open the share
@@ -36,35 +41,37 @@ export default function Account() {
       if (file.exists) file.delete();
       file.write(JSON.stringify(data, null, 2));
       await Sharing.shareAsync(file.uri, { mimeType: "application/json" });
-      Alert.alert(t("exportDone"));
+      toast(t("exportDone"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setBusy(false);
     }
   };
 
   const deleteAccount = () => {
-    Alert.alert(t("confirmDeleteTitle"), t("confirmDeleteBody"), [
-      { text: t("keepAccount"), style: "cancel" },
+    confirmDialog(
       {
-        text: t("yesDelete"),
-        style: "destructive",
-        onPress: () => {
-          void (async () => {
-            setBusy(true);
-            try {
-              await api("/me", { method: "DELETE" });
-            } catch {
-              // Even if the network hiccups, the session ends locally.
-            } finally {
-              await signOut();
-              setBusy(false);
-            }
-          })();
-        },
+        title: t("confirmDeleteTitle"),
+        body: t("confirmDeleteBody"),
+        okLabel: t("yesDelete"),
+        cancelLabel: t("keepAccount"),
+        destructive: true,
       },
-    ]);
+      () => {
+        void (async () => {
+          setBusy(true);
+          try {
+            await api("/me", { method: "DELETE" });
+          } catch {
+            // Even if the network hiccups, the session ends locally.
+          } finally {
+            await signOut();
+            setBusy(false);
+          }
+        })();
+      },
+    );
   };
 
   return (

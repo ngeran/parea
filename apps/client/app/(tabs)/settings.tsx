@@ -1,10 +1,11 @@
 // Settings tab — plain grouped rows; everything is one tap from here.
-import { Alert, ScrollView, Switch, Text, View } from "react-native";
+import { ScrollView, Switch, Text, View } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import type { SelfProfile } from "@parea/shared";
 import { Avatar, Card, SettingsRow, Title } from "../../src/components/ui";
 import { api } from "../../src/lib/api";
+import { confirmDialog, toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -37,7 +38,7 @@ export default function Settings() {
       });
       setProfile(updated);
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setPushBusy(false);
     }
@@ -47,10 +48,16 @@ export default function Settings() {
     if (volunteerBusy) return;
     // Off is irreversible-ish (drops an existing badge) — confirm it.
     if (!on) {
-      Alert.alert(t("volunteerSetting"), t("volunteerOffConfirm"), [
-        { text: t("cancel"), style: "cancel" },
-        { text: t("yes"), style: "destructive", onPress: () => void patchVolunteer(false) },
-      ]);
+      confirmDialog(
+        {
+          title: t("volunteerSetting"),
+          body: t("volunteerOffConfirm"),
+          okLabel: t("yes"),
+          cancelLabel: t("cancel"),
+          destructive: true,
+        },
+        () => void patchVolunteer(false),
+      );
       return;
     }
     void patchVolunteer(true);
@@ -65,9 +72,9 @@ export default function Settings() {
         token: useStore.getState().token ?? undefined,
       });
       setProfile(updated);
-      if (on) Alert.alert(t("volunteerSetting"), t("volunteerApplied"));
+      if (on) toast(t("volunteerApplied"));
     } catch {
-      Alert.alert(t("genericError"), t("networkError"));
+      toast(t("networkError"), "error");
     } finally {
       setVolunteerBusy(false);
     }

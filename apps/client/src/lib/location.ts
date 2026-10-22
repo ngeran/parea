@@ -2,6 +2,7 @@
 // The server rounds the position to ~500 m before anything is stored, and
 // the app only ever shows those rounded values; exact coordinates never
 // leave this function except to POST /me/location, which snaps immediately.
+import { Platform } from "react-native";
 import * as Location from "expo-location";
 import { api } from "./api";
 import { useStore } from "../store";
@@ -16,7 +17,26 @@ export interface Coords {
 // friendly location note and everything else keeps working.
 const FIX_TIMEOUT_MS = 10_000;
 
-export async function getCoords(): Promise<Coords | null> {
+/**
+ * Web: the browser's own geolocation, straight from the platform API.
+ * expo-location's web shim routes permissions through
+ * navigator.permissions.query — which throws on Safari and never shows a
+ * prompt elsewhere — so we call navigator.geolocation directly instead.
+ * getCurrentPosition triggers the browser's native permission prompt the
+ * first time; every browser supports it.
+ */
+function getCoordsWeb(): Promise<Coords | null> {
+  return new Promise((resolve) => {
+    if (!navigator.geolocation) return resolve(null);
+    navigator.geolocation.getCurrentPosition(
+      (pos) => resolve({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => resolve(null),
+      { enableHighAccuracy: false, timeout: FIX_TIMEOUT_MS, maximumAge: 60_000 },
+    );
+  });
+}
+
+async function getCoordsNative(): Promise<Coords | null> {
   const { status } = await Location.requestForegroundPermissionsAsync();
   if (status !== "granted") return null;
   try {
@@ -30,6 +50,10 @@ export async function getCoords(): Promise<Coords | null> {
   } catch {
     return null;
   }
+}
+
+export function getCoords(): Promise<Coords | null> {
+  return Platform.OS === "web" ? getCoordsWeb() : getCoordsNative();
 }
 
 /**

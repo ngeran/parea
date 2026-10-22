@@ -1,7 +1,7 @@
 // Make a plan from a conversation: where (public place name) + when.
 // The safety loop (share with trusted contact, I'm safe) lives on the plan
 // screen this creates.
-import { Alert, View } from "react-native";
+import { View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import type { PlanDTO } from "@parea/shared";
@@ -10,6 +10,7 @@ import { BigButton } from "../../src/components/BigButton";
 import { Body } from "../../src/components/ui";
 import { Chip, ChipGrid, SectionHeader, TextField } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
+import { ackDialog, toast } from "../../src/lib/notify";
 import { toIso } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
@@ -62,13 +63,11 @@ export default function NewPlan() {
         body: { place_name: place.trim(), starts_at },
       });
       // OK moves the screen — never navigate underneath an alert.
-      Alert.alert(t("planCreated"), undefined, [
-        { text: t("ok"), onPress: () => router.replace(`/plans/${result.plan.id}`) },
-      ]);
+      ackDialog(t("planCreated"), t("ok"), () => router.replace(`/plans/${result.plan.id}`));
     } catch (e) {
-      Alert.alert(
-        t("genericError"),
+      toast(
         e instanceof ApiError && e.status === 409 ? t("planAlready") : t("networkError"),
+        "error",
       );
     } finally {
       setBusy(false);

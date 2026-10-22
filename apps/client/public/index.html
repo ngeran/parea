@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="%LANG_ISO_CODE%">
+  <head>
+    <meta charset="utf-8" />
+    <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+
+    <!-- PWA: installable standalone ("Add to Home Screen" runs fullscreen,
+         no browser chrome). The theme-color pair follows the OS light/dark
+         setting so the phone's status bar always matches the app theme; the
+         app also updates them at runtime when the user picks a theme. -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101214" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <!-- "default" keeps the iOS status bar solid and the app below the notch:
+     no safe-area plumbing needed. -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Parea" />
+    <link rel="apple-touch-icon" href="/icon-1024.png" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <title>%WEB_TITLE%</title>
+    <style id="expo-reset">
+      /* These styles make the body full-height */
+      html,
+      body {
+        height: 100%;
+      }
+      /* These styles disable body scrolling if you are using <ScrollView> */
+      body {
+        overflow: hidden;
+      }
+      /* These styles make the root element full-height */
+      #root {
+        display: flex;
+        height: 100%;
+        flex: 1;
+      }
+
+      /* App-like feel on mobile: no blue tap flashes, no rubber-banding
+         behind the app's own ScrollViews, no double-tap-zoom delay, and no
+         iOS landscape text inflation (the app sizes its own text). */
+      html {
+        -webkit-text-size-adjust: 100%;
+        overscroll-behavior: none;
+      }
+      body {
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+
+      /* Launch background matches the theme bg so standalone startup (and
+         dark-mode refreshes) don't flash white before JS mounts. */
+      html {
+        color-scheme: light dark;
+        background: #ffffff;
+      }
+      @media (prefers-color-scheme: dark) {
+        html {
+          background: #101214;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Use static rendering with Expo Router to support running without JavaScript. -->
+    <noscript> You need to enable JavaScript to run this app. </noscript>
+    <!-- The root element for your Expo app. -->
+    <div id="root"></div>
+  </body>
+</html>

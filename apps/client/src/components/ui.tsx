@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import type { Lang, PublicProfile } from "@parea/shared";
 import { API_BASE } from "../lib/api";
 import { BigButton } from "./BigButton";
-import { useTheme } from "../theme";
+import { ELEVATION, useTheme } from "../theme";
 import { useStore } from "../store";
 import { useT } from "../i18n";
 import { tr } from "../i18n";
@@ -25,12 +25,15 @@ export function Card({
       style={[
         {
           backgroundColor: c.surface,
-          borderRadius: radius.md,
+          borderRadius: radius.lg,
           padding: space.xl,
           gap: space.m,
           // High contrast: surface == bg there, so cards need an outline to
-          // exist at all (plan §4.3 "3 px borders").
-          ...(themeName === "contrast" ? { borderWidth: 3, borderColor: c.border } : {}),
+          // exist at all (plan §4.3 "3 px borders"). Elsewhere a hairline +
+          // soft shadow carry the card — depth, not loud outlines.
+          ...(themeName === "contrast"
+            ? { borderWidth: 3, borderColor: c.border }
+            : { borderWidth: 1, borderColor: c.hairline, ...ELEVATION.sm }),
         },
         style,
       ]}
@@ -91,8 +94,10 @@ export function SettingsRow({
         backgroundColor: pressed ? c.primarySoft : c.surface,
         borderRadius: radius.md,
         // High contrast: surface == bg, so rows need a 3 px outline
-        // (plan §4.3).
-        ...(themeName === "contrast" ? { borderWidth: 3, borderColor: c.border } : {}),
+        // (plan §4.3). Elsewhere a hairline defines the row against the bg.
+        ...(themeName === "contrast"
+          ? { borderWidth: 3, borderColor: c.border }
+          : { borderWidth: 1, borderColor: c.hairline }),
       }}
     >
       <Text style={{ fontSize: f.title, color: pressed ? c.onSoft : c.text }}>{icon}</Text>

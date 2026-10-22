@@ -2,6 +2,7 @@
 // chips. All ≥ 56 px, explicit roles/states, labels always visible (never
 // placeholder-only), errors read out by screen readers via accessibilityLabel.
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
 import { useTheme } from "../theme";
 
 export function TextField({
@@ -26,6 +27,7 @@ export function TextField({
   accessibilityLabel?: string;
 }) {
   const { c, f, space, radius, themeName } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <View style={{ gap: space.s }}>
       {label ? (
@@ -40,16 +42,21 @@ export function TextField({
         keyboardType={keyboardType}
         multiline={multiline}
         keyboardAppearance={c.bg === "#000000" ? "dark" : "light"}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         style={{
           minHeight: 64,
-          borderRadius: radius.sm,
-          borderWidth: themeName === "contrast" ? 3 : 2,
-          borderColor: error ? c.danger : c.border,
+          borderRadius: radius.md,
+          // Focused fields get the strong 2 px primary ring (a clear focus
+          // indicator matters more than décor); at rest a hairline on a
+          // surface fill. High contrast keeps the 3 px outline always.
+          borderWidth: themeName === "contrast" ? 3 : focused || error ? 2 : 1,
+          borderColor: error ? c.danger : focused ? c.primary : themeName === "contrast" ? c.border : c.hairline,
           paddingHorizontal: 16,
           paddingVertical: multiline ? 14 : 0,
           fontSize: f.body,
           color: c.text,
-          backgroundColor: c.bg,
+          backgroundColor: c.surface,
           textAlignVertical: multiline ? "top" : "center",
         }}
       />

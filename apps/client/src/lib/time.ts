@@ -37,3 +37,17 @@ export function formatDistance(km: number, lang: Lang): string {
   const kmRounded = Math.round(km);
   return lang === "el" ? `≈ ${kmRounded} χλμ.` : `≈ ${kmRounded} km`;
 }
+
+/**
+ * Compact day-chip label for the wizard's "another day" grid:
+ * "Mon 27/10" / "Δευ 27/10". `dayAhead` 0 = today, 1 = tomorrow, …
+ */
+export function formatDayShort(dayAhead: number, lang: Lang): string {
+  const d = new Date();
+  d.setDate(d.getDate() + dayAhead);
+  return new Intl.DateTimeFormat(localeOf(lang), {
+    weekday: "short",
+    day: "numeric",
+    month: "numeric",
+  }).format(d);
+}

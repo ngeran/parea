@@ -14,6 +14,17 @@ export function setUnauthorizedHandler(fn: () => void) {
   onUnauthorized = fn;
 }
 
+/**
+ * Session token source, registered by the store (an import cycle keeps api.ts
+ * from reading it directly). Calls that don't pass `token` explicitly — most
+ * of the write paths — used to go out with NO Authorization header, 401, and
+ * trip the unauthorized handler into a surprise sign-out.
+ */
+let getToken: (() => string | null) | null = null;
+export function setTokenProvider(fn: () => string | null) {
+  getToken = fn;
+}
+
 export class ApiError extends Error {
   constructor(
     public status: number,
@@ -42,7 +53,10 @@ function buildQuery(query: ApiOptions["query"]): string {
 
 export async function api<T>(path: string, opts: ApiOptions = {}): Promise<T> {
   const headers: Record<string, string> = {};
-  if (opts.token) headers.authorization = `Bearer ${opts.token}`;
+  // Explicit token wins (including `null` as an opt-out); otherwise the
+  // store's session token rides along automatically.
+  const token = opts.token !== undefined ? opts.token : (getToken?.() ?? null);
+  if (token) headers.authorization = `Bearer ${token}`;
   if (opts.body !== undefined) headers["content-type"] = "application/json";
 
   let res: Response;

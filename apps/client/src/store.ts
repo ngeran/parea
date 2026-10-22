@@ -6,7 +6,7 @@ import { create } from "zustand";
 import * as SecureStore from "expo-secure-store";
 import { Appearance } from "react-native";
 import type { Lang, SelfProfile, TextSize, ThemeName } from "@parea/shared";
-import { api } from "./lib/api";
+import { api, setTokenProvider } from "./lib/api";
 
 const TOKEN_KEY = "together.token";
 const PREFS_KEY = "together.prefs";
@@ -145,3 +145,9 @@ export const useStore = create<PareaState>((set, get) => ({
     set({ token: null, profile: null, coords: null });
   },
 }));
+
+// Every API call now carries the session unless a caller overrides it. The
+// write paths (send request, join, messages, plans, …) used to go out with
+// no Authorization header — the server 401'd them and the unauthorized
+// handler silently signed the user out mid-flow.
+setTokenProvider(() => useStore.getState().token);

@@ -339,12 +339,30 @@ app.post("/responses/:id/accept", async (c) => {
 });
 
 app.post("/:id/cancel", async (c) => {
-  const res = await c.env.DB.prepare(
-    "UPDATE requests SET status = 'cancelled' WHERE id = ? AND user_id = ? AND status IN ('open','matched')",
+  const me = c.get("user");
+  const row = await c.env.DB.prepare(
+    "SELECT * FROM requests WHERE id = ? AND user_id = ? AND status IN ('open','matched')",
   )
-    .bind(c.req.param("id"), c.get("user").id)
+    .bind(c.req.param("id"), me.id)
+    .first<RequestRow>();
+  if (!row) throw new AppError(404, "not_found", "Request not found.");
+  await c.env.DB.prepare(
+    "UPDATE requests SET status = 'cancelled' WHERE id = ? AND user_id = ?",
+  )
+    .bind(row.id, me.id)
     .run();
-  if (res.meta.changes === 0) throw new AppError(404, "not_found", "Request not found.");
+
+  // Everyone who could still see the request learns it is gone: the owner's
+  // own devices and the same nearby audience the create route told.
+  const at = nowIso();
+  const payload = { request_id: row.id };
+  const tell = (userId: string) => emitToUser(c.env, userId, { type: "request.cancelled", at, payload });
+  const others = await nearbyProfileRows(
+    c.env.DB,
+    { id: me.id, lat: row.lat, lng: row.lng, radiusKm: row.radius_km },
+    { requireComplete: false, limit: 200 },
+  );
+  await Promise.all([tell(me.id), ...others.map((p) => tell(p.id))]);
   return c.json({ ok: true });
 });
 

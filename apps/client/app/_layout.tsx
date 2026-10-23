@@ -15,6 +15,7 @@ import { API_BASE, setUnauthorizedHandler } from "../src/lib/api";
 import { connectLive } from "../src/lib/live";
 import { COLORS, useReduceMotion, useResolvedThemeName } from "../src/theme";
 import { Toaster } from "../src/components/Toast";
+import { DialogHost } from "../src/components/DialogHost";
 import { useStore } from "../src/store";
 
 const queryClient = new QueryClient({
@@ -48,6 +49,13 @@ function LiveBridge() {
           break;
         case "request.declined":
           queryClient.invalidateQueries({ queryKey: ["requests", "mine"] });
+          queryClient.invalidateQueries({ queryKey: ["request", event.payload.request_id] });
+          break;
+        case "request.cancelled":
+          // The owner's other devices drop it from "my requests"; everyone
+          // else drops it from the nearby list.
+          queryClient.invalidateQueries({ queryKey: ["requests", "mine"] });
+          queryClient.invalidateQueries({ queryKey: ["requests", "nearby"] });
           queryClient.invalidateQueries({ queryKey: ["request", event.payload.request_id] });
           break;
         case "request.nearby":
@@ -149,6 +157,8 @@ function RootLayout() {
         <Stack.Screen name="chat/[matchId]" />
         <Stack.Screen name="plans" />
       </Stack>
+      {/* After the Stack: a later sibling paints above every screen. */}
+      <DialogHost />
     </>
   );
 }

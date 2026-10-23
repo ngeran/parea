@@ -1,11 +1,9 @@
-// Feedback that works on every platform. Alert.alert is a silent NO-OP on
-// react-native-web (an empty stub class), so the whole web build used to
-// swallow "Location saved", "Request sent" and every confirmation. From
-// here on:
-//   · informational messages → toast() — cross-platform, non-blocking
-//   · confirmations         → confirmDialog() — native Alert dialog with
-//     buttons on iOS/Android, window.confirm on web
-import { Alert, Platform } from "react-native";
+// Feedback that works on every platform — and always in the app's own voice.
+//   · informational messages → toast() — non-blocking, top of screen
+//   · questions/acknowledgements → confirmDialog()/ackDialog() — the themed
+//     in-app DialogHost (system popups looked foreign; window.confirm can't
+//     be styled at all). Signatures are unchanged: fire-and-forget with a
+//     callback, so call sites never touch the store themselves.
 import { create } from "zustand";
 
 export type ToastKind = "success" | "error" | "info";
@@ -41,10 +39,34 @@ export function toast(text: string, kind: ToastKind = "success") {
   useToastStore.getState().push(text, kind);
 }
 
+/** One queued question, rendered by <DialogHost /> in the root layout. */
+interface DialogOptions {
+  title: string;
+  body?: string;
+  okLabel?: string;
+  cancelLabel?: string;
+  /** OK renders as the danger (destructive) button. */
+  destructive?: boolean;
+  /** ackDialog: no cancel button, no backdrop dismissal. */
+  ackOnly?: boolean;
+  onOk?: () => void;
+}
+
+interface DialogState {
+  dialog: DialogOptions | null;
+  open: (dialog: DialogOptions) => void;
+  close: () => void;
+}
+
+export const useDialogStore = create<DialogState>((set) => ({
+  dialog: null,
+  open: (dialog) => set({ dialog }),
+  close: () => set({ dialog: null }),
+}));
+
 /**
- * A yes/no question. `onOk` runs only when the user confirms; on web the
- * blocking window.confirm is the honest, accessible browser primitive
- * (a custom skinned modal can come later).
+ * A yes/no question. `onOk` runs only when the user confirms; Cancel and
+ * backdrop tap simply close.
  */
 export function confirmDialog(
   opts: {
@@ -52,23 +74,11 @@ export function confirmDialog(
     body?: string;
     okLabel?: string;
     cancelLabel?: string;
-    /** Styles the OK action as destructive on native. */
     destructive?: boolean;
   },
   onOk: () => void,
 ) {
-  if (Platform.OS === "web") {
-    if (window.confirm(opts.body ? `${opts.title}\n\n${opts.body}` : opts.title)) onOk();
-    return;
-  }
-  Alert.alert(opts.title, opts.body, [
-    { text: opts.cancelLabel ?? "Cancel", style: "cancel" },
-    {
-      text: opts.okLabel ?? "OK",
-      style: opts.destructive ? "destructive" : "default",
-      onPress: onOk,
-    },
-  ]);
+  useDialogStore.getState().open({ ...opts, onOk });
 }
 
 /**
@@ -77,10 +87,5 @@ export function confirmDialog(
  * the OK tap so screen readers don't lose the announcement.
  */
 export function ackDialog(title: string, okLabel: string, onOk?: () => void) {
-  if (Platform.OS === "web") {
-    window.alert(title);
-    onOk?.();
-    return;
-  }
-  Alert.alert(title, undefined, [{ text: okLabel, onPress: onOk }]);
+  useDialogStore.getState().open({ title, okLabel, ackOnly: true, onOk });
 }

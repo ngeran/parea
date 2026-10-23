@@ -122,6 +122,7 @@ export type ServerEvent =
   | { type: "response.created"; at: string; payload: { request_id: string; responder: PublicProfile } }
   | { type: "request.accepted"; at: string; payload: { request_id: string; match_id: string } }
   | { type: "request.declined"; at: string; payload: { request_id: string } }
+  | { type: "request.cancelled"; at: string; payload: { request_id: string } }
   | { type: "request.nearby"; at: string; payload: { request: RequestDTO } }
   | { type: "match.created"; at: string; payload: { match_id: string; other: PublicProfile } }
   | { type: "message.new"; at: string; payload: { message: MessageDTO } }

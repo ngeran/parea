@@ -85,6 +85,13 @@ export default function RequestDetail() {
         void (async () => {
           try {
             await api(`/requests/${id}/cancel`, { method: "POST" });
+            // Drop it from every cached list before going back — otherwise
+            // Home still shows the cancelled card (tabs never remount).
+            await Promise.all([
+              queryClient.invalidateQueries({ queryKey: ["requests", "mine"] }),
+              queryClient.invalidateQueries({ queryKey: ["requests", "nearby"] }),
+              queryClient.invalidateQueries({ queryKey: ["request", id] }),
+            ]);
             router.back();
           } catch {
             toast(t("noLongerAvailable"), "error");

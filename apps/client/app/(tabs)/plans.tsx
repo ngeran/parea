@@ -5,6 +5,7 @@ import { useRouter } from "expo-router";
 import type { PlanListItem } from "@parea/shared";
 import { Avatar, Body, EmptyState, ErrorState, Title } from "../../src/components/ui";
 import { formatWhen } from "../../src/lib/time";
+import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -16,6 +17,9 @@ export default function Plans() {
   const router = useRouter();
   const language = useStore((s) => s.language);
   const plans = usePlans();
+
+  // Tab screens never remount — refetch stale data when the tab is revisited.
+  useRefreshOnFocus(["plans"]);
 
   // Soonest meeting is the hero (the mockup's featured RSVP card); the rest
   // are compact avatar rows below it.

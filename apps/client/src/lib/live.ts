@@ -1,11 +1,11 @@
 // The one live WebSocket every signed-in screen shares (UserEvents DO).
 // "Live everywhere": while the app is foregrounded this socket is open and
 // every ServerEvent lands here; screens react through TanStack Query
-// invalidation (see LiveProvider in app/_layout.tsx).
+// invalidation (see LiveBridge in app/_layout.tsx).
 //
-// React Native's WebSocket accepts a third `options` argument with HTTP
-// headers — the Worker's /events route expects the session token in the
-// Authorization header, which the browser WebSocket API cannot send.
+// The session rides in the URL as ?token= — browsers cannot send custom
+// headers on a WebSocket handshake, and the Worker's /events route accepts
+// the query param for exactly that (middleware/auth.ts).
 import type { ServerEvent } from "@parea/shared";
 
 export interface LiveHandlers {
@@ -38,15 +38,9 @@ export function connectLive(
 
   const connect = () => {
     if (disposed) return;
-    const url = `${base.replace(/^http/, "ws")}/events`;
-    // React Native's WebSocket accepts a third `options` argument with HTTP
-    // headers; the DOM typing only knows two arguments, hence the narrow cast.
-    const RNWebSocket = WebSocket as unknown as new (
-      url: string,
-      protocols: string | null,
-      options: { headers: Record<string, string> },
-    ) => WebSocket;
-    ws = new RNWebSocket(url, null, { headers: { authorization: `Bearer ${token}` } });
+    // Query-param auth: the only channel that works in a browser handshake.
+    const url = `${base.replace(/^http/, "ws")}/events?token=${encodeURIComponent(token)}`;
+    ws = new WebSocket(url);
 
     ws.onopen = () => {
       backoffMs = 1000;

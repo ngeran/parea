@@ -10,6 +10,7 @@ import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
 import { registerPush } from "../../src/lib/push";
 import { formatDistance, formatToday, formatWhen } from "../../src/lib/time";
+import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -26,6 +27,10 @@ export default function Home() {
   const token = useStore((s) => s.token);
   const myRequests = useMyRequests();
   const plans = usePlans();
+
+  // Tab screens never remount — refetch stale data when the tab is revisited.
+  useRefreshOnFocus(["requests", "mine"]);
+  useRefreshOnFocus(["plans"]);
 
   // The three live counters under the greeting — real numbers, never filler.
   const openCount = myRequests.data?.requests.length ?? 0;

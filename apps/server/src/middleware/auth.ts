@@ -8,10 +8,16 @@ import type { AppEnv } from "../types";
 
 export const requireAuth = createMiddleware<AppEnv>(async (c, next) => {
   const header = c.req.header("Authorization") ?? "";
-  if (!header.startsWith("Bearer ")) {
+  // Browsers cannot send custom headers on a WebSocket handshake, so the
+  // /events upgrade carries the session as ?token= instead. The header wins
+  // when present; both paths hit the same session validation.
+  const token = header.startsWith("Bearer ")
+    ? header.slice("Bearer ".length)
+    : (c.req.query("token") ?? "");
+  if (!token) {
     throw new AppError(401, "unauthorized", "Sign in required.");
   }
-  const user = await getSessionUser(c.env.DB, header.slice("Bearer ".length));
+  const user = await getSessionUser(c.env.DB, token);
   if (!user) {
     throw new AppError(401, "unauthorized", "Session expired — please sign in again.");
   }

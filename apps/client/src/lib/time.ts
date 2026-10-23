@@ -8,6 +8,13 @@ export function toIso(d: Date): string {
   return d.toISOString().slice(0, 19) + "Z";
 }
 
+/** "27 Μαρτίου" / "27 March" — the home greeting's date line. */
+export function formatToday(lang: Lang): string {
+  return new Intl.DateTimeFormat(localeOf(lang), { day: "numeric", month: "long" }).format(
+    new Date(),
+  );
+}
+
 /** "Today at 14:00" / "Σήμερα στις 14:00" / "Tuesday, 3 November at …" */
 export function formatWhen(iso: string, lang: Lang): string {
   const loc = localeOf(lang);

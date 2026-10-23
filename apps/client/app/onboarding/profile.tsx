@@ -3,7 +3,7 @@
 //   2. about + interest chips
 //   3. languages + mobility → Finish
 // Finishing also asks for location (the rounded one — see lib/location).
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -23,7 +23,7 @@ import { api, uploadPhoto } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
 import { useT, tr } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 
 const MOBILITIES: Mobility[] = ["walk", "ride", "home"];
@@ -160,7 +160,27 @@ export default function ProfileSetup() {
             hint={`${about.length}/500`}
           />
           <View style={{ gap: space.m }}>
-            <SectionHeader>{t("interestsQ")}</SectionHeader>
+            <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+              <SectionHeader>{t("interestsQ")}</SectionHeader>
+              {/* The mockup's counter pill — fills in as chips are tapped. */}
+              {interests.length > 0 ? (
+                <Text
+                  accessible
+                  style={{
+                    color: c.success,
+                    fontSize: f.label,
+                    fontWeight: "700",
+                    backgroundColor: withAlpha(c.success, 0.12),
+                    borderRadius: 999,
+                    paddingHorizontal: space.m,
+                    paddingVertical: 4,
+                    overflow: "hidden",
+                  }}
+                >
+                  {t("interestsSelected", { n: interests.length })}
+                </Text>
+              ) : null}
+            </View>
             <Body muted>{t("interestsHint")}</Body>
             <ChipGrid>
               {INTEREST_CHIPS.map((chip) => (

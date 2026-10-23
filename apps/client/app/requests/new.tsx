@@ -7,7 +7,7 @@
 // last step opens — BEFORE any dialog — so a missing fix shows an inline
 // error with a Retry instead of a confirm-popup that loops forever.
 import { useEffect, useState } from "react";
-import { View } from "react-native";
+import { Text, View } from "react-native";
 import { router } from "expo-router";
 import {
   ACTIVITIES,
@@ -73,7 +73,7 @@ const ACTIVITY_PLACES: Record<string, readonly string[]> = {
 
 export default function NewRequest() {
   const t = useT();
-  const { space } = useTheme();
+  const { c, f, space } = useTheme();
   const language = useStore((s) => s.language);
   const coords = useStore((s) => s.coords);
 
@@ -239,6 +239,14 @@ export default function NewRequest() {
             busy={busy}
             onPress={() => (step < 3 ? setStep(step + 1) : confirmSend())}
           />
+          {/* The mockup's trust line — reassurance right where hesitation
+              peaks (before the first send). */}
+          <Text
+            accessible
+            style={{ color: c.textSecondary, fontSize: f.label, textAlign: "center" }}
+          >
+            🔒 {t("noCharge")}
+          </Text>
         </View>
       }
     >

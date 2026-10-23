@@ -5,15 +5,15 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { activityLabel, placeTypeLabel } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
-import { Body, Card, EmptyState, ErrorState } from "../../src/components/ui";
+import { Avatar, Body, Card, EmptyState, ErrorState } from "../../src/components/ui";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
 import { registerPush } from "../../src/lib/push";
-import { formatDistance, formatWhen } from "../../src/lib/time";
+import { formatDistance, formatToday, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
-import { useMyRequests } from "../../src/lib/queries";
+import { useMyRequests, usePlans } from "../../src/lib/queries";
 
 export default function Home() {
   const t = useT();
@@ -25,6 +25,17 @@ export default function Home() {
   const language = useStore((s) => s.language);
   const token = useStore((s) => s.token);
   const myRequests = useMyRequests();
+  const plans = usePlans();
+
+  // The three live counters under the greeting — real numbers, never filler.
+  const openCount = myRequests.data?.requests.length ?? 0;
+  const offersCount = myRequests.data?.requests.reduce((sum, r) => sum + r.offered_count, 0) ?? 0;
+  const plansCount = plans.data?.plans.length ?? 0;
+  const metrics: { n: number; label: string; color: string }[] = [
+    { n: openCount, label: t("metricRequests"), color: c.primary },
+    { n: offersCount, label: t("metricOffers"), color: c.accent },
+    { n: plansCount, label: t("metricPlans"), color: c.success },
+  ];
 
   // Best-effort push registration, once, after sign-in (native only).
   useEffect(() => {
@@ -48,7 +59,7 @@ export default function Home() {
       style={{ flex: 1, backgroundColor: c.bg }}
       contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
     >
-      {/* Greeting banner — name on the left, a friendly tile on the right. */}
+      {/* Greeting — the user's own avatar, today's date, then the name. */}
       <View
         style={{
           flexDirection: "row",
@@ -61,25 +72,41 @@ export default function Home() {
           borderColor: themeName === "contrast" ? c.border : c.hairline,
         }}
       >
-        <Text
-          accessible
-          accessibilityRole="header"
-          style={{ color: c.text, fontSize: f.hero, lineHeight: f.hero * 1.25, fontWeight: "800", flex: 1 }}
-        >
-          {t("hi", { name: profile?.first_name ?? "" })}
-        </Text>
-        <View
-          style={{
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            alignItems: "center",
-            justifyContent: "center",
-            backgroundColor: c.surfaceHigh,
-          }}
-        >
-          <Text style={{ fontSize: 30 }}>👋</Text>
+        <Avatar photoUrl={profile?.photo_url ?? null} name={profile?.first_name ?? "?"} size={56} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: c.textSecondary, fontSize: f.label, fontWeight: "600" }}>
+            {t("todayLabel")}, {formatToday(language)}
+          </Text>
+          <Text
+            accessible
+            accessibilityRole="header"
+            style={{ color: c.text, fontSize: f.hero, lineHeight: f.hero * 1.25, fontWeight: "800" }}
+          >
+            {t("hi", { name: profile?.first_name ?? "" })}
+          </Text>
         </View>
+      </View>
+
+      {/* Live counters — each pill taps nothing; they are just a glance. */}
+      <View style={{ flexDirection: "row", gap: space.s }}>
+        {metrics.map((m) => (
+          <View
+            key={m.label}
+            style={{
+              flex: 1,
+              alignItems: "center",
+              gap: 2,
+              backgroundColor: c.surface,
+              borderRadius: radius.md,
+              paddingVertical: space.m,
+              borderWidth: themeName === "contrast" ? 3 : 1,
+              borderColor: themeName === "contrast" ? c.border : c.hairline,
+            }}
+          >
+            <Text style={{ color: m.color, fontSize: f.title, fontWeight: "800" }}>{m.n}</Text>
+            <Text style={{ color: c.textSecondary, fontSize: f.label }}>{m.label}</Text>
+          </View>
+        ))}
       </View>
 
       {needsLocation ? (

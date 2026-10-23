@@ -6,20 +6,20 @@ import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { activityLabel, placeTypeLabel, type RequestDTO } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
-import { Body, EmptyState, ErrorState } from "../../src/components/ui";
+import { Avatar, Body, EmptyState, ErrorState } from "../../src/components/ui";
 import { Screen } from "../../src/components/Screen";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
 import { formatDistance, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { errCode, useNearbyRequests } from "../../src/lib/queries";
 
 export default function Nearby() {
   const t = useT();
-  const { c, f, space } = useTheme();
+  const { c, f, space, radius, themeName } = useTheme();
   const router = useRouter();
   const queryClient = useQueryClient();
   const language = useStore((s) => s.language);
@@ -59,35 +59,71 @@ export default function Nearby() {
     }
   };
 
+  // A neighbor, not a form field: face first, then who/when/where, then the
+  // single action. Distance gets an accent pill (the mockup's signature).
   const card = (request: RequestDTO) => (
     <View
       key={request.id}
-      style={{ backgroundColor: c.surface, borderRadius: 16, padding: space.xl, gap: space.s }}
+      style={{
+        backgroundColor: c.surface,
+        borderRadius: radius.lg,
+        padding: space.xl,
+        gap: space.m,
+        borderWidth: themeName === "contrast" ? 3 : 1,
+        borderColor: themeName === "contrast" ? c.border : c.hairline,
+      }}
     >
-      <Text style={{ color: c.text, fontSize: f.body + 2, fontWeight: "700" }}>
+      <Text style={{ color: c.text, fontSize: f.body + 2, fontWeight: "800" }}>
         {activityLabel(request.activity, language)}
       </Text>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+        <Avatar
+          photoUrl={request.owner.photo_url ?? null}
+          name={request.owner.first_name}
+          size={52}
+        />
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={{ color: c.text, fontSize: f.body, fontWeight: "700" }}>
+            {request.owner.first_name}
+            {request.owner.birth_year
+              ? `, ${new Date().getFullYear() - request.owner.birth_year}`
+              : ""}
+          </Text>
+          {request.owner.volunteer ? (
+            <Text
+              accessibilityLabel={t("volunteerBadge")}
+              style={{ color: c.success, fontSize: f.label, fontWeight: "700" }}
+            >
+              🤝 {t("volunteerBadge")}
+            </Text>
+          ) : null}
+        </View>
+        {request.owner.distance_km !== undefined ? (
+          <View
+            style={{
+              backgroundColor: withAlpha(c.accent, 0.15),
+              borderRadius: 999,
+              paddingHorizontal: space.m,
+              paddingVertical: 4,
+            }}
+          >
+            <Text style={{ color: c.accent, fontSize: f.label, fontWeight: "700" }}>
+              {t("kmAway", { d: formatDistance(request.owner.distance_km, language) })}
+            </Text>
+          </View>
+        ) : null}
+      </View>
       <Text style={{ color: c.text, fontSize: f.body }}>
-        👤 {request.owner.first_name}
-        {request.owner.birth_year
-          ? `, ${new Date().getFullYear() - request.owner.birth_year}`
-          : ""}
+        📅 {formatWhen(request.starts_at, language)}
       </Text>
-      {request.owner.volunteer ? (
-        <Text
-          accessibilityLabel={t("volunteerBadge")}
-          style={{ color: c.text, fontSize: f.label, fontWeight: "700" }}
-        >
-          🤝 {t("volunteerBadge")}
+      <Text style={{ color: c.textSecondary, fontSize: f.body }}>
+        {placeTypeLabel(request.place_type, language)}
+      </Text>
+      {request.owner.about ? (
+        <Text style={{ color: c.textSecondary, fontSize: f.body, fontStyle: "italic" }}>
+          «{request.owner.about}»
         </Text>
       ) : null}
-      <Text style={{ color: c.text, fontSize: f.body }}>📅 {formatWhen(request.starts_at, language)}</Text>
-      <Text style={{ color: c.textSecondary, fontSize: f.body }}>
-        {placeTypeLabel(request.place_type, language)} ·{" "}
-        {request.owner.distance_km !== undefined
-          ? t("kmAway", { d: formatDistance(request.owner.distance_km, language) })
-          : ""}
-      </Text>
       <BigButton
         label={t("canJoin")}
         icon="🙋"

@@ -3,10 +3,10 @@
 // theme). Preferences persist on-device (SecureStore) AND to the profile on
 // the server, so a new phone starts with the same settings.
 import { create } from "zustand";
-import * as SecureStore from "expo-secure-store";
 import { Appearance } from "react-native";
 import type { Lang, SelfProfile, TextSize, ThemeName } from "@parea/shared";
 import { api, setTokenProvider } from "./lib/api";
+import { deleteValue, loadValue, saveValue } from "./lib/storage";
 
 const TOKEN_KEY = "together.token";
 const PREFS_KEY = "together.prefs";
@@ -52,7 +52,7 @@ interface PareaState {
 
 async function loadPrefs(): Promise<Partial<Prefs>> {
   try {
-    const raw = await SecureStore.getItemAsync(PREFS_KEY);
+    const raw = await loadValue(PREFS_KEY);
     return raw ? (JSON.parse(raw) as Partial<Prefs>) : {};
   } catch {
     return {};
@@ -70,10 +70,7 @@ export const useStore = create<PareaState>((set, get) => ({
 
   /** App start: restore prefs + token, then confirm the token is still valid. */
   hydrate: async () => {
-    const [prefs, token] = await Promise.all([
-      loadPrefs(),
-      SecureStore.getItemAsync(TOKEN_KEY).catch(() => null),
-    ]);
+    const [prefs, token] = await Promise.all([loadPrefs(), loadValue(TOKEN_KEY)]);
     set({
       textSize: prefs.textSize ?? "normal",
       language: prefs.language ?? "en",
@@ -86,7 +83,7 @@ export const useStore = create<PareaState>((set, get) => ({
         set({ profile });
       } catch {
         // Expired or revoked token — fall back to the welcome screen.
-        await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+        await deleteValue(TOKEN_KEY);
         set({ token: null, profile: null });
       }
     }
@@ -94,7 +91,7 @@ export const useStore = create<PareaState>((set, get) => ({
   },
 
   setSession: async (token, profile) => {
-    await SecureStore.setItemAsync(TOKEN_KEY, token).catch(() => {});
+    await saveValue(TOKEN_KEY, token);
     set({ token, profile });
     // First sign-in on this device adopts the profile's saved preferences
     // (only where the user has not already chosen locally).
@@ -119,7 +116,7 @@ export const useStore = create<PareaState>((set, get) => ({
       ...patch,
     };
     set(current);
-    await SecureStore.setItemAsync(PREFS_KEY, JSON.stringify(current)).catch(() => {});
+    await saveValue(PREFS_KEY, JSON.stringify(current));
     const { token } = get();
     if (token) {
       try {
@@ -141,7 +138,7 @@ export const useStore = create<PareaState>((set, get) => ({
   },
 
   signOut: async () => {
-    await SecureStore.deleteItemAsync(TOKEN_KEY).catch(() => {});
+    await deleteValue(TOKEN_KEY);
     set({ token: null, profile: null, coords: null });
   },
 }));

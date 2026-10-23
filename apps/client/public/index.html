@@ -11,7 +11,7 @@
          app also updates them at runtime when the user picks a theme. -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#FFFFFF" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#101214" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0B1326" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <!-- "default" keeps the iOS status bar solid and the app below the notch:
@@ -20,6 +20,16 @@
     <meta name="apple-mobile-web-app-title" content="Parea" />
     <link rel="apple-touch-icon" href="/icon-1024.png" />
     <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <!-- App typeface. Loaded here (not via RN) so every react-native-web Text
+         simply inherits it — no fontFamily props anywhere in the app. Native
+         keeps its system font. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
     <title>%WEB_TITLE%</title>
     <style id="expo-reset">
@@ -59,8 +69,15 @@
       }
       @media (prefers-color-scheme: dark) {
         html {
-          background: #101214;
+          background: #0b1326;
         }
+      }
+
+      /* The app typeface — react-native-web Text elements set no font-family
+         of their own, so everything inherits from the body. */
+      body {
+        font-family: "Plus Jakarta Sans", -apple-system, "Segoe UI", Roboto,
+          "Helvetica Neue", Arial, sans-serif;
       }
     </style>
   </head>

@@ -10,6 +10,8 @@ import type { TextSize, ThemeName } from "@parea/shared";
 export interface ThemeColors {
   bg: string;
   surface: string;
+  /** Pressed/secondary fills — one step up from `surface`. */
+  surfaceHigh: string;
   text: string;
   textSecondary: string;
   primary: string;
@@ -18,6 +20,8 @@ export interface ThemeColors {
   /** Label color on primarySoft fills (soft buttons, selected chips/radios). */
   onSoft: string;
   success: string;
+  /** Warm amber for counts, badges and highlights (always ≥ AAA as text). */
+  accent: string;
   danger: string;
   border: string;
   /**
@@ -29,42 +33,50 @@ export interface ThemeColors {
 }
 
 export const COLORS: Record<ThemeName, ThemeColors> = {
+  // Light and dark share one family: deep blue-gray surfaces, a sky-blue
+  // primary, warm amber accent, mint success. All pairs re-verified by
+  // scripts/contrast-check.mjs (AAA text, ≥ 3:1 borders).
   light: {
     bg: "#FFFFFF",
-    surface: "#F5F7FA",
-    text: "#1A1C1E",
-    textSecondary: "#44474A",
-    primary: "#0A4D8C",
-    primarySoft: "#DCEAF8",
+    surface: "#EEF3FA",
+    surfaceHigh: "#E2EAF5",
+    text: "#1A2B45",
+    textSecondary: "#3E4D60",
+    primary: "#005676",
+    primarySoft: "#D6E9F5",
     onPrimary: "#FFFFFF",
-    onSoft: "#1A1C1E",
+    onSoft: "#1A2B45",
     success: "#146038",
+    // Dark amber — amber as text must clear AAA on white AND surface, so the
+    // light theme uses a burned tone; only dark gets the bright #FFB95F.
+    accent: "#6E4200",
     // #9E1F19 is the lightest red that keeps ≥ 7:1 against white AND surface
     // (Phase 6 audit; #B3261E only reached 6.5:1).
     danger: "#9E1F19",
-    // #6A7076 is the darkest gray still ≥ 3:1 on white and surface
-    // (WCAG 1.4.11 non-text contrast; #C9CDD2 failed at 1.6:1).
-    border: "#6A7076",
-    hairline: "#E3E7EC",
+    // ≥ 3:1 on white and surface (WCAG 1.4.11 non-text contrast).
+    border: "#5F6B7A",
+    hairline: "#DDE5F0",
   },
   dark: {
-    bg: "#101214",
-    surface: "#1C1F22",
-    text: "#FFFFFF",
-    textSecondary: "#D5D8DC",
-    primary: "#9CC9F5",
-    primarySoft: "#17324D",
+    bg: "#0B1326",
+    surface: "#171F33",
+    surfaceHigh: "#222A3D",
+    text: "#DAE2FD",
+    textSecondary: "#BDC8D1",
+    primary: "#8ED5FF",
+    primarySoft: "#16395C",
     onPrimary: "#0A2540",
-    onSoft: "#FFFFFF",
-    success: "#7FD8A4",
-    danger: "#F2A196",
-    // #71777D ≥ 3:1 on bg and surface (#3A3F44 failed at 1.8:1).
-    border: "#71777D",
-    hairline: "#2A2F36",
+    onSoft: "#DAE2FD",
+    success: "#56E5A9",
+    accent: "#FFB95F",
+    danger: "#FFB4AB",
+    border: "#87929A",
+    hairline: "#303B58",
   },
   contrast: {
     bg: "#000000",
     surface: "#000000",
+    surfaceHigh: "#000000",
     text: "#FFFFFF",
     textSecondary: "#FFFFFF",
     primary: "#FFFFFF",
@@ -73,11 +85,25 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
     // Soft fills are white here, so their labels must flip to black.
     onSoft: "#000000",
     success: "#FFFFFF",
+    accent: "#FFFFFF",
     danger: "#FFFFFF",
     border: "#FFFFFF",
     hairline: "#FFFFFF",
   },
 };
+
+/**
+ * Solid-color surfaces can't use RN's rgba() token strings directly — this
+ * converts a #RRGGBB token to a translucent fill for tinted tiles over
+ * colored buttons (the hero card's inner circles). Decorative only.
+ */
+export function withAlpha(hex: string, alpha: number): string {
+  const n = hex.replace("#", "");
+  const r = parseInt(n.slice(0, 2), 16);
+  const g = parseInt(n.slice(2, 4), 16);
+  const b = parseInt(n.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
 
 // px per text level (plan §4.1). Line-height ≈ 1.4 is applied by consumers.
 // "normal" is a standard mobile scale (17 px body ≈ iOS default) so screens

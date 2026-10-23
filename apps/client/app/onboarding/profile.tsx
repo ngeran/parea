@@ -16,6 +16,7 @@ import {
 } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
+import { StepProgress } from "../../src/components/StepProgress";
 import { Body, Avatar } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader, TextField } from "../../src/components/fields";
 import { api, uploadPhoto } from "../../src/lib/api";
@@ -124,7 +125,7 @@ export default function ProfileSetup() {
         />
       }
     >
-      <Body muted>{t("stepN", { n: step })}</Body>
+      <StepProgress step={step} total={3} label={t("stepN", { n: step })} />
 
       {step === 1 ? (
         <View style={{ gap: space.xl }}>

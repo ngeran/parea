@@ -65,8 +65,12 @@ export function BigButton({
       style={{
         transform: [{ scale }],
         borderRadius: radius.pill,
-        // Filled buttons float; outlined ("quiet") ones stay flat.
-        ...(filled && themeName !== "contrast" ? ELEVATION.sm : {}),
+        // Filled buttons float on a glow tinted with their own fill (modern
+        // "colored elevation"); outlined ("quiet") ones stay flat. The
+        // high-contrast theme skips all shadow decoration.
+        ...(filled && themeName !== "contrast"
+          ? { ...ELEVATION.md, shadowColor: bg, shadowOpacity: 0.35, shadowRadius: 12 }
+          : {}),
       }}
     >
       <Pressable

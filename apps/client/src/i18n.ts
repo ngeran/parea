@@ -242,6 +242,7 @@ const en = {
 
   // ── Phase 4: safety ────────────────────────────────────────────────────────
   sosButton: "SOS — alert my contacts",
+  sosHint: "Alerts your trusted contacts with your location",
   sosSending: "Sending the alert…",
   sosSentTitle: "Your contacts have been alerted",
   sosSentBody: "We texted: {names}",
@@ -522,6 +523,7 @@ const el: Dict = {
 
   // ── Φάση 4: ασφάλεια ───────────────────────────────────────────────────────
   sosButton: "ΣΟΣ — ειδοποίηση επαφών",
+  sosHint: "Ειδοποιεί τους έμπιστους επαφές σας με την τοποθεσία σας",
   sosSending: "Στέλνουμε την ειδοποίηση…",
   sosSentTitle: "Οι επαφές σας ειδοποιήθηκαν",
   sosSentBody: "Στείλαμε μήνυμα σε: {names}",
@@ -594,4 +596,26 @@ export function useT() {
     () => (key: StringKey, vars?: Record<string, string | number>) => tr(lang, key, vars),
     [lang],
   );
+}
+
+/**
+ * One-line subtitle per activity (selection cards in the request wizard).
+ * Keys follow @parea/shared ACTIVITIES; unknown keys simply render no hint.
+ */
+const ACTIVITY_HINTS: Record<string, Record<Lang, string>> = {
+  coffee: { en: "At a café or the square", el: "Σε καφενείο ή στην πλατεία" },
+  supermarket: { en: "Company for the groceries", el: "Παρέα για τις προμήθειες" },
+  errands: { en: "Pharmacy, post office, errands", el: "Φαρμακείο, ταχυδρομείο, θελήματα" },
+  meal: { en: "At a neighborhood taverna", el: "Σε ταβερνάκι της γειτονιάς" },
+  walk: { en: "An easy stroll in the fresh air", el: "Χαλαρός περίπατος & αέρας" },
+  call: { en: "A warm voice from home", el: "Ζεστή φωνή από το σπίτι" },
+  tech_help: { en: "Settings, video calls, apps", el: "Ρυθμίσεις, βιντεοκλήσεις, εφαρμογές" },
+  ride: { en: "Doctor, hospital, services", el: "Γιατρός, νοσοκομείο, υπηρεσίες" },
+  house_help: { en: "Small fixes, heavy lifting", el: "Μικροδιορθώσεις, βαριά αντικείμενα" },
+  paperwork: { en: "gov.gr, bank, payments", el: "gov.gr, τράπεζα, πληρωμές" },
+};
+
+/** Subtitle for a selection card, or undefined when the activity has none. */
+export function activityHint(key: string, lang: Lang): string | undefined {
+  return ACTIVITY_HINTS[key]?.[lang];
 }

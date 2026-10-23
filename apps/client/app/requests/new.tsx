@@ -20,13 +20,14 @@ import {
 } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
+import { StepProgress } from "../../src/components/StepProgress";
 import { Body, Card } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { ackDialog, confirmDialog, toast } from "../../src/lib/notify";
 import { formatDayShort, toIso } from "../../src/lib/time";
-import { useT } from "../../src/i18n";
+import { activityHint, useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
 
@@ -241,7 +242,7 @@ export default function NewRequest() {
         </View>
       }
     >
-      <Body muted>{t("stepN", { n: step })}</Body>
+      <StepProgress step={step} total={3} label={t("stepN", { n: step })} />
 
       {step === 1 ? (
         <View style={{ gap: space.m }}>
@@ -252,6 +253,7 @@ export default function NewRequest() {
                 key={a.key}
                 emoji={a.emoji}
                 label={activityLabel(a.key, language)}
+                subtitle={activityHint(a.key, language)}
                 selected={activity === a.key}
                 onSelect={() => selectActivity(a.key)}
               />
@@ -265,6 +267,7 @@ export default function NewRequest() {
                 key={a.key}
                 emoji={a.emoji}
                 label={activityLabel(a.key, language)}
+                subtitle={activityHint(a.key, language)}
                 selected={activity === a.key}
                 onSelect={() => selectActivity(a.key)}
               />

@@ -3,7 +3,7 @@
 // placeholder-only), errors read out by screen readers via accessibilityLabel.
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { useState } from "react";
-import { useTheme } from "../theme";
+import { ELEVATION, useTheme } from "../theme";
 
 export function TextField({
   label,
@@ -68,23 +68,33 @@ export function TextField({
   );
 }
 
-/** One radio choice — whole row tappable, ≥ 72 px. */
+/**
+ * One radio choice as a selection card (the wizard's main building block):
+ * circular emoji tile, title + optional subtitle, and a circular check
+ * indicator that fills (with a soft glow) when selected. Whole card tappable,
+ * ≥ 64 px.
+ */
 export function RadioRow({
   selected,
   label,
+  subtitle,
   emoji,
   onSelect,
 }: {
   selected: boolean;
   label: string;
+  subtitle?: string;
   emoji?: string;
   onSelect: () => void;
 }) {
   const { c, f, space, radius, themeName } = useTheme();
+  // The glow is decoration — the high-contrast theme skips it, and the fill
+  // + check carry the selection state instead.
+  const glow = selected && themeName !== "contrast" ? { ...ELEVATION.sm, shadowColor: c.primary, shadowOpacity: 0.3, shadowRadius: 8 } : {};
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityLabel={label}
+      accessibilityLabel={subtitle ? `${label}. ${subtitle}` : label}
       accessibilityState={{ selected }}
       onPress={onSelect}
       style={({ pressed }) => ({
@@ -92,44 +102,70 @@ export function RadioRow({
         alignItems: "center",
         gap: space.m,
         minHeight: 64,
-        paddingHorizontal: space.l,
+        padding: space.m,
         borderRadius: radius.md,
-        borderWidth: themeName === "contrast" ? 3 : 2,
-        borderColor: selected ? c.primary : c.border,
-        backgroundColor: selected ? c.primarySoft : pressed ? c.surface : c.bg,
+        borderWidth: themeName === "contrast" ? 3 : 1,
+        borderColor: selected ? c.primary : themeName === "contrast" ? c.border : c.hairline,
+        backgroundColor: selected ? c.primarySoft : pressed ? c.surfaceHigh : c.surface,
+        ...glow,
       })}
     >
-      {emoji ? <Text style={{ fontSize: f.title }}>{emoji}</Text> : null}
-      {/* Selected fills use primarySoft → label follows onSoft (flips to
+      {emoji ? (
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: selected ? c.bg : c.surfaceHigh,
+          }}
+        >
+          <Text style={{ fontSize: 22 }}>{emoji}</Text>
+        </View>
+      ) : null}
+      {/* Selected fills use primarySoft → labels follow onSoft (flips to
           black in the high-contrast theme, where primarySoft is white). */}
-      <Text
-        style={{
-          color: selected ? c.onSoft : c.text,
-          fontSize: f.body,
-          fontWeight: "600",
-          flex: 1,
-        }}
-      >
-        {label}
-      </Text>
+      <View style={{ flex: 1, gap: 1 }}>
+        <Text
+          style={{
+            color: selected ? c.onSoft : c.text,
+            fontSize: f.body,
+            fontWeight: selected ? "700" : "600",
+          }}
+        >
+          {label}
+        </Text>
+        {subtitle ? (
+          <Text style={{ color: selected ? c.onSoft : c.textSecondary, fontSize: f.label }}>
+            {subtitle}
+          </Text>
+        ) : null}
+      </View>
       <View
         style={{
-          width: 24,
-          height: 24,
-          borderRadius: 12,
-          borderWidth: 3,
+          width: 28,
+          height: 28,
+          borderRadius: 14,
+          borderWidth: 2,
           borderColor: selected ? c.primary : c.border,
+          backgroundColor: selected ? c.primary : "transparent",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        {selected ? <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: c.primary }} /> : null}
+        {selected ? (
+          <Text style={{ color: c.onPrimary, fontSize: 16, fontWeight: "800" }}>✓</Text>
+        ) : null}
       </View>
     </Pressable>
   );
 }
 
-/** Selectable chip (single- or multi-select), ≥ 56 px, emoji + label. */
+/**
+ * Selectable chip (single- or multi-select), ≥ 48 px, emoji + label + a
+ * trailing ✓ that reserves its width so toggling never reflows the grid.
+ */
 export function Chip({
   label,
   emoji,
@@ -156,11 +192,13 @@ export function Chip({
         alignItems: "center",
         gap: space.s,
         minHeight: 48,
-        paddingHorizontal: space.l,
-        borderRadius: radius.pill,
-        borderWidth: themeName === "contrast" ? 3 : 2,
-        borderColor: selected ? c.primary : c.border,
-        backgroundColor: selected ? c.primarySoft : pressed ? c.surface : c.bg,
+        paddingLeft: space.l,
+        paddingRight: space.m,
+        paddingVertical: space.s,
+        borderRadius: radius.md,
+        borderWidth: themeName === "contrast" ? 3 : 1,
+        borderColor: selected ? c.primary : themeName === "contrast" ? c.border : c.hairline,
+        backgroundColor: selected ? c.primarySoft : pressed ? c.surfaceHigh : c.surface,
         opacity: disabled ? 0.4 : 1,
       })}
     >
@@ -173,8 +211,21 @@ export function Chip({
           fontWeight: "600",
         }}
       >
-        {selected ? "✓ " : ""}
         {label}
+      </Text>
+      <Text
+        style={{
+          width: 18,
+          // onSoft, not primary: on primarySoft fills the primary mark can
+          // drop below AA (and vanish in the high-contrast theme, where both
+          // are white). onSoft follows the fill everywhere.
+          color: selected ? c.onSoft : "transparent",
+          fontSize: f.label + 2,
+          fontWeight: "800",
+          textAlign: "right",
+        }}
+      >
+        ✓
       </Text>
     </Pressable>
   );

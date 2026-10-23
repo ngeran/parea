@@ -11,13 +11,13 @@ import { toast } from "../../src/lib/notify";
 import { registerPush } from "../../src/lib/push";
 import { formatDistance, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { useMyRequests } from "../../src/lib/queries";
 
 export default function Home() {
   const t = useT();
-  const { c, f, space, touch, themeName } = useTheme();
+  const { c, f, space, touch, radius, themeName } = useTheme();
   const router = useRouter();
   const profile = useStore((s) => s.profile);
   const coords = useStore((s) => s.coords);
@@ -48,14 +48,39 @@ export default function Home() {
       style={{ flex: 1, backgroundColor: c.bg }}
       contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
     >
-      {/* Hero-size greeting — the home screen's own "top of the hierarchy". */}
-      <Text
-        accessible
-        accessibilityRole="header"
-        style={{ color: c.text, fontSize: f.hero, lineHeight: f.hero * 1.25, fontWeight: "800" }}
+      {/* Greeting banner — name on the left, a friendly tile on the right. */}
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space.m,
+          backgroundColor: c.surface,
+          borderRadius: radius.lg,
+          padding: space.xl,
+          borderWidth: themeName === "contrast" ? 3 : 1,
+          borderColor: themeName === "contrast" ? c.border : c.hairline,
+        }}
       >
-        {t("hi", { name: profile?.first_name ?? "" })}
-      </Text>
+        <Text
+          accessible
+          accessibilityRole="header"
+          style={{ color: c.text, fontSize: f.hero, lineHeight: f.hero * 1.25, fontWeight: "800", flex: 1 }}
+        >
+          {t("hi", { name: profile?.first_name ?? "" })}
+        </Text>
+        <View
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: c.surfaceHigh,
+          }}
+        >
+          <Text style={{ fontSize: 30 }}>👋</Text>
+        </View>
+      </View>
 
       {needsLocation ? (
         <Card>
@@ -64,37 +89,121 @@ export default function Home() {
         </Card>
       ) : null}
 
-      {/* THE primary action. */}
-      <View style={{ gap: space.s }}>
+      {/* THE primary action — a glowing primary card: emoji tile, label +
+          hint, trailing arrow (the mockup's hero, in app tokens). */}
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${t("idLikeCompany")}. ${t("askNearby")}`}
+        onPress={() => router.push("/requests/new")}
+        style={({ pressed }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space.m,
+          backgroundColor: c.primary,
+          borderRadius: radius.lg,
+          padding: space.xl,
+          minHeight: touch.hero,
+          opacity: pressed ? 0.9 : 1,
+          ...(themeName === "contrast"
+            ? {}
+            : { ...ELEVATION.md, shadowColor: c.primary, shadowOpacity: 0.4, shadowRadius: 16 }),
+        })}
+      >
+        <View
+          style={{
+            width: 56,
+            height: 56,
+            borderRadius: 16,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: withAlpha(c.onPrimary, 0.16),
+          }}
+        >
+          <Text style={{ fontSize: 30 }}>☕</Text>
+        </View>
+        <View style={{ flex: 1, gap: 2 }}>
+          <Text style={{ color: c.onPrimary, fontSize: f.title, fontWeight: "800" }}>
+            {t("idLikeCompany")}
+          </Text>
+          <Text style={{ color: withAlpha(c.onPrimary, 0.85), fontSize: f.label }}>
+            {t("askNearby")}
+          </Text>
+        </View>
+        <View
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 22,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: withAlpha(c.onPrimary, 0.16),
+          }}
+        >
+          <Text style={{ color: c.onPrimary, fontSize: f.title }}>→</Text>
+        </View>
+      </Pressable>
+
+      {/* Secondary paths — selection-card rows with emoji tiles. */}
+      {[
+        { emoji: "👋", label: t("seeNearby"), to: "/requests/nearby" },
+        { emoji: "🤝", label: t("discoverPeople"), to: "/discover" },
+      ].map((row) => (
+        <Pressable
+          key={row.to}
+          accessibilityRole="button"
+          accessibilityLabel={row.label}
+          onPress={() => router.push(row.to)}
+          style={({ pressed }) => ({
+            flexDirection: "row",
+            alignItems: "center",
+            gap: space.m,
+            minHeight: touch.row,
+            backgroundColor: pressed ? c.surfaceHigh : c.surface,
+            borderRadius: radius.md,
+            padding: space.l,
+            borderWidth: themeName === "contrast" ? 3 : 1,
+            borderColor: themeName === "contrast" ? c.border : c.hairline,
+          })}
+        >
+          <View
+            style={{
+              width: 48,
+              height: 48,
+              borderRadius: 24,
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundColor: c.surfaceHigh,
+            }}
+          >
+            <Text style={{ fontSize: 24 }}>{row.emoji}</Text>
+          </View>
+          <Text style={{ color: c.text, fontSize: f.body, fontWeight: "700", flex: 1 }}>
+            {row.label}
+          </Text>
+          <Text style={{ color: c.textSecondary, fontSize: f.title }}>›</Text>
+        </Pressable>
+      ))}
+
+      {/* Emergency: a softly danger-tinted card so the red button lands on
+          context. One tap opens /sos, which alerts immediately (no confirm). */}
+      <View
+        style={{
+          gap: space.m,
+          backgroundColor: themeName === "contrast" ? c.bg : withAlpha(c.danger, 0.12),
+          borderRadius: radius.lg,
+          padding: space.xl,
+          borderWidth: themeName === "contrast" ? 3 : 1,
+          borderColor: themeName === "contrast" ? c.border : c.hairline,
+        }}
+      >
+        <Body>{t("sosHint")}</Body>
         <BigButton
-          label={t("idLikeCompany")}
-          icon="☕"
-          size="big"
-          onPress={() => router.push("/requests/new")}
+          label={t("sosButton")}
+          icon="🆘"
+          variant="danger"
+          onPress={() => router.push("/sos")}
         />
-        <Body muted>{t("askNearby")}</Body>
       </View>
-
-      <BigButton
-        label={t("seeNearby")}
-        icon="👋"
-        variant="soft"
-        onPress={() => router.push("/requests/nearby")}
-      />
-      <BigButton
-        label={t("discoverPeople")}
-        icon="🤝"
-        variant="soft"
-        onPress={() => router.push("/discover")}
-      />
-
-      {/* Emergency: one tap opens /sos, which alerts immediately (no confirm). */}
-      <BigButton
-        label={t("sosButton")}
-        icon="🆘"
-        variant="danger"
-        onPress={() => router.push("/sos")}
-      />
 
       {myRequests.isError ? (
         <ErrorState
@@ -121,7 +230,7 @@ export default function Home() {
               onPress={() => router.push(`/requests/${request.id}`)}
               style={({ pressed }) => ({
                 backgroundColor: pressed ? c.primarySoft : c.surface,
-                borderRadius: 16,
+                borderRadius: radius.md,
                 padding: space.xl,
                 gap: space.s,
                 minHeight: touch.row,

@@ -46,37 +46,32 @@ export function Screen({
           borderBottomColor: separator,
         }}
       >
-        {back || showHome ? (
-          <View style={{ flexDirection: "row", gap: space.xl }}>
-            {back ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t("back")}
-                onPress={() => router.canGoBack() && router.back()}
-                style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, flexDirection: "row", alignItems: "center", gap: 8, minHeight: touch.min, paddingHorizontal: 8, marginHorizontal: -8 })}
-              >
-                <Text style={{ color: c.primary, fontSize: f.button }}>←</Text>
-                <Text style={{ color: c.primary, fontSize: f.button, fontWeight: "600" }}>
-                  {t("back")}
-                </Text>
-              </Pressable>
-            ) : null}
-            {showHome ? (
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={t("home")}
-                onPress={() => router.replace("/home")}
-                style={({ pressed }) => ({ opacity: pressed ? 0.6 : 1, flexDirection: "row", alignItems: "center", gap: 8, minHeight: touch.min, paddingHorizontal: 8, marginHorizontal: -8 })}
-              >
-                <Text style={{ color: c.primary, fontSize: f.button }}>🏠</Text>
-                <Text style={{ color: c.primary, fontSize: f.button, fontWeight: "600" }}>
-                  {t("home")}
-                </Text>
-              </Pressable>
-            ) : null}
-          </View>
-        ) : null}
+        {/* Header = circular nav buttons + title on one line (the read-aloud
+            action joins at the end). Buttons are tappable circles ≥ 48 px. */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+          {back || showHome ? (
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={back ? t("back") : t("home")}
+              onPress={() =>
+                back ? router.canGoBack() && router.back() : router.replace("/home")
+              }
+              style={({ pressed }) => ({
+                width: touch.min,
+                height: touch.min,
+                borderRadius: touch.min / 2,
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: pressed ? c.surfaceHigh : c.surface,
+                borderWidth: themeName === "contrast" ? 3 : 1,
+                borderColor: themeName === "contrast" ? c.border : c.hairline,
+              })}
+            >
+              <Text style={{ color: c.text, fontSize: f.button }}>
+                {back ? "←" : "🏠"}
+              </Text>
+            </Pressable>
+          ) : null}
           <Text
             accessible
             accessibilityRole="header"

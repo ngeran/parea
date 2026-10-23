@@ -10,19 +10,22 @@
 // Keep in sync with src/theme.ts COLORS.
 const THEMES = {
   light: {
-    bg: "#FFFFFF", surface: "#F5F7FA", text: "#1A1C1E", textSecondary: "#44474A",
-    primary: "#0A4D8C", primarySoft: "#DCEAF8", onPrimary: "#FFFFFF", onSoft: "#1A1C1E",
-    success: "#146038", danger: "#9E1F19", border: "#6A7076", hairline: "#E3E7EC",
+    bg: "#FFFFFF", surface: "#EEF3FA", surfaceHigh: "#E2EAF5", text: "#1A2B45",
+    textSecondary: "#3E4D60", primary: "#005676", primarySoft: "#D6E9F5",
+    onPrimary: "#FFFFFF", onSoft: "#1A2B45", success: "#146038", accent: "#6E4200",
+    danger: "#9E1F19", border: "#5F6B7A", hairline: "#DDE5F0",
   },
   dark: {
-    bg: "#101214", surface: "#1C1F22", text: "#FFFFFF", textSecondary: "#D5D8DC",
-    primary: "#9CC9F5", primarySoft: "#17324D", onPrimary: "#0A2540", onSoft: "#FFFFFF",
-    success: "#7FD8A4", danger: "#F2A196", border: "#71777D", hairline: "#2A2F36",
+    bg: "#0B1326", surface: "#171F33", surfaceHigh: "#222A3D", text: "#DAE2FD",
+    textSecondary: "#BDC8D1", primary: "#8ED5FF", primarySoft: "#16395C",
+    onPrimary: "#0A2540", onSoft: "#DAE2FD", success: "#56E5A9", accent: "#FFB95F",
+    danger: "#FFB4AB", border: "#87929A", hairline: "#303B58",
   },
   contrast: {
-    bg: "#000000", surface: "#000000", text: "#FFFFFF", textSecondary: "#FFFFFF",
-    primary: "#FFFFFF", primarySoft: "#FFFFFF", onPrimary: "#000000", onSoft: "#000000",
-    success: "#FFFFFF", danger: "#FFFFFF", border: "#FFFFFF", hairline: "#FFFFFF",
+    bg: "#000000", surface: "#000000", surfaceHigh: "#000000", text: "#FFFFFF",
+    textSecondary: "#FFFFFF", primary: "#FFFFFF", primarySoft: "#FFFFFF",
+    onPrimary: "#000000", onSoft: "#000000", success: "#FFFFFF", accent: "#FFFFFF",
+    danger: "#FFFFFF", border: "#FFFFFF", hairline: "#FFFFFF",
   },
 };
 
@@ -45,6 +48,8 @@ function pairs(c) {
     ["quiet button + Back link on surface", c.primary, c.surface, 7],
     ["error text on bg", c.danger, c.bg, 7],
     ["error text on surface", c.danger, c.surface, 7],
+    ["accent text on bg", c.accent, c.bg, 7],
+    ["accent text on surface", c.accent, c.surface, 7],
     ["avatar initial", c.onSoft, c.primarySoft, 4.5],
     ["input border on bg (non-text)", c.border, c.bg, 3],
     ["chip/radio border on bg (non-text)", c.border, c.bg, 3],

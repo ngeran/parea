@@ -96,13 +96,6 @@ export default function Sos() {
     <Screen
       title={phase === "sending" ? t("sosSending") : phase === "nobody" ? t("sosNoContactsTitle") : t("sosSentTitle")}
       showHome
-      speakText={
-        phase === "sent"
-          ? `${t("sosSentTitle")}. ${t("sosSentBody", { names: result?.names.join(", ") ?? "" })}`
-          : phase === "nobody"
-            ? `${t("sosNoContactsTitle")}. ${t("sosNoContactsBody")}`
-            : undefined
-      }
     >
       {/* Live region: phase changes are announced on Android without
           needing the app to speak them manually. */}

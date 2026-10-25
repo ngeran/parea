@@ -20,7 +20,7 @@ export default function TextSizeSetting() {
   const setPrefs = useStore((s) => s.setPrefs);
 
   return (
-    <Screen title={t("textSizeSetting")} speakText={t("chooseTextSize")}>
+    <Screen title={t("textSizeSetting")}>
       <Body>{t("chooseTextSize")}</Body>
       <View style={{ gap: 16 }}>
         {SIZES.map((size) => (

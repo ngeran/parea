@@ -151,11 +151,16 @@ All in `src/components/`, all backward-compatible:
   `eyebrow` (two-line CTA) and `gradient` (two-stop ember; skipped in
   contrast); each variant reads its own on-color (`onSuccess`,
   `onError`, `onSoft`). Spring press dies under reduce-motion.
-  `IconAction` = cyan-tinted pill (read-aloud).
+  `IconAction` (cyan pill) is currently unused: the read-aloud 🔊 was
+  removed app-wide 2026-10-25 ("for now") — `lib/speech.ts`, the
+  `listen`/`stop` i18n keys and `IconAction` itself are kept so the
+  feature can return without re-deriving anything.
 - **`ui`** — `Card` (+`variant: "amber"|"danger"|"cyan"` tint),
-  `SettingsRow` (IconTile + `hue`), `Avatar` (3 px gradient ring, white
-  ring in contrast, `badge: "verified"|"volunteer"` folded into the
-  a11y label; expo-image Authorization header untouched),
+  `SettingsRow` (IconTile + `hue` + optional trailing `pill`),
+  `Avatar` (3 px gradient ring, white ring in contrast, `badge:`
+  `"verified"|"volunteer"` folded into the a11y label; expo-image
+  Authorization header untouched; disk-cached, initials fallback on
+  load error, recycled via `imageKey`),
   `Title/Body/EmptyState/ErrorState/ProfileLine`.
 - **`fields`** — `TextField` (66 px rest height, 2 px CTA focus ring),
   `RadioRow` (selection card: 44 px tile bleached when selected, 2 px
@@ -163,8 +168,8 @@ All in `src/components/`, all backward-compatible:
   (`as="select"` pill / `as="tag"` static), `SectionHeader`, `ChipGrid`.
 - **`StepProgress`** — optional `steps: string[]` numbered pills; done
   pills invert (ctaFill + ctaLabel).
-- **`Screen`** — flat circle nav buttons, 800-weight title, cyan
-  read-aloud pill, footer on `surfaceContainerLowest`.
+- **`Screen`** — flat circle nav buttons, 800-weight title, footer on
+  `surfaceContainerLowest`; optional `avoidKeyboard` / `scroll={false}`.
 - **`Toast` / `DialogHost`** — token reskin only, behavior unchanged.
 
 ## 5. Honest-data rules (visuals may never invent facts)

@@ -5,17 +5,15 @@
 // route — the phone step signs existing members in.
 import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Body, Card, Title } from "../src/components/ui";
-import { BigButton, IconAction } from "../src/components/BigButton";
+import { BigButton } from "../src/components/BigButton";
 import { IconTile } from "../src/components/IconTile";
 import { QuoteWell } from "../src/components/bits";
 import { RadioRow } from "../src/components/fields";
 import { useT } from "../src/i18n";
 import { useStore } from "../src/store";
 import { COLUMN, useTheme } from "../src/theme";
-import { speak, stopSpeaking } from "../src/lib/speech";
 import type { TextSize } from "@parea/shared";
 
 const SIZES: Array<{ value: TextSize; label: "sizeNormal" | "sizeLarge" | "sizeXLarge" }> = [
@@ -32,17 +30,6 @@ export default function Welcome() {
   const language = useStore((s) => s.language);
   const setPrefs = useStore((s) => s.setPrefs);
   const insets = useSafeAreaInsets();
-  const [reading, setReading] = useState(false);
-
-  const pitch = () => {
-    if (reading) {
-      stopSpeaking();
-      setReading(false);
-    } else {
-      speak(`${t("welcomeTitle")}. ${t("welcomeTagline")}. ${t("trustQuote")}`, language);
-      setReading(true);
-    }
-  };
 
   return (
     <ScrollView
@@ -55,7 +42,7 @@ export default function Welcome() {
         paddingBottom: space.xxxl,
       }}
     >
-      {/* Hero band — mark, title, tagline, read-aloud. */}
+      {/* Hero band — mark, title, tagline. */}
       <View style={{ alignItems: "center", gap: space.m }}>
         <View
           style={{
@@ -70,21 +57,18 @@ export default function Welcome() {
         >
           <Text style={{ fontSize: 56 }}>🤝</Text>
         </View>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: space.s, width: "100%" }}>
-          <View style={{ flex: 1, alignItems: "center", gap: space.s }}>
-            <Title>{t("welcomeTitle")}</Title>
-            <Text
-              style={{
-                color: c.primary,
-                fontSize: f.body,
-                fontWeight: "700",
-                textAlign: "center",
-              }}
-            >
-              {t("welcomeTagline")}
-            </Text>
-          </View>
-          <IconAction icon={reading ? "⏹" : "🔊"} label={reading ? t("stop") : t("listen")} onPress={pitch} />
+        <View style={{ alignItems: "center", gap: space.s, width: "100%" }}>
+          <Title>{t("welcomeTitle")}</Title>
+          <Text
+            style={{
+              color: c.primary,
+              fontSize: f.body,
+              fontWeight: "700",
+              textAlign: "center",
+            }}
+          >
+            {t("welcomeTagline")}
+          </Text>
         </View>
         <Text
           style={{

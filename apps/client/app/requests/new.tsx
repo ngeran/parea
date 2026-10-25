@@ -253,7 +253,6 @@ export default function NewRequest() {
       title={t("newRequestTitle")}
       showHome
       avoidKeyboard
-      speakText={`${t("newRequestTitle")}. ${t("stepN", { n: step })}`}
       footer={
         <View style={{ gap: 8 }}>
           {!canNext ? (

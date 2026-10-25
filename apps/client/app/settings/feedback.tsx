@@ -36,7 +36,7 @@ export default function FeedbackScreen() {
   };
 
   return (
-    <Screen title={t("feedbackSetting")} avoidKeyboard speakText={t("feedbackHint")}>
+    <Screen title={t("feedbackSetting")} avoidKeyboard>
       <TextField
         label={t("feedbackSetting")}
         value={message}

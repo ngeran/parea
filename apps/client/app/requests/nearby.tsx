@@ -25,7 +25,6 @@ import { COLUMN, CTA_GRADIENT, ELEVATION, useTheme, withAlpha, type TintHue } fr
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
-import { speak } from "../../src/lib/speech";
 import { formatDistance, formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
@@ -95,23 +94,9 @@ export default function Nearby() {
   const requests = nearby.data?.requests ?? [];
   const visible = requests.filter((r) => filter === "all" || r.activity === filter);
 
-  // The header read-aloud: the hero copy plus each visible neighbor in one
-  // pass — real query state only.
-  const speakAll = [
-    t("nearbyHeroTitle"),
-    t("nearbyHeroBody"),
-    requests.length > 0 ? t("nearbyCount", { n: requests.length }) : "",
-    ...visible.map(
-      (r) => `${r.owner.first_name}. ${activityLabel(r.activity, language)}, ${formatWhen(r.starts_at, language)}.`,
-    ),
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   // A neighbor, not a form field: badges, face, their own words, then the
   // single action. Distance gets the cyan pill (the mockup's signature).
   const card = (request: RequestDTO) => {
-    const summary = `${request.owner.first_name}. ${activityLabel(request.activity, language)}, ${formatWhen(request.starts_at, language)}, ${placeTypeLabel(request.place_type, language)}${request.owner.about ? `. ${request.owner.about}` : ""}`;
     return (
       <View
         style={{
@@ -166,21 +151,6 @@ export default function Nearby() {
               </Text>
             ) : null}
           </View>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`${t("listen")} — ${request.owner.first_name}`}
-            onPress={() => speak(summary, language)}
-            style={({ pressed }) => ({
-              width: 48,
-              height: 48,
-              borderRadius: 24,
-              alignItems: "center",
-              justifyContent: "center",
-              backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainerLow,
-            })}
-          >
-            <Text style={{ fontSize: f.title }}>🔊</Text>
-          </Pressable>
         </View>
 
         <Text style={{ color: c.onSurface, fontSize: f.body }}>
@@ -309,7 +279,7 @@ export default function Nearby() {
   );
 
   return (
-    <Screen title={t("nearbyTitle")} speakText={nearby.isLoading ? undefined : speakAll} scroll={false}>
+    <Screen title={t("nearbyTitle")} scroll={false}>
       <FlatList
         data={visible}
         renderItem={({ item }) => card(item)}

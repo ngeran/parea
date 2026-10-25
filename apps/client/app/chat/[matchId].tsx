@@ -1,5 +1,6 @@
-// Chat — big bubbles, read-aloud on every received message, quick replies,
-// the door to making a plan, and one-tap Report/Block in the header.
+// Chat — big bubbles, quick replies, the door to making a plan, and one-tap
+// Report/Block in the header. Incoming messages are announced to screen
+// readers. (Per-message read-aloud was removed for now; lib/speech stays.)
 import {
   AccessibilityInfo,
   FlatList,
@@ -19,7 +20,6 @@ import { Body, EmptyState, ErrorState } from "../../src/components/ui";
 import { TextField } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
 import { toast } from "../../src/lib/notify";
-import { speak, stopSpeaking } from "../../src/lib/speech";
 import { useT } from "../../src/i18n";
 import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
@@ -40,8 +40,6 @@ export default function Chat() {
   const messages = useMessages(matchId ?? "");
   const [draft, setDraft] = useState("");
   const [sending, setSending] = useState(false);
-  // Which message is being read aloud (the 🔊 button becomes ⏹ while active).
-  const [readingId, setReadingId] = useState<string | null>(null);
   // Last message id announced to screen readers; null until the first load.
   const lastAnnounced = useRef<string | null>(null);
 
@@ -69,16 +67,6 @@ export default function Chat() {
     }
     lastAnnounced.current = latest.id;
   }, [messages.data, myId, other?.first_name]);
-
-  const readAloud = (message: MessageDTO) => {
-    if (readingId === message.id) {
-      stopSpeaking();
-      setReadingId(null);
-    } else {
-      speak(message.body, language);
-      setReadingId(message.id);
-    }
-  };
 
   const send = async (body: string) => {
     const text = body.trim();
@@ -118,29 +106,10 @@ export default function Chat() {
         style={{
           flexDirection: "row",
           alignItems: "flex-end",
-          gap: space.s,
           justifyContent: mine ? "flex-end" : "flex-start",
           marginVertical: space.xs,
         }}
       >
-        {!mine ? (
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={`${readingId === message.id ? t("stop") : t("listen")}: ${message.body}`}
-            accessibilityState={{ selected: readingId === message.id }}
-            onPress={() => readAloud(message)}
-            style={({ pressed }) => ({
-              opacity: pressed ? 0.6 : 1,
-              padding: space.s,
-              minWidth: touch.min,
-              minHeight: touch.min,
-              alignItems: "center",
-              justifyContent: "center",
-            })}
-          >
-            <Text style={{ fontSize: f.title }}>{readingId === message.id ? "⏹" : "🔊"}</Text>
-          </Pressable>
-        ) : null}
         <View
           style={{
             maxWidth: "78%",

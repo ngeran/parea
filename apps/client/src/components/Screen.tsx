@@ -1,15 +1,12 @@
 // Screen shell: Back + Home always visible in pushed screens, big title,
-// optional read-aloud for the whole screen, scrollable body and an optional
-// fixed footer (where the single primary action lives).
+// scrollable body and an optional fixed footer (where the single primary
+// action lives). (Read-aloud was removed for now — lib/speech stays for a
+// future return.)
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
-import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { COLUMN, useTheme } from "../theme";
-import { useT, tr } from "../i18n";
-import { useStore } from "../store";
-import { speak, stopSpeaking } from "../lib/speech";
-import { IconAction } from "./BigButton";
+import { useT } from "../i18n";
 
 export function Screen({
   title,
@@ -17,7 +14,6 @@ export function Screen({
   footer,
   back = true,
   showHome = false,
-  speakText,
   avoidKeyboard = false,
   scroll = true,
 }: {
@@ -26,7 +22,6 @@ export function Screen({
   footer?: React.ReactNode;
   back?: boolean;
   showHome?: boolean;
-  speakText?: string;
   /** Wrap the body+footer so the keyboard never covers the focused input
    *  (iOS padding; Android's window resize already handles it). */
   avoidKeyboard?: boolean;
@@ -37,8 +32,6 @@ export function Screen({
   const { c, f, space, touch, themeName } = useTheme();
   const t = useT();
   const router = useRouter();
-  const lang = useStore((s) => s.language);
-  const [reading, setReading] = useState(false);
   // Real notch/status-bar/home-bar insets (zeros on web) instead of guessed
   // constants — the header clears the notch, the footer clears the home bar,
   // and landscape phones get side insets so content never hides under the
@@ -148,21 +141,6 @@ export function Screen({
           >
             {title}
           </Text>
-          {speakText ? (
-            <IconAction
-              icon={reading ? "⏹" : "🔊"}
-              label={reading ? t("stop") : t("listen")}
-              onPress={() => {
-                if (reading) {
-                  stopSpeaking();
-                  setReading(false);
-                } else {
-                  speak(speakText, lang);
-                  setReading(true);
-                }
-              }}
-            />
-          ) : null}
         </View>
         </View>
       </View>

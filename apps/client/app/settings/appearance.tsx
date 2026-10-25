@@ -21,7 +21,7 @@ export default function AppearanceSetting() {
   const setPrefs = useStore((s) => s.setPrefs);
 
   return (
-    <Screen title={t("appearanceSetting")} speakText={t("chooseTheme")}>
+    <Screen title={t("appearanceSetting")}>
       <Body>{t("chooseTheme")}</Body>
       <View style={{ gap: 16 }}>
         {THEMES.map((item) => (

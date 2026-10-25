@@ -72,7 +72,7 @@ export default function Discover() {
   );
 
   return (
-    <Screen title={t("discoverPeople")} speakText={person ? person.about : undefined}>
+    <Screen title={t("discoverPeople")}>
       {!coords ? (
         <View style={{ gap: space.xl }}>
           <EmptyState emoji="📍" text={t("locationNote")} />

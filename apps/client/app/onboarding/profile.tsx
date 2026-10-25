@@ -107,7 +107,6 @@ export default function ProfileSetup() {
   return (
     <Screen
       title={t("setupTitle")}
-      speakText={`${t("stepN", { n: step })}. ${t("setupTitle")}`}
       back={step === 1}
       footer={
         <BigButton

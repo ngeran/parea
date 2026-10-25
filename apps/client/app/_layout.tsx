@@ -110,7 +110,7 @@ function ThemeColorBridge() {
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
     const meta = document.createElement("meta");
     meta.setAttribute("name", "theme-color");
-    meta.setAttribute("content", COLORS[themeName].bg);
+    meta.setAttribute("content", COLORS[themeName].background);
     document.head.appendChild(meta);
   }, [themeName]);
   return null;
@@ -144,7 +144,7 @@ function RootLayout() {
           // bar leaves a band under it that must follow an explicit theme
           // choice, not just the OS scheme (which is all the html bg knows).
           contentStyle: {
-            backgroundColor: COLORS[themeName].bg,
+            backgroundColor: COLORS[themeName].background,
           },
         }}
       >

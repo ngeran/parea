@@ -1,16 +1,18 @@
-// My details — edit photo, name, about and interests. One Save action.
+// My details — edit photo, name, about, interests and mobility. One Save.
 import { View } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
-import { INTEREST_CHIPS, type SelfProfile } from "@parea/shared";
+import { INTEREST_CHIPS, MOBILITY_LABELS, type Mobility, type SelfProfile } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
 import { Avatar, Body } from "../../src/components/ui";
-import { Chip, ChipGrid, TextField } from "../../src/components/fields";
+import { Chip, ChipGrid, RadioRow, SectionHeader, TextField } from "../../src/components/fields";
 import { api, uploadPhoto } from "../../src/lib/api";
 import { toast } from "../../src/lib/notify";
 import { useT } from "../../src/i18n";
 import { useStore } from "../../src/store";
+
+const MOBILITIES: Mobility[] = ["walk", "ride", "home"];
 
 export default function MyDetails() {
   const t = useT();
@@ -22,6 +24,7 @@ export default function MyDetails() {
   const [firstName, setFirstName] = useState(profile?.first_name ?? "");
   const [about, setAbout] = useState(profile?.about ?? "");
   const [interests, setInterests] = useState<string[]>(profile?.interests ?? []);
+  const [mobility, setMobility] = useState<Mobility>(profile?.mobility ?? "walk");
   const [busy, setBusy] = useState(false);
 
   const pickPhoto = async () => {
@@ -45,7 +48,7 @@ export default function MyDetails() {
       let updated = await api<SelfProfile>("/me", {
         method: "PATCH",
         token,
-        body: { first_name: firstName.trim(), about: about.trim(), interests },
+        body: { first_name: firstName.trim(), about: about.trim(), interests, mobility },
       });
       if (photoUri) {
         await uploadPhoto(token, photoUri);
@@ -66,6 +69,7 @@ export default function MyDetails() {
   return (
     <Screen
       title={t("detailsTitle")}
+      avoidKeyboard
       footer={<BigButton label={t("save")} size="big" busy={busy} onPress={() => void save()} />}
     >
       <View style={{ alignItems: "center", gap: 16 }}>
@@ -95,6 +99,23 @@ export default function MyDetails() {
             />
           ))}
         </ChipGrid>
+      </View>
+
+      {/* Mobility — same single-select cards as onboarding; part of Save. */}
+      <View style={{ gap: 16 }}>
+        <SectionHeader>{t("mobilityQ")}</SectionHeader>
+        <View style={{ gap: 16 }}>
+          {MOBILITIES.map((m) => (
+            <RadioRow
+              key={m}
+              selected={mobility === m}
+              label={MOBILITY_LABELS[m][language]}
+              emoji={m === "walk" ? "🚶" : m === "ride" ? "🚗" : "🏠"}
+              hue={m === "walk" ? "cyan" : m === "ride" ? "amber" : "ember"}
+              onSelect={() => setMobility(m)}
+            />
+          ))}
+        </View>
       </View>
     </Screen>
   );

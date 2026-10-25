@@ -189,6 +189,39 @@ All in `src/components/`, all backward-compatible:
 - **Motion**: the only animations are the ≤200 ms fade transitions and
   the 3% button spring — both vanish under the OS reduce-motion setting.
 
+## 6b. Responsive & safe areas (phones + tablets, any orientation)
+
+The app rotates freely (`app.json` orientation `"default"`,
+`ios.supportsTablet`). Three primitives in `src/theme.ts`:
+
+- `BREAKPOINTS { medium: 600, expanded: 900 }` + `useBreakpoint()` —
+  wraps `useWindowDimensions`, re-renders on rotation.
+- `COLUMN { width: "100%", maxWidth: 720, alignSelf: "center" }` — the
+  **reading column**. Merged into every `Screen` body/footer and tab
+  screen `contentContainerStyle`; phones never reach the cap (pixel-
+  identical), tablets/landscape/desktop web get a centered column instead
+  of stretched content. The floating tab bar caps/centers at the same
+  width; toasts cap at 480; dialogs at 420.
+- Grids **inside** the column, not layout swaps: home's two quick paths
+  go two-up at `isWide`, `ChipGrid` wraps naturally, StatPills wrap on
+  tiny widths. Nearby cards stay single-column (dense cards read better
+  stacked). No two-pane anywhere — one task per screen, elderly-first.
+
+Safe areas: `useSafeAreaInsets` everywhere spacing meets an edge —
+`Screen` header/footer/body, tab bar + scenes, tab screens, welcome,
+toasts, chat header/composer/list. Web insets are zero (no change there).
+Keyboard: `Screen` has `avoidKeyboard` (iOS padding; Android resizes) —
+used by wizard, details, contacts, feedback, phone, code; and
+`keyboardShouldPersistTaps="handled"` always, so one tap works behind the
+keyboard. `scroll={false}` lets a screen host its own virtualized list
+(nearby is a FlatList — the only unbounded one). Avatars: `cachePolicy
+="memory-disk"`, `transition` (0 under reduce-motion), initials fallback
+on error, `recyclingKey` via `imageKey` in lists.
+
+Deferred for lack of honest data: the mockup profile's **availability
+schedule** (days + time slots) — no schema/API fields exist; needs server
+work (a `profile_availability` table + endpoints) before any UI.
+
 ## 7. Verification loop
 
 ```sh

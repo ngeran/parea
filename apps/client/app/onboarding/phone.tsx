@@ -56,7 +56,7 @@ export default function PhoneSignIn() {
   };
 
   return (
-    <Screen title={t("signInTitle")} speakText={t("signInTitle")}>
+    <Screen title={t("signInTitle")} avoidKeyboard speakText={t("signInTitle")}>
       <TextField
         label={t("yourPhone")}
         value={phone}

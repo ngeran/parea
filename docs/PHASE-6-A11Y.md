@@ -142,3 +142,11 @@ Cannot be verified from code — run with VoiceOver (iOS) and TalkBack (Android)
 8. **Reduce motion**: enable OS setting → screen transitions are instant.
 9. **Greek**: repeat 2–3 flows in el; check RTL-independent layout is fine
    (Greek is LTR — trivially yes) and no truncated labels at Extra large.
+10. **Rotation & tablets** (app rotates freely now): phone portrait **and**
+    landscape (SE-class small → Pro Max) — header/footer clear the notch/
+    home bar, landscape side insets hold, home quick-paths two-up; iPad and
+    an Android tablet in both orientations — content centers in the 720 px
+    reading column, tab bar centers above it, toasts stay pills.
+11. **Keyboard**: wizard, details, contacts add, feedback, phone + code —
+    footer button stays visible above the keyboard; one tap activates
+    quick replies / buttons (no tap-twice).

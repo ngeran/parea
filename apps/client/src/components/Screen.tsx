@@ -1,10 +1,11 @@
 // Screen shell: Back + Home always visible in pushed screens, big title,
 // optional read-aloud for the whole screen, scrollable body and an optional
 // fixed footer (where the single primary action lives).
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { useTheme } from "../theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { COLUMN, useTheme } from "../theme";
 import { useT, tr } from "../i18n";
 import { useStore } from "../store";
 import { speak, stopSpeaking } from "../lib/speech";
@@ -17,6 +18,8 @@ export function Screen({
   back = true,
   showHome = false,
   speakText,
+  avoidKeyboard = false,
+  scroll = true,
 }: {
   title: string;
   children: React.ReactNode;
@@ -24,28 +27,94 @@ export function Screen({
   back?: boolean;
   showHome?: boolean;
   speakText?: string;
+  /** Wrap the body+footer so the keyboard never covers the focused input
+   *  (iOS padding; Android's window resize already handles it). */
+  avoidKeyboard?: boolean;
+  /** false = the body hosts its own scrollable/FlatList (e.g. nearby) and
+   *  this shell renders a plain flex container instead. */
+  scroll?: boolean;
 }) {
   const { c, f, space, touch, themeName } = useTheme();
   const t = useT();
   const router = useRouter();
   const lang = useStore((s) => s.language);
   const [reading, setReading] = useState(false);
+  // Real notch/status-bar/home-bar insets (zeros on web) instead of guessed
+  // constants — the header clears the notch, the footer clears the home bar,
+  // and landscape phones get side insets so content never hides under the
+  // sensor housing.
+  const insets = useSafeAreaInsets();
   // High contrast keeps the strong white separator; other themes use the
   // subtle hairline so the header reads as a surface, not a boxed layout.
   const separator = themeName === "contrast" ? c.outline : c.outlineVariant;
 
+  // Body + footer together, so KeyboardAvoidingView (when requested) lifts
+  // the fixed footer above the keyboard too — the primary action must stay
+  // reachable while typing.
+  const bodyAndFooter = (
+    <>
+      {/* keyboardShouldPersistTaps="handled": one tap dismisses nothing and
+          still presses the button — the tap-twice dance is hostile to
+          everyone, worse with motor difficulties. */}
+      {scroll ? (
+        <ScrollView
+          style={{ flex: 1 }}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={{
+            ...COLUMN,
+            padding: space.xl,
+            paddingLeft: space.xl + insets.left,
+            paddingRight: space.xl + insets.right,
+            gap: space.xl,
+            paddingBottom: space.xxxl,
+          }}
+        >
+          {children}
+        </ScrollView>
+      ) : (
+        <View style={{ flex: 1 }}>{children}</View>
+      )}
+
+      {footer ? (
+        <View
+          style={{
+            borderTopWidth: 1,
+            borderTopColor: separator,
+            backgroundColor: c.surfaceContainerLowest,
+          }}
+        >
+          <View
+            style={{
+              ...COLUMN,
+              padding: space.xl,
+              paddingLeft: space.xl + insets.left,
+              paddingRight: space.xl + insets.right,
+              paddingTop: space.m,
+              paddingBottom: space.xl + insets.bottom,
+              gap: space.m,
+            }}
+          >
+            {footer}
+          </View>
+        </View>
+      ) : null}
+    </>
+  );
+
   return (
     <View style={{ flex: 1, backgroundColor: c.background }}>
-      <View
-        style={{
-          paddingHorizontal: space.xl,
-          paddingTop: space.xl,
-          paddingBottom: space.m,
-          gap: space.m,
-          borderBottomWidth: 1,
-          borderBottomColor: separator,
-        }}
-      >
+      {/* Header/footer paint full-width (border + surface), while their
+          content stays inside the reading column on wide screens. */}
+      <View style={{ borderBottomWidth: 1, borderBottomColor: separator }}>
+        <View
+          style={{
+            ...COLUMN,
+            paddingHorizontal: space.xl + insets.left + insets.right,
+            paddingTop: Math.max(space.xl, insets.top + space.m),
+            paddingBottom: space.m,
+            gap: space.m,
+          }}
+        >
         {/* Header = circular nav buttons + title on one line (the read-aloud
             action joins at the end). Buttons are tappable circles ≥ 48 px. */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
@@ -95,29 +164,19 @@ export function Screen({
             />
           ) : null}
         </View>
+        </View>
       </View>
 
-      <ScrollView
-        style={{ flex: 1 }}
-        contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingBottom: space.xxxl }}
-      >
-        {children}
-      </ScrollView>
-
-      {footer ? (
-        <View
-          style={{
-            padding: space.xl,
-            paddingTop: space.m,
-            borderTopWidth: 1,
-            borderTopColor: separator,
-            backgroundColor: c.surfaceContainerLowest,
-            gap: space.m,
-          }}
+      {avoidKeyboard ? (
+        <KeyboardAvoidingView
+          style={{ flex: 1 }}
+          behavior={Platform.OS === "ios" ? "padding" : undefined}
         >
-          {footer}
-        </View>
-      ) : null}
+          {bodyAndFooter}
+        </KeyboardAvoidingView>
+      ) : (
+        bodyAndFooter
+      )}
     </View>
   );
 }

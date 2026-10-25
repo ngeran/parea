@@ -169,6 +169,9 @@ export function StatPill({ n, label, hue = "ember" }: { n: number; label: string
       accessibilityLabel={`${n} ${label}`}
       style={{
         flex: 1,
+        // Lets a wrapping row drop to two pills on very narrow phones / huge
+        // text instead of squeezing three into unreadable slivers.
+        minWidth: "30%",
         alignItems: "center",
         gap: 2,
         backgroundColor: c.surfaceContainer,

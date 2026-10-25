@@ -1,20 +1,24 @@
-// Settings tab — the profile hero first (face, badges, own words, real
-// interests), then grouped rows, the volunteer + notification switches, a
-// danger-tinted emergency card (real trusted contact, no dialing — the API
-// returns only masked numbers), and a quiet sign-out.
+// Settings tab — the profile page: hero (face, badges, own words), the
+// interests card (real count, editable in details), quick settings rows, a
+// mobility card, the volunteer + notification switches, a danger-tinted
+// emergency card (real trusted contact, no dialing — the API returns only
+// masked numbers), and a quiet sign-out. Read-aloud recites the real data.
 import { ScrollView, Switch, Text, View } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { INTEREST_CHIPS, MOBILITY_LABELS, type SelfProfile } from "@parea/shared";
 import { Avatar, Card, SettingsRow, Title } from "../../src/components/ui";
 import { StatusBadge, QuoteWell, TrustNote } from "../../src/components/bits";
 import { Chip, ChipGrid } from "../../src/components/fields";
-import { BigButton } from "../../src/components/BigButton";
+import { BigButton, IconAction } from "../../src/components/BigButton";
+import { IconTile } from "../../src/components/IconTile";
 import { api } from "../../src/lib/api";
 import { confirmDialog, toast } from "../../src/lib/notify";
+import { speak, stopSpeaking } from "../../src/lib/speech";
 import { useTrustedContacts } from "../../src/lib/queries";
 import { useT, tr } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { COLUMN, useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
 
 export default function Settings() {
@@ -27,14 +31,41 @@ export default function Settings() {
   const theme = useStore((s) => s.theme);
   const language = useStore((s) => s.language);
   const contacts = useTrustedContacts();
+  const insets = useSafeAreaInsets();
   const [pushBusy, setPushBusy] = useState(false);
   const [volunteerBusy, setVolunteerBusy] = useState(false);
+  // Read-aloud state for the profile summary (same pattern as welcome).
+  const [reading, setReading] = useState(false);
 
   const sizeLabel =
     textSize === "normal" ? t("sizeNormal") : textSize === "large" ? t("sizeLarge") : t("sizeXLarge");
   const langLabel = language === "el" ? "Ελληνικά" : "English";
   const age = profile?.birth_year ? new Date().getFullYear() - profile.birth_year : null;
   const firstContact = contacts.data?.contacts[0];
+  const interests = profile?.interests ?? [];
+
+  // The 🔊 summary recites exactly what the page shows — real data only.
+  const speakProfile = [
+    profile?.first_name,
+    age ? tr(language, "yearsOld", { age }) : "",
+    profile?.verified ? t("verifiedNeighbor") : "",
+    profile?.volunteer ? t("volunteerBadge") : "",
+    profile?.about || "",
+    interests.length > 0 ? t("interestsSelected", { n: interests.length }) : "",
+    t("mobilityQ") + ": " + (profile ? MOBILITY_LABELS[profile.mobility][language] : ""),
+  ]
+    .filter(Boolean)
+    .join(". ");
+
+  const toggleReading = () => {
+    if (reading) {
+      stopSpeaking();
+      setReading(false);
+    } else {
+      speak(speakProfile, language);
+      setReading(true);
+    }
+  };
 
   const togglePush = async (on: boolean) => {
     if (pushBusy) return;
@@ -100,9 +131,22 @@ export default function Settings() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
-      <Title>{t("settingsTitle")}</Title>
+      {/* Title + read-aloud: the pill recites this page's real data. */}
+      <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+        <Title>{t("settingsTitle")}</Title>
+        <IconAction
+          icon={reading ? "⏹" : "🔊"}
+          label={reading ? t("stop") : t("listen")}
+          onPress={toggleReading}
+        />
+      </View>
 
       {/* Profile hero — face with badges, name + age, their own words. */}
       <Card>
@@ -127,25 +171,51 @@ export default function Settings() {
           </View>
         </View>
         {profile?.about ? <QuoteWell>{profile.about}</QuoteWell> : null}
-        {profile?.interests && profile.interests.length > 0 ? (
+      </Card>
+
+      {/* Interests — its own card with the real count and the honest way to
+          change them (they are genuinely editable in details). */}
+      <Card>
+        <View style={{ flexDirection: "row", alignItems: "center", flexWrap: "wrap", gap: space.s }}>
+          <Title>{t("myInterests")}</Title>
+          {interests.length > 0 ? (
+            <StatusBadge emoji="✨" label={t("interestsSelected", { n: interests.length })} hue="success" />
+          ) : null}
+        </View>
+        {interests.length > 0 ? (
           <ChipGrid>
-            {profile.interests.map((key) => {
+            {interests.map((key) => {
               const chip = INTEREST_CHIPS.find((ch) => ch.key === key);
               return chip ? (
                 <Chip key={key} as="tag" emoji={chip.emoji} label={chip.label[language]} />
               ) : null;
             })}
           </ChipGrid>
-        ) : null}
+        ) : (
+          <TrustNote emoji="✨">{t("interestsHint")}</TrustNote>
+        )}
+        <BigButton
+          label={t("addInterest")}
+          icon="➕"
+          variant="quiet"
+          size="min"
+          onPress={() => router.push("/settings/details")}
+        />
       </Card>
 
       <View style={{ gap: space.m }}>
-        <SettingsRow icon="📝" hue="ember" label={t("myDetails")} onPress={() => router.push("/settings/details")} />
+        <SettingsRow
+          icon="📝"
+          hue="ember"
+          label={t("editProfile")}
+          onPress={() => router.push("/settings/details")}
+        />
         <SettingsRow
           icon="🅰️"
           hue="cyan"
           label={t("textSizeSetting")}
           value={sizeLabel}
+          pill={t("change")}
           onPress={() => router.push("/settings/text-size")}
         />
         <SettingsRow
@@ -177,17 +247,37 @@ export default function Settings() {
           value={profile ? `${profile.radius_km} km` : undefined}
           onPress={() => router.push("/settings/radius")}
         />
-        {/* Mobility as an IconTile card — the tile mirrors the onboarding choice. */}
-        <SettingsRow
-          icon={profile?.mobility === "ride" ? "🚗" : profile?.mobility === "home" ? "🏠" : "🚶"}
-          hue={profile?.mobility === "ride" ? "amber" : profile?.mobility === "home" ? "ember" : "cyan"}
-          label={t("mobilityQ")}
-          value={profile ? MOBILITY_LABELS[profile.mobility][language] : undefined}
-          onPress={() => router.push("/settings/details")}
-        />
         <SettingsRow icon="🤝" hue="success" label={t("contactsSetting")} onPress={() => router.push("/settings/contacts")} />
         <SettingsRow icon="🔐" hue="danger" label={t("privacySetting")} onPress={() => router.push("/settings/account")} />
       </View>
+
+      {/* Mobility — shown as the user's own sentence, changeable in details
+          (which now actually edits it). */}
+      <Card>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+          <IconTile
+            emoji={profile?.mobility === "ride" ? "🚗" : profile?.mobility === "home" ? "🏠" : "🚶"}
+            size={48}
+            hue={profile?.mobility === "ride" ? "amber" : profile?.mobility === "home" ? "ember" : "cyan"}
+          />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={{ color: c.onSurface, fontSize: f.body, fontWeight: "700" }}>
+              {t("mobilityQ")}
+            </Text>
+            {profile ? (
+              <Text style={{ color: c.onSurfaceVariant, fontSize: f.label, lineHeight: f.label * 1.3 }}>
+                {MOBILITY_LABELS[profile.mobility][language]}
+              </Text>
+            ) : null}
+          </View>
+        </View>
+        <BigButton
+          label={t("change")}
+          variant="quiet"
+          size="min"
+          onPress={() => router.push("/settings/details")}
+        />
+      </Card>
 
       {/* Volunteer: switching on files an application; an admin approves it.
           The badge others see only appears after that review. */}
@@ -253,7 +343,8 @@ export default function Settings() {
       </Card>
 
       {/* Emergency: the real first trusted contact (name + masked number —
-          the API never exposes a dialable phone) and the SOS button. */}
+          the API never exposes a dialable phone, so nothing dials), the SOS
+          button, and the quiet door to managing contacts/alerts. */}
       <Card variant="danger">
         <Text
           accessible
@@ -272,8 +363,8 @@ export default function Settings() {
             </Text>
           </View>
         ) : (
-          // No contacts yet — honest empty state; the rows above link to
-          // /settings/contacts where they can add one.
+          // No contacts yet — honest empty state; the link below opens the
+          // contacts screen where they can add one.
           <TrustNote emoji="🤝">{t("noContacts")}</TrustNote>
         )}
         <BigButton
@@ -281,6 +372,12 @@ export default function Settings() {
           icon="🆘"
           variant="danger"
           onPress={() => router.push("/sos")}
+        />
+        <BigButton
+          label={t("sosSettings")}
+          variant="quiet"
+          size="min"
+          onPress={() => router.push("/settings/contacts")}
         />
       </Card>
 

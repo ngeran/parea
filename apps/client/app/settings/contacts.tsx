@@ -109,6 +109,7 @@ export default function TrustedContacts() {
   return (
     <Screen
       title={t("contactsTitle")}
+      avoidKeyboard
       footer={
         <BigButton
           label={t("addContact")}

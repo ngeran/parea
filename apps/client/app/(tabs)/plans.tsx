@@ -2,12 +2,13 @@
 // glance (shared with the trusted contact? checked in?).
 import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { PlanListItem } from "@parea/shared";
 import { Avatar, Body, EmptyState, ErrorState, Title } from "../../src/components/ui";
 import { formatWhen } from "../../src/lib/time";
 import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
-import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
+import { COLUMN, ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { usePlans } from "../../src/lib/queries";
 
@@ -16,6 +17,7 @@ export default function Plans() {
   const { c, f, space, touch, radius, themeName } = useTheme();
   const router = useRouter();
   const language = useStore((s) => s.language);
+  const insets = useSafeAreaInsets();
   const plans = usePlans();
 
   // Tab screens never remount — refetch stale data when the tab is revisited.
@@ -71,7 +73,12 @@ export default function Plans() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.bg }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
       <Title>{t("plansTitle")}</Title>
 

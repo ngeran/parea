@@ -63,7 +63,7 @@ export default function CodeEntry() {
   };
 
   return (
-    <Screen title={t("codeTitle")} speakText={t("codeSentTo", { phone })}>
+    <Screen title={t("codeTitle")} avoidKeyboard speakText={t("codeSentTo", { phone })}>
       <Body>{t("codeSentTo", { phone })}</Body>
       <TextField
         label={t("codeTitle")}

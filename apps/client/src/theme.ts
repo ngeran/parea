@@ -160,7 +160,10 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
       inverseSurface: "#181C20",
       inverseOnSurface: "#F7F9FF",
       inversePrimary: "#FFB59A",
-      success: "#146038",
+      // L5: the app's green #146038 read 6.54:1 as text on the container
+      // fill (StatPill numbers); #0F5A31 gives 7.15 and 8.31 with a white
+      // label. Hue preserved.
+      success: "#0F5A31",
       onSuccess: "#FFFFFF",
       ctaFill: "#8A2F10",
       ctaLabel: "#FFFFFF",
@@ -281,12 +284,23 @@ export const COLORS: Record<ThemeName, ThemeColors> = {
  * components keep their 3px-border branches.
  */
 export type TintHue = "ember" | "cyan" | "amber" | "success" | "danger";
+
+/**
+ * The primary CTA gradient stops (BigButton `gradient`, hero cards).
+ * ctaLabel passes ≥ 7:1 on BOTH stops — asserted in the contrast gate.
+ * Never used raw in screens — always through a component.
+ */
+export const CTA_GRADIENT: Record<"light" | "dark", [string, string]> = {
+  light: ["#8A2F10", "#7C280E"],
+  dark: ["#FF7A45", "#F97316"],
+};
+
 export const TINT: Record<ThemeName, Record<TintHue, string>> = {
   light: {
     ember: "#F7EBE6", // primaryContainer 12% over white — onSurface 14.67
     cyan: "#FFF0E4", // secondaryContainer 18% over white — onSecondaryContainer 7.64
     amber: "#E8E6E4", // tertiaryContainer 18% over white — onSurface ≈13
-    success: "#E3ECE7", // success 12% over white — onSurface ≈13
+    success: "#E2EBE6", // success 12% over white — onSurface ≈13
     danger: "#F3E4E3", // error 12% over white — onSurface ≈13
   },
   dark: {

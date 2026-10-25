@@ -1,9 +1,9 @@
 // Form building blocks: labeled text fields, big radio rows and selectable
-// chips. All ≥ 56 px, explicit roles/states, labels always visible (never
+// chips. All ≥ 48 px, explicit roles/states, labels always visible (never
 // placeholder-only), errors read out by screen readers via accessibilityLabel.
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, Text, TextInput, View } from "react-native";
 import { useState } from "react";
-import { ELEVATION, useTheme } from "../theme";
+import { ELEVATION, TINT, useTheme, type TintHue } from "../theme";
 
 export function TextField({
   label,
@@ -31,66 +31,78 @@ export function TextField({
   return (
     <View style={{ gap: space.s }}>
       {label ? (
-        <Text style={{ color: c.text, fontSize: f.body, fontWeight: "600" }}>{label}</Text>
+        <Text style={{ color: c.onSurface, fontSize: f.body, fontWeight: "600" }}>{label}</Text>
       ) : null}
       <TextInput
         accessibilityLabel={accessibilityLabel ?? `${label}${error ? `. ${error}` : ""}`}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor={c.textSecondary}
+        placeholderTextColor={c.onSurfaceVariant}
         keyboardType={keyboardType}
         multiline={multiline}
-        keyboardAppearance={c.bg === "#000000" ? "dark" : "light"}
+        keyboardAppearance={themeName === "light" ? "light" : "dark"}
         onFocus={() => setFocused(true)}
         onBlur={() => setFocused(false)}
         style={{
-          minHeight: 56,
+          // 66 px rest height — the extra air matters at xlarge text.
+          minHeight: 66,
           borderRadius: radius.md,
-          // Focused fields get the strong 2 px primary ring (a clear focus
+          // Focused fields get the strong 2 px CTA ring (a clear focus
           // indicator matters more than décor); at rest a hairline on a
           // surface fill. High contrast keeps the 3 px outline always.
           borderWidth: themeName === "contrast" ? 3 : focused || error ? 2 : 1,
-          borderColor: error ? c.danger : focused ? c.primary : themeName === "contrast" ? c.border : c.hairline,
-          paddingHorizontal: 14,
-          paddingVertical: multiline ? 12 : 0,
+          borderColor: error
+            ? c.error
+            : focused
+              ? c.ctaFill
+              : themeName === "contrast"
+                ? c.border
+                : c.outlineVariant,
+          paddingHorizontal: 16,
+          paddingVertical: multiline ? 14 : 0,
           fontSize: f.body,
-          color: c.text,
-          backgroundColor: c.surface,
+          color: c.onSurface,
+          backgroundColor: c.surfaceContainer,
           textAlignVertical: multiline ? "top" : "center",
         }}
       />
       {hint && !error ? (
-        <Text style={{ color: c.textSecondary, fontSize: f.label }}>{hint}</Text>
+        <Text style={{ color: c.onSurfaceVariant, fontSize: f.label }}>{hint}</Text>
       ) : null}
-      {error ? <Text style={{ color: c.danger, fontSize: f.label }}>{error}</Text> : null}
+      {error ? <Text style={{ color: c.error, fontSize: f.label }}>{error}</Text> : null}
     </View>
   );
 }
 
 /**
  * One radio choice as a selection card (the wizard's main building block):
- * circular emoji tile, title + optional subtitle, and a circular check
- * indicator that fills (with a soft glow) when selected. Whole card tappable,
- * ≥ 64 px.
+ * tinted emoji tile, title + optional subtitle, and a rounded-square check
+ * that fills with the CTA color (plus a soft glow) when selected. Whole card
+ * tappable, ≥ 68 px.
  */
 export function RadioRow({
   selected,
   label,
   subtitle,
   emoji,
+  hue = "ember",
   onSelect,
 }: {
   selected: boolean;
   label: string;
   subtitle?: string;
   emoji?: string;
+  hue?: TintHue;
   onSelect: () => void;
 }) {
   const { c, f, space, radius, themeName } = useTheme();
   // The glow is decoration — the high-contrast theme skips it, and the fill
   // + check carry the selection state instead.
-  const glow = selected && themeName !== "contrast" ? { ...ELEVATION.sm, shadowColor: c.primary, shadowOpacity: 0.3, shadowRadius: 8 } : {};
+  const glow =
+    selected && themeName !== "contrast"
+      ? { ...ELEVATION.sm, shadowColor: c.ctaFill, shadowOpacity: 0.3, shadowRadius: 8 }
+      : {};
   return (
     <Pressable
       accessibilityRole="radio"
@@ -101,27 +113,37 @@ export function RadioRow({
         flexDirection: "row",
         alignItems: "center",
         gap: space.m,
-        minHeight: 64,
+        minHeight: 68,
         padding: space.m,
         borderRadius: radius.md,
-        borderWidth: themeName === "contrast" ? 3 : 1,
-        borderColor: selected ? c.primary : themeName === "contrast" ? c.border : c.hairline,
-        backgroundColor: selected ? c.primarySoft : pressed ? c.surfaceHigh : c.surface,
+        borderWidth: selected ? 2 : themeName === "contrast" ? 3 : 1,
+        borderColor: selected ? c.ctaFill : themeName === "contrast" ? c.border : c.outlineVariant,
+        backgroundColor: selected
+          ? c.primarySoft
+          : pressed
+            ? c.surfaceContainerHigh
+            : c.surfaceContainer,
         ...glow,
       })}
     >
       {emoji ? (
+        // Decorative tile — selected cards bleach it to the lowest surface
+        // so the check, border and fill carry the state (never color-only).
         <View
+          accessible={false}
+          importantForAccessibility="no-hide-descendants"
           style={{
             width: 44,
             height: 44,
-            borderRadius: 22,
+            borderRadius: 13,
             alignItems: "center",
             justifyContent: "center",
-            backgroundColor: selected ? c.bg : c.surfaceHigh,
+            backgroundColor: selected ? c.surfaceContainerLowest : TINT[themeName][hue],
+            borderWidth: themeName === "contrast" ? 3 : 0,
+            borderColor: c.border,
           }}
         >
-          <Text style={{ fontSize: 22 }}>{emoji}</Text>
+          <Text style={{ fontSize: 24, lineHeight: 28 }}>{emoji}</Text>
         </View>
       ) : null}
       {/* Selected fills use primarySoft → labels follow onSoft (flips to
@@ -129,7 +151,7 @@ export function RadioRow({
       <View style={{ flex: 1, gap: 1 }}>
         <Text
           style={{
-            color: selected ? c.onSoft : c.text,
+            color: selected ? c.onSoft : c.onSurface,
             fontSize: f.body,
             fontWeight: selected ? "700" : "600",
           }}
@@ -137,25 +159,29 @@ export function RadioRow({
           {label}
         </Text>
         {subtitle ? (
-          <Text style={{ color: selected ? c.onSoft : c.textSecondary, fontSize: f.label }}>
+          <Text
+            style={{ color: selected ? c.onSoft : c.onSurfaceVariant, fontSize: f.label }}
+          >
             {subtitle}
           </Text>
         ) : null}
       </View>
+      {/* Rounded-square check in the CTA color — the mockup's marker. */}
       <View
+        accessible={false}
         style={{
           width: 28,
           height: 28,
-          borderRadius: 14,
+          borderRadius: 8,
           borderWidth: 2,
-          borderColor: selected ? c.primary : c.border,
-          backgroundColor: selected ? c.primary : "transparent",
+          borderColor: selected ? c.ctaFill : c.outline,
+          backgroundColor: selected ? c.ctaFill : "transparent",
           alignItems: "center",
           justifyContent: "center",
         }}
       >
         {selected ? (
-          <Text style={{ color: c.onPrimary, fontSize: 16, fontWeight: "800" }}>✓</Text>
+          <Text style={{ color: c.ctaLabel, fontSize: 16, fontWeight: "800" }}>✓</Text>
         ) : null}
       </View>
     </Pressable>
@@ -163,23 +189,56 @@ export function RadioRow({
 }
 
 /**
- * Selectable chip (single- or multi-select), ≥ 48 px, emoji + label + a
- * trailing ✓ that reserves its width so toggling never reflows the grid.
+ * Chips: `as="select"` (default) is the single/multi-select pill, ≥ 48 px,
+ * emoji + label + a trailing ✓ that reserves its width so toggling never
+ * reflows the grid; `as="tag"` is a static pill for display-only lists
+ * (interests on a profile — nothing to tap).
  */
 export function Chip({
   label,
   emoji,
-  selected,
+  selected = false,
   onToggle,
   disabled = false,
+  as = "select",
 }: {
   label: string;
   emoji?: string;
-  selected: boolean;
-  onToggle: () => void;
+  selected?: boolean;
+  onToggle?: () => void;
   disabled?: boolean;
+  as?: "select" | "tag";
 }) {
   const { c, f, radius, space, themeName } = useTheme();
+
+  if (as === "tag") {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space.s,
+          minHeight: 40,
+          paddingLeft: space.m,
+          paddingRight: space.l,
+          paddingVertical: 8,
+          borderRadius: radius.pill,
+          backgroundColor: c.surfaceContainerHigh,
+          borderWidth: themeName === "contrast" ? 3 : 0,
+          borderColor: c.border,
+        }}
+      >
+        {emoji ? <Text style={{ fontSize: f.body }}>{emoji}</Text> : null}
+        <Text
+          style={{ color: c.onSurface, fontSize: f.label, fontWeight: "600" }}
+          numberOfLines={2}
+        >
+          {label}
+        </Text>
+      </View>
+    );
+  }
+
   return (
     <Pressable
       accessibilityRole="button"
@@ -195,10 +254,14 @@ export function Chip({
         paddingLeft: space.l,
         paddingRight: space.m,
         paddingVertical: space.s,
-        borderRadius: radius.md,
-        borderWidth: themeName === "contrast" ? 3 : 1,
-        borderColor: selected ? c.primary : themeName === "contrast" ? c.border : c.hairline,
-        backgroundColor: selected ? c.primarySoft : pressed ? c.surfaceHigh : c.surface,
+        borderRadius: radius.pill,
+        borderWidth: selected ? 2 : themeName === "contrast" ? 3 : 1,
+        borderColor: selected ? c.ctaFill : themeName === "contrast" ? c.border : c.outlineVariant,
+        backgroundColor: selected
+          ? c.primarySoft
+          : pressed
+            ? c.surfaceContainerHigh
+            : c.surfaceContainer,
         opacity: disabled ? 0.4 : 1,
       })}
     >
@@ -206,7 +269,7 @@ export function Chip({
       {/* Same onSoft rule as RadioRow: labels on primarySoft fills. */}
       <Text
         style={{
-          color: selected ? c.onSoft : c.text,
+          color: selected ? c.onSoft : c.onSurface,
           fontSize: f.label,
           fontWeight: "600",
         }}
@@ -238,7 +301,7 @@ export function SectionHeader({ children }: { children: React.ReactNode }) {
     <Text
       accessible
       accessibilityRole="header"
-      style={{ color: c.text, fontSize: f.body + 2, fontWeight: "700", marginTop: space.m }}
+      style={{ color: c.onSurface, fontSize: f.body + 2, fontWeight: "700", marginTop: space.m }}
     >
       {children}
     </Text>

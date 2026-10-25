@@ -34,13 +34,13 @@ const THEMES = {
     error: "#971B15", onError: "#FFFFFF", errorContainer: "#FFDAD6", onErrorContainer: "#93000A",
     outline: "#8A726A", outlineVariant: "#DDC0B7",
     inverseSurface: "#181C20", inverseOnSurface: "#F7F9FF", inversePrimary: "#FFB59A",
-    success: "#146038", onSuccess: "#FFFFFF",
+    success: "#0F5A31", onSuccess: "#FFFFFF",
     ctaFill: "#8A2F10", ctaLabel: "#FFFFFF", primarySoft: "#FFE7DB", onSoft: "#390C00",
     // BigButton gradient (second stop) — the label must pass on BOTH stops.
     ctaGradientStop2: "#7C280E",
     // TINT composites (src/theme.ts) — solid fills the gate asserts here.
     tints: {
-      ember: "#F7EBE6", cyan: "#FFF0E4", amber: "#E8E6E4", success: "#E3ECE7", danger: "#F3E4E3",
+      ember: "#F7EBE6", cyan: "#FFF0E4", amber: "#E8E6E4", success: "#E2EBE6", danger: "#F3E4E3",
     },
   },
   dark: {
@@ -138,6 +138,7 @@ function pairs(c, name) {
   out.push(["tertiary as text on container", c.tertiary, c.surfaceContainer, 7]);
   out.push(["error as text on bg", c.error, c.background, 7]);
   out.push(["error as text on container", c.error, c.surfaceContainer, 7]);
+  out.push(["success as text on container (StatPill)", c.success, c.surfaceContainer, 7]);
   // Interactive borders (≥ 3:1, WCAG 1.4.11) on every surface level.
   for (const level of SURFACE_LEVELS) {
     out.push([`outline border on ${level} (non-text)`, c.outline, c[level], 3]);
@@ -180,9 +181,12 @@ function pairs(c, name) {
       // Drift: recipe and TINT table disagree — a ratio check can't tell
       // 1.0 from 1.01, so compare the hexes and hard-fail on any difference.
       out.push([`${hue} tint DRIFT — theme.ts ${want} vs recipe ${got}`, "#000000", "#FFFFFF", 999]);
-    } else if (name === "dark") {
-      out.push([`${hue} accent label on ${hue} tint ${got}`, label, got, 7]);
     } else {
+      // Dark badges use the bright accent of the hue on the tint …
+      if (name === "dark") {
+        out.push([`${hue} accent label on ${hue} tint ${got}`, label, got, 7]);
+      }
+      // … and body text may sit inside a tinted Card in every theme.
       out.push([`${hue} tint ${got} carries onSurface`, c.onSurface, got, 7]);
     }
   }

@@ -3,7 +3,7 @@
 //   2. about + interest chips
 //   3. languages + mobility → Finish
 // Finishing also asks for location (the rounded one — see lib/location).
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { router } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
@@ -17,20 +17,21 @@ import {
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
 import { StepProgress } from "../../src/components/StepProgress";
-import { Body, Avatar } from "../../src/components/ui";
+import { StatusBadge, TrustNote } from "../../src/components/bits";
+import { Body, Card, Avatar } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader, TextField } from "../../src/components/fields";
 import { api, uploadPhoto } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
 import { useT, tr } from "../../src/i18n";
-import { useTheme, withAlpha } from "../../src/theme";
+import { useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
 
 const MOBILITIES: Mobility[] = ["walk", "ride", "home"];
 
 export default function ProfileSetup() {
   const t = useT();
-  const { c, f, space } = useTheme();
+  const { c, f, space, themeName } = useTheme();
   const language = useStore((s) => s.language);
   const setProfile = useStore((s) => s.setProfile);
 
@@ -112,6 +113,7 @@ export default function ProfileSetup() {
         <BigButton
           label={step === 3 ? t("finish") : t("next")}
           size="big"
+          gradient
           busy={busy}
           onPress={() => {
             if (step === 1 && !firstName.trim()) {
@@ -125,12 +127,47 @@ export default function ProfileSetup() {
         />
       }
     >
-      <StepProgress step={step} total={3} label={t("stepN", { n: step })} />
+      <StepProgress
+        step={step}
+        total={3}
+        label={t("stepN", { n: step })}
+        steps={[t("profileStepPhoto"), t("profileStepAbout"), t("profileStepDetails")]}
+      />
 
       {step === 1 ? (
         <View style={{ gap: space.xl }}>
           <View style={{ alignItems: "center", gap: space.l }}>
-            <Avatar photoUrl={photoUri} name={firstName || "?"} size={112} />
+            {/* The avatar itself opens the picker — the ring + camera bubble
+                mark it as tappable; the labeled soft button stays for anyone
+                who misses it. */}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel={photoUri ? t("changePhoto") : t("addPhoto")}
+              onPress={() => void pickPhoto()}
+            >
+              <View>
+                <Avatar photoUrl={photoUri} name={firstName || "?"} size={112} />
+                <View
+                  accessible={false}
+                  importantForAccessibility="no-hide-descendants"
+                  style={{
+                    position: "absolute",
+                    right: -2,
+                    bottom: -2,
+                    width: 40,
+                    height: 40,
+                    borderRadius: 20,
+                    backgroundColor: c.ctaFill,
+                    borderWidth: themeName === "contrast" ? 3 : 0,
+                    borderColor: c.outline,
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <Text style={{ fontSize: 18 }}>📷</Text>
+                </View>
+              </View>
+            </Pressable>
             <BigButton
               label={photoUri ? t("changePhoto") : t("addPhoto")}
               icon="📷"
@@ -164,21 +201,11 @@ export default function ProfileSetup() {
               <SectionHeader>{t("interestsQ")}</SectionHeader>
               {/* The mockup's counter pill — fills in as chips are tapped. */}
               {interests.length > 0 ? (
-                <Text
-                  accessible
-                  style={{
-                    color: c.success,
-                    fontSize: f.label,
-                    fontWeight: "700",
-                    backgroundColor: withAlpha(c.success, 0.12),
-                    borderRadius: 999,
-                    paddingHorizontal: space.m,
-                    paddingVertical: 4,
-                    overflow: "hidden",
-                  }}
-                >
-                  {t("interestsSelected", { n: interests.length })}
-                </Text>
+                <StatusBadge
+                  emoji="✨"
+                  label={t("interestsSelected", { n: interests.length })}
+                  hue="success"
+                />
               ) : null}
             </View>
             <Body muted>{t("interestsHint")}</Body>
@@ -222,6 +249,7 @@ export default function ProfileSetup() {
                   selected={mobility === m}
                   label={MOBILITY_LABELS[m][language]}
                   emoji={m === "walk" ? "🚶" : m === "ride" ? "🚗" : "🏠"}
+                  hue={m === "walk" ? "cyan" : m === "ride" ? "amber" : "ember"}
                   onSelect={() => setMobility(m)}
                 />
               ))}
@@ -229,6 +257,12 @@ export default function ProfileSetup() {
           </View>
         </View>
       ) : null}
+
+      {/* The privacy line sits under every step — the reassurance belongs to
+          the whole form, not one field. */}
+      <Card>
+        <TrustNote>{t("privacyNote")}</TrustNote>
+      </Card>
     </Screen>
   );
 }

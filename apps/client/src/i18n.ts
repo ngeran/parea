@@ -66,6 +66,9 @@ const en = {
 
   // ── Profile setup ───────────────────────────────────────────────────────
   setupTitle: "Your profile",
+  profileStepPhoto: "Photo",
+  profileStepAbout: "About you",
+  profileStepDetails: "Details",
   stepN: "Step {n} of 3",
   next: "Next",
   finish: "Finish",
@@ -372,6 +375,9 @@ const el: Dict = {
   useDevCode: "Χρήση",
 
   setupTitle: "Το προφίλ σας",
+  profileStepPhoto: "Φωτογραφία",
+  profileStepAbout: "Σχετικά",
+  profileStepDetails: "Στοιχεία",
   stepN: "Βήμα {n} από 3",
   next: "Επόμενο",
   finish: "Τέλος",

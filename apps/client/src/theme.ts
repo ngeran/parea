@@ -5,7 +5,7 @@
 // theme. Three text sizes (user-selectable). Every color pair here meets
 // WCAG AAA (≥ 7:1) for text and ≥ 3:1 for interactive borders; the audit
 // re-verifies with scripts/contrast-check.mjs.
-import { AccessibilityInfo, useColorScheme } from "react-native";
+import { AccessibilityInfo, useColorScheme, useWindowDimensions } from "react-native";
 import { useEffect, useState } from "react";
 import { useStore } from "./store";
 import type { TextSize, ThemeName } from "@parea/shared";
@@ -414,4 +414,37 @@ export function useTheme() {
     themeName,
     textSize,
   };
+}
+
+/**
+ * Width breakpoints (Material-style naming): phones are "compact" in portrait
+ * and landscape, small tablets split at 600, large tablets/desktop go
+ * "expanded". The app rotates freely (app.json orientation "default"), so
+ * layouts must read this instead of assuming a vertical phone.
+ */
+export const BREAKPOINTS = { medium: 600, expanded: 900 } as const;
+export type Breakpoint = "compact" | "medium" | "expanded";
+
+/**
+ * The reading-column style: merges into any contentContainerStyle so wide
+ * screens (tablets, landscape, desktop web) center a ~720 px column instead
+ * of stretching content edge to edge. Phone widths never reach the cap, so
+ * phone layout is pixel-identical.
+ */
+export const COLUMN: { width: "100%"; maxWidth: number; alignSelf: "center" } = {
+  width: "100%",
+  maxWidth: 720,
+  alignSelf: "center",
+};
+
+/** Resolved breakpoint for the current window — re-renders on rotation. */
+export function useBreakpoint(): {
+  width: number;
+  breakpoint: Breakpoint;
+  isWide: boolean;
+} {
+  const { width } = useWindowDimensions();
+  const breakpoint: Breakpoint =
+    width >= BREAKPOINTS.expanded ? "expanded" : width >= BREAKPOINTS.medium ? "medium" : "compact";
+  return { width, breakpoint, isWide: width >= BREAKPOINTS.medium };
 }

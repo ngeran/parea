@@ -3,7 +3,10 @@
     "name": "Parea",
     "slug": "parea",
     "version": "0.1.0",
-    "orientation": "portrait",
+    // "default" = free rotation on phones and tablets alike. The layouts adapt
+    // via useBreakpoint()/COLUMN (src/theme.ts) — portrait stays as-is,
+    // landscape gets a centered reading column instead of stretched content.
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
     "scheme": "parea",

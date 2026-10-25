@@ -4,6 +4,7 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme } from "../theme";
 import { useT, tr } from "../i18n";
 import { useStore } from "../store";
@@ -30,6 +31,11 @@ export function Screen({
   const router = useRouter();
   const lang = useStore((s) => s.language);
   const [reading, setReading] = useState(false);
+  // Real notch/status-bar/home-bar insets (zeros on web) instead of guessed
+  // constants — the header clears the notch, the footer clears the home bar,
+  // and landscape phones get side insets so content never hides under the
+  // sensor housing.
+  const insets = useSafeAreaInsets();
   // High contrast keeps the strong white separator; other themes use the
   // subtle hairline so the header reads as a surface, not a boxed layout.
   const separator = themeName === "contrast" ? c.outline : c.outlineVariant;
@@ -38,8 +44,8 @@ export function Screen({
     <View style={{ flex: 1, backgroundColor: c.background }}>
       <View
         style={{
-          paddingHorizontal: space.xl,
-          paddingTop: space.xl,
+          paddingHorizontal: space.xl + insets.left + insets.right,
+          paddingTop: Math.max(space.xl, insets.top + space.m),
           paddingBottom: space.m,
           gap: space.m,
           borderBottomWidth: 1,
@@ -99,7 +105,13 @@ export function Screen({
 
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingBottom: space.xxxl }}
+        contentContainerStyle={{
+          padding: space.xl,
+          paddingLeft: space.xl + insets.left,
+          paddingRight: space.xl + insets.right,
+          gap: space.xl,
+          paddingBottom: space.xxxl,
+        }}
       >
         {children}
       </ScrollView>
@@ -108,7 +120,10 @@ export function Screen({
         <View
           style={{
             padding: space.xl,
+            paddingLeft: space.xl + insets.left,
+            paddingRight: space.xl + insets.right,
             paddingTop: space.m,
+            paddingBottom: space.xl + insets.bottom,
             borderTopWidth: 1,
             borderTopColor: separator,
             backgroundColor: c.surfaceContainerLowest,

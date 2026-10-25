@@ -5,6 +5,7 @@
 import { ScrollView, Switch, Text, View } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { INTEREST_CHIPS, MOBILITY_LABELS, type SelfProfile } from "@parea/shared";
 import { Avatar, Card, SettingsRow, Title } from "../../src/components/ui";
 import { StatusBadge, QuoteWell, TrustNote } from "../../src/components/bits";
@@ -27,6 +28,7 @@ export default function Settings() {
   const theme = useStore((s) => s.theme);
   const language = useStore((s) => s.language);
   const contacts = useTrustedContacts();
+  const insets = useSafeAreaInsets();
   const [pushBusy, setPushBusy] = useState(false);
   const [volunteerBusy, setVolunteerBusy] = useState(false);
 
@@ -100,7 +102,7 @@ export default function Settings() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
+      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
     >
       <Title>{t("settingsTitle")}</Title>
 

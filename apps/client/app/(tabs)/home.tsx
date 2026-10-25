@@ -5,6 +5,7 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { activityLabel, placeTypeLabel } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
 import { IconTile } from "../../src/components/IconTile";
@@ -29,6 +30,7 @@ export default function Home() {
   const setCoords = useStore((s) => s.setCoords);
   const language = useStore((s) => s.language);
   const token = useStore((s) => s.token);
+  const insets = useSafeAreaInsets();
   const myRequests = useMyRequests();
   const plans = usePlans();
 
@@ -119,7 +121,7 @@ export default function Home() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: space.xxxl }}
+      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
     >
       {/* Greeting — the user's own avatar, today's date, then the name. */}
       <View

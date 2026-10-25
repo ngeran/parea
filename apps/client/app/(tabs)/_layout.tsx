@@ -5,6 +5,7 @@
 // tile; selection is carried by the tile + tint (never color alone).
 import { Tabs } from "expo-router";
 import { Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme } from "../../src/theme";
 
@@ -34,6 +35,9 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
 export default function TabsLayout() {
   const t = useT();
   const { c, f, themeName } = useTheme();
+  // The bar floats above the home-indicator/home-bar — lift it by the real
+  // inset (zeros on web) instead of a guessed constant.
+  const insets = useSafeAreaInsets();
 
   return (
     <Tabs
@@ -45,7 +49,11 @@ export default function TabsLayout() {
           position: "absolute",
           backgroundColor: c.surfaceContainer,
           marginHorizontal: 16,
-          marginBottom: 10,
+          marginBottom: 10 + insets.bottom,
+          // Wide screens: the pill bar centers over the reading column instead
+          // of stretching across a tablet (self-sizing keeps phones as-is).
+          alignSelf: "center",
+          maxWidth: 720,
           borderRadius: 24,
           borderTopWidth: 0,
           // High contrast: the white bar on black bg is its own outline;
@@ -65,8 +73,9 @@ export default function TabsLayout() {
           fontWeight: "600",
         },
         // The floating bar overlays the screen, so every tab's content gets
-        // bottom room to stay clear of it (bar 72 + margin 10 + gap).
-        sceneStyle: { backgroundColor: c.background, marginBottom: 86 },
+        // bottom room to stay clear of it (bar 72 + margin 10 + gap) plus the
+        // real home-bar inset.
+        sceneStyle: { backgroundColor: c.background, marginBottom: 86 + insets.bottom },
       }}
     >
       <Tabs.Screen

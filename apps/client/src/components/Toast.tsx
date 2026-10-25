@@ -5,6 +5,7 @@
 // already says it (never color-only).
 import { Animated, Pressable, Text, View } from "react-native";
 import { useEffect, useRef } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useToastStore, type ToastMessage } from "../lib/notify";
 import { ELEVATION, useReduceMotion, useTheme } from "../theme";
 
@@ -37,6 +38,9 @@ function ToastRow({ toast, onDismiss }: { toast: ToastMessage; onDismiss: () => 
           borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
           paddingHorizontal: space.xl,
           paddingVertical: space.m,
+          // A long Greek message mustn't stretch into a full-width banner on
+          // tablets — toasts stay a readable pill.
+          maxWidth: 480,
           ...(themeName === "contrast" ? {} : ELEVATION.md),
         }}
       >
@@ -56,6 +60,9 @@ export function Toaster() {
   const toasts = useToastStore((s) => s.toasts);
   const dismiss = useToastStore((s) => s.dismiss);
   const { space } = useTheme();
+  // Clear the notch/camera housing instead of pinning to raw y=0 (zeros on
+  // web, where nothing overlaps).
+  const insets = useSafeAreaInsets();
 
   if (toasts.length === 0) return null;
   return (
@@ -67,7 +74,7 @@ export function Toaster() {
         top: 0,
         left: 0,
         right: 0,
-        paddingTop: space.l,
+        paddingTop: insets.top + space.s,
         paddingHorizontal: space.xl,
         gap: space.s,
         alignItems: "center",

@@ -6,6 +6,7 @@
 import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Body, Card, Title } from "../src/components/ui";
 import { BigButton, IconAction } from "../src/components/BigButton";
 import { IconTile } from "../src/components/IconTile";
@@ -30,6 +31,7 @@ export default function Welcome() {
   const textSize = useStore((s) => s.textSize);
   const language = useStore((s) => s.language);
   const setPrefs = useStore((s) => s.setPrefs);
+  const insets = useSafeAreaInsets();
   const [reading, setReading] = useState(false);
 
   const pitch = () => {
@@ -45,7 +47,12 @@ export default function Welcome() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: 48, paddingBottom: space.xxxl }}
+      contentContainerStyle={{
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+        paddingBottom: space.xxxl,
+      }}
     >
       {/* Hero band — mark, title, tagline, read-aloud. */}
       <View style={{ alignItems: "center", gap: space.m }}>

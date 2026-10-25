@@ -12,6 +12,7 @@ import {
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { MessageDTO } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
 import { Body, EmptyState, ErrorState } from "../../src/components/ui";
@@ -34,6 +35,7 @@ export default function Chat() {
   const { matchId } = useLocalSearchParams<{ matchId: string }>();
   const myId = useStore((s) => s.profile?.id);
   const language = useStore((s) => s.language);
+  const insets = useSafeAreaInsets();
   const matches = useMatches();
   const messages = useMessages(matchId ?? "");
   const [draft, setDraft] = useState("");
@@ -164,8 +166,8 @@ export default function Chat() {
       {/* Header: back + the other person's name + the door to plans */}
       <View
         style={{
-          paddingHorizontal: space.xl,
-          paddingTop: space.xl,
+          paddingHorizontal: space.xl + insets.left + insets.right,
+          paddingTop: Math.max(space.xl, insets.top + space.m),
           paddingBottom: space.m,
           borderBottomWidth: 1,
           borderBottomColor: c.surface,
@@ -262,7 +264,11 @@ export default function Chat() {
           renderItem={({ item }) => bubble(item)}
           keyExtractor={(m) => m.id}
           inverted
-          contentContainerStyle={{ padding: space.xl }}
+          contentContainerStyle={{
+            padding: space.xl,
+            paddingLeft: space.xl + insets.left,
+            paddingRight: space.xl + insets.right,
+          }}
           ListFooterComponent={
             messages.isLoading ? (
               <View style={{ padding: space.xl }}>
@@ -273,8 +279,18 @@ export default function Chat() {
         />
       )}
 
-      {/* Quick replies + the input row */}
-      <View style={{ padding: space.l, gap: space.m, borderTopWidth: 1, borderTopColor: c.surface }}>
+      {/* Quick replies + the input row — clears the home bar via the real inset */}
+      <View
+        style={{
+          padding: space.l,
+          paddingLeft: space.l + insets.left,
+          paddingRight: space.l + insets.right,
+          paddingBottom: space.l + insets.bottom,
+          gap: space.m,
+          borderTopWidth: 1,
+          borderTopColor: c.surface,
+        }}
+      >
         <View style={{ flexDirection: "row", gap: space.s, flexWrap: "wrap" }}>
           {QUICK_REPLIES.map((key) => (
             <Pressable

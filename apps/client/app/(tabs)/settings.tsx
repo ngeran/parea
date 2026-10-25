@@ -11,11 +11,10 @@ import { INTEREST_CHIPS, MOBILITY_LABELS, type SelfProfile } from "@parea/shared
 import { Avatar, Card, SettingsRow, Title } from "../../src/components/ui";
 import { StatusBadge, QuoteWell, TrustNote } from "../../src/components/bits";
 import { Chip, ChipGrid } from "../../src/components/fields";
-import { BigButton, IconAction } from "../../src/components/BigButton";
+import { BigButton } from "../../src/components/BigButton";
 import { IconTile } from "../../src/components/IconTile";
 import { api } from "../../src/lib/api";
 import { confirmDialog, toast } from "../../src/lib/notify";
-import { speak, stopSpeaking } from "../../src/lib/speech";
 import { useTrustedContacts } from "../../src/lib/queries";
 import { useT, tr } from "../../src/i18n";
 import { COLUMN, useTheme } from "../../src/theme";
@@ -34,8 +33,6 @@ export default function Settings() {
   const insets = useSafeAreaInsets();
   const [pushBusy, setPushBusy] = useState(false);
   const [volunteerBusy, setVolunteerBusy] = useState(false);
-  // Read-aloud state for the profile summary (same pattern as welcome).
-  const [reading, setReading] = useState(false);
 
   const sizeLabel =
     textSize === "normal" ? t("sizeNormal") : textSize === "large" ? t("sizeLarge") : t("sizeXLarge");
@@ -43,29 +40,6 @@ export default function Settings() {
   const age = profile?.birth_year ? new Date().getFullYear() - profile.birth_year : null;
   const firstContact = contacts.data?.contacts[0];
   const interests = profile?.interests ?? [];
-
-  // The 🔊 summary recites exactly what the page shows — real data only.
-  const speakProfile = [
-    profile?.first_name,
-    age ? tr(language, "yearsOld", { age }) : "",
-    profile?.verified ? t("verifiedNeighbor") : "",
-    profile?.volunteer ? t("volunteerBadge") : "",
-    profile?.about || "",
-    interests.length > 0 ? t("interestsSelected", { n: interests.length }) : "",
-    t("mobilityQ") + ": " + (profile ? MOBILITY_LABELS[profile.mobility][language] : ""),
-  ]
-    .filter(Boolean)
-    .join(". ");
-
-  const toggleReading = () => {
-    if (reading) {
-      stopSpeaking();
-      setReading(false);
-    } else {
-      speak(speakProfile, language);
-      setReading(true);
-    }
-  };
 
   const togglePush = async (on: boolean) => {
     if (pushBusy) return;
@@ -138,15 +112,7 @@ export default function Settings() {
         paddingTop: insets.top + space.xl,
       }}
     >
-      {/* Title + read-aloud: the pill recites this page's real data. */}
-      <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
-        <Title>{t("settingsTitle")}</Title>
-        <IconAction
-          icon={reading ? "⏹" : "🔊"}
-          label={reading ? t("stop") : t("listen")}
-          onPress={toggleReading}
-        />
-      </View>
+      <Title>{t("settingsTitle")}</Title>
 
       {/* Profile hero — face with badges, name + age, their own words. */}
       <Card>

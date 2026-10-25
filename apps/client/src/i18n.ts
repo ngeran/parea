@@ -228,6 +228,8 @@ const en = {
 
   // ── Settings ────────────────────────────────────────────────────────────
   settingsTitle: "Settings",
+  emergencyTitle: "In case of emergency",
+  emergencyContact: "Trusted contact",
   myDetails: "My details",
   textSizeSetting: "Text size",
   languageSetting: "Language",
@@ -239,6 +241,7 @@ const en = {
   themeContrast: "High contrast",
   radiusSetting: "Search distance",
   contactsSetting: "Trusted contacts",
+  noContacts: "No trusted contact yet. Add one so we know who to alert.",
   privacySetting: "Privacy & account",
   logout: "Log out",
   confirmLogout: "Log out of Parea?",
@@ -545,6 +548,8 @@ const el: Dict = {
   planDone: "Συναντηθήκατε — ελπίζουμε πέρασαν ωραία!",
 
   settingsTitle: "Ρυθμίσεις",
+  emergencyTitle: "Σε περίπτωση ανάγκης",
+  emergencyContact: "Έμπιστη επαφή",
   myDetails: "Τα στοιχεία μου",
   textSizeSetting: "Μέγεθος κειμένου",
   languageSetting: "Γλώσσα",
@@ -556,6 +561,7 @@ const el: Dict = {
   themeContrast: "Υψηλή αντίθεση",
   radiusSetting: "Απόσταση αναζήτησης",
   contactsSetting: "Επαφές εμπιστοσύνης",
+  noContacts: "Δεν υπάρχει ακόμα έμπιστη επαφή. Προσθέστε μία για να ξέρουμε ποιον να ειδοποιήσουμε.",
   privacySetting: "Απόρρητο & λογαριασμός",
   logout: "Αποσύνδεση",
   confirmLogout: "Να κλείσουμε το Parea;",

@@ -4,7 +4,7 @@
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Lang, PublicProfile } from "@parea/shared";
 import { API_BASE } from "../lib/api";
 import { BigButton } from "./BigButton";
@@ -238,8 +238,13 @@ export function Avatar({
   const token = useStore((s) => s.token);
   const reduceMotion = useReduceMotion();
   // A failed download (404, offline) falls back to the initials instead of
-  // leaving an empty circle.
+  // leaving an empty circle. The flag must clear when a new URI arrives —
+  // otherwise one bad load would pin the initials forever and even hide a
+  // freshly picked photo in the editor.
   const [failed, setFailed] = useState(false);
+  useEffect(() => {
+    setFailed(false);
+  }, [photoUrl]);
   // Server photos arrive as absolute paths ("/photos/…") — prefix the API
   // base. Local file URIs (photo preview during setup) are used as-is.
   const uri = useMemo(

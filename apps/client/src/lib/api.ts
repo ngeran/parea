@@ -1,6 +1,7 @@
 // Thin fetch wrapper around the Worker API. Every call is JSON in / JSON out;
 // errors arrive as { error: { code, message } } and become ApiError so
 // screens can react to specific codes with plain-language messages.
+import { Platform } from "react-native";
 import type { Lang } from "@parea/shared";
 
 /** GDPR consent version recorded at sign-up (must match the server). */
@@ -91,16 +92,23 @@ export async function api<T>(path: string, opts: ApiOptions = {}): Promise<T> {
 }
 
 /**
- * Multipart photo upload (PUT /me/photo). React Native's FormData takes a
+ * Multipart photo upload (PUT /me/photo). Native FormData takes a
  * { uri, name, type } file reference instead of a Blob — a shape the DOM
- * types don't know, hence the cast.
+ * types don't know, hence the cast. On web that shape silently sends
+ * garbage, so there the local blob:/data: URI is fetched into a real Blob
+ * first — without this, "add photo" did nothing in the browser.
  */
 export async function uploadPhoto(
   token: string,
   uri: string,
 ): Promise<{ photo_url: string }> {
   const form = new FormData();
-  form.append("photo", { uri, name: "photo.jpg", type: "image/jpeg" } as unknown as Blob);
+  if (Platform.OS === "web") {
+    const blob = await (await fetch(uri)).blob();
+    form.append("photo", blob, "photo.jpg");
+  } else {
+    form.append("photo", { uri, name: "photo.jpg", type: "image/jpeg" } as unknown as Blob);
+  }
   let res: Response;
   try {
     res = await fetch(`${API_BASE}/me/photo`, {

@@ -16,7 +16,11 @@ end — cannot be automated here).**
 Automated: `npm run check:contrast -w @together/client`
 (`scripts/contrast-check.mjs`) — verifies every color pair the UI can
 produce, in all three themes, and fails CI on any regression. Keep its
-`THEMES` table in sync with `src/theme.ts`.
+`THEMES` table in sync with `src/theme.ts`. **2026-10-25 redesign update:**
+the script now audits 127 pairs (every content color on every surface
+level, both CTA gradient stops, the tint composites hex-exact) — the
+token architecture, nudge log and tint rules are documented in
+`apps/client/DESIGN.md`.
 
 ### Fixed in this phase
 

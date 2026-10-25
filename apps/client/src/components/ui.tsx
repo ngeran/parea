@@ -69,17 +69,21 @@ export function Body({ children, muted }: { children: React.ReactNode; muted?: b
   );
 }
 
-/** A tappable settings row — ≥ 88 px, emoji tile + label always together. */
+/** A tappable settings row — ≥ 88 px, emoji tile + label always together.
+ *  `pill` renders a trailing "Αλλαγή"-style action pill (primarySoft) after
+ *  the value; purely visual emphasis, the label/value still announce. */
 export function SettingsRow({
   icon,
   label,
   value,
+  pill,
   onPress,
   hue = "ember",
 }: {
   icon: string;
   label: string;
   value?: string;
+  pill?: string;
   onPress: () => void;
   hue?: TintHue;
 }) {
@@ -125,6 +129,25 @@ export function SettingsRow({
         <Text style={{ color: pressed ? c.onSoft : c.textSecondary, fontSize: f.label }}>
           {value}
         </Text>
+      ) : null}
+      {pill ? (
+        <View
+          importantForAccessibility="no-hide-descendants"
+          style={{
+            backgroundColor:
+              // Pressed rows are primarySoft — the pill would blend into it,
+              // except in high contrast where both are white and only the
+              // 3 px outline separates them.
+              pressed && themeName !== "contrast" ? c.surfaceContainerLowest : c.primarySoft,
+            borderRadius: radius.pill,
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderWidth: themeName === "contrast" ? 3 : 0,
+            borderColor: c.border,
+          }}
+        >
+          <Text style={{ color: c.onSoft, fontSize: f.label, fontWeight: "800" }}>{pill}</Text>
+        </View>
       ) : null}
       <Text style={{ color: pressed ? c.onSoft : c.textSecondary, fontSize: f.title }}>›</Text>
     </Pressable>

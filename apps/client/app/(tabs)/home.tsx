@@ -17,7 +17,7 @@ import { registerPush } from "../../src/lib/push";
 import { formatDistance, formatToday, formatWhen } from "../../src/lib/time";
 import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
-import { CTA_GRADIENT, ELEVATION, useTheme, withAlpha } from "../../src/theme";
+import { CTA_GRADIENT, COLUMN, ELEVATION, useBreakpoint, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { useMyRequests, usePlans } from "../../src/lib/queries";
 
@@ -31,6 +31,7 @@ export default function Home() {
   const language = useStore((s) => s.language);
   const token = useStore((s) => s.token);
   const insets = useSafeAreaInsets();
+  const { isWide } = useBreakpoint();
   const myRequests = useMyRequests();
   const plans = usePlans();
 
@@ -121,7 +122,12 @@ export default function Home() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
       {/* Greeting — the user's own avatar, today's date, then the name. */}
       <View
@@ -151,8 +157,9 @@ export default function Home() {
         </View>
       </View>
 
-      {/* Live counters — each pill taps nothing; they are just a glance. */}
-      <View style={{ flexDirection: "row", gap: space.s }}>
+      {/* Live counters — each pill taps nothing; they are just a glance.
+          Wraps to two rows on very narrow screens or huge text. */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.s }}>
         <StatPill n={openCount} label={t("metricRequests")} hue="ember" />
         <StatPill n={offersCount} label={t("metricOffers")} hue="cyan" />
         <StatPill n={plansCount} label={t("metricPlans")} hue="success" />
@@ -189,35 +196,40 @@ export default function Home() {
         </LinearGradient>
       )}
 
-      {/* Secondary paths — selection-card rows with emoji tiles. */}
-      {[
-        { emoji: "👋", hue: "cyan" as const, label: t("seeNearby"), to: "/requests/nearby" },
-        { emoji: "🤝", hue: "amber" as const, label: t("discoverPeople"), to: "/discover" },
-      ].map((row) => (
-        <Pressable
-          key={row.to}
-          accessibilityRole="button"
-          accessibilityLabel={row.label}
-          onPress={() => router.push(row.to)}
-          style={({ pressed }) => ({
-            flexDirection: "row",
-            alignItems: "center",
-            gap: space.m,
-            minHeight: touch.row,
-            backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainer,
-            borderRadius: radius.md,
-            padding: space.l,
-            borderWidth: themeName === "contrast" ? 3 : 1,
-            borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
-          })}
-        >
-          <IconTile emoji={row.emoji} size={48} shape="circle" hue={row.hue} />
-          <Text style={{ color: c.onSurface, fontSize: f.body, fontWeight: "700", flex: 1 }}>
-            {row.label}
-          </Text>
-          <Text style={{ color: c.onSurfaceVariant, fontSize: f.title }}>›</Text>
-        </Pressable>
-      ))}
+      {/* Secondary paths — selection-card rows with emoji tiles. Two-up once
+          the column is wide enough (tablet/landscape); stacked on phones. */}
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: space.m }}>
+        {[
+          { emoji: "👋", hue: "cyan" as const, label: t("seeNearby"), to: "/requests/nearby" },
+          { emoji: "🤝", hue: "amber" as const, label: t("discoverPeople"), to: "/discover" },
+        ].map((row) => (
+          <Pressable
+            key={row.to}
+            accessibilityRole="button"
+            accessibilityLabel={row.label}
+            onPress={() => router.push(row.to)}
+            style={({ pressed }) => ({
+              flexDirection: "row",
+              alignItems: "center",
+              gap: space.m,
+              minHeight: touch.row,
+              flexGrow: 1,
+              minWidth: isWide ? "47%" : "100%",
+              backgroundColor: pressed ? c.surfaceContainerHigh : c.surfaceContainer,
+              borderRadius: radius.md,
+              padding: space.l,
+              borderWidth: themeName === "contrast" ? 3 : 1,
+              borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
+            })}
+          >
+            <IconTile emoji={row.emoji} size={48} shape="circle" hue={row.hue} />
+            <Text style={{ color: c.onSurface, fontSize: f.body, fontWeight: "700", flex: 1 }}>
+              {row.label}
+            </Text>
+            <Text style={{ color: c.onSurfaceVariant, fontSize: f.title }}>›</Text>
+          </Pressable>
+        ))}
+      </View>
 
       {/* Emergency: a danger-tinted card so the red button lands on context.
           One tap opens /sos, which alerts immediately (no confirm). */}

@@ -8,7 +8,7 @@ import { Avatar, Body, EmptyState, ErrorState, Title } from "../../src/component
 import { formatWhen } from "../../src/lib/time";
 import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
-import { ELEVATION, useTheme, withAlpha } from "../../src/theme";
+import { COLUMN, ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { usePlans } from "../../src/lib/queries";
 
@@ -73,7 +73,12 @@ export default function Plans() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.bg }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
       <Title>{t("plansTitle")}</Title>
 

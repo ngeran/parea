@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Body, EmptyState, ErrorState, Title, Avatar } from "../../src/components/ui";
 import { formatWhen } from "../../src/lib/time";
 import { useT } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { COLUMN, useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
 import { useMatches } from "../../src/lib/queries";
 
@@ -20,7 +20,12 @@ export default function Chats() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.bg }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
       <Title>{t("chatsTitle")}</Title>
 

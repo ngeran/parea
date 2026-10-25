@@ -5,7 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTheme } from "../theme";
+import { COLUMN, useTheme } from "../theme";
 import { useT, tr } from "../i18n";
 import { useStore } from "../store";
 import { speak, stopSpeaking } from "../lib/speech";
@@ -42,16 +42,18 @@ export function Screen({
 
   return (
     <View style={{ flex: 1, backgroundColor: c.background }}>
-      <View
-        style={{
-          paddingHorizontal: space.xl + insets.left + insets.right,
-          paddingTop: Math.max(space.xl, insets.top + space.m),
-          paddingBottom: space.m,
-          gap: space.m,
-          borderBottomWidth: 1,
-          borderBottomColor: separator,
-        }}
-      >
+      {/* Header/footer paint full-width (border + surface), while their
+          content stays inside the reading column on wide screens. */}
+      <View style={{ borderBottomWidth: 1, borderBottomColor: separator }}>
+        <View
+          style={{
+            ...COLUMN,
+            paddingHorizontal: space.xl + insets.left + insets.right,
+            paddingTop: Math.max(space.xl, insets.top + space.m),
+            paddingBottom: space.m,
+            gap: space.m,
+          }}
+        >
         {/* Header = circular nav buttons + title on one line (the read-aloud
             action joins at the end). Buttons are tappable circles ≥ 48 px. */}
         <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
@@ -101,11 +103,13 @@ export function Screen({
             />
           ) : null}
         </View>
+        </View>
       </View>
 
       <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
+          ...COLUMN,
           padding: space.xl,
           paddingLeft: space.xl + insets.left,
           paddingRight: space.xl + insets.right,
@@ -119,18 +123,24 @@ export function Screen({
       {footer ? (
         <View
           style={{
-            padding: space.xl,
-            paddingLeft: space.xl + insets.left,
-            paddingRight: space.xl + insets.right,
-            paddingTop: space.m,
-            paddingBottom: space.xl + insets.bottom,
             borderTopWidth: 1,
             borderTopColor: separator,
             backgroundColor: c.surfaceContainerLowest,
-            gap: space.m,
           }}
         >
-          {footer}
+          <View
+            style={{
+              ...COLUMN,
+              padding: space.xl,
+              paddingLeft: space.xl + insets.left,
+              paddingRight: space.xl + insets.right,
+              paddingTop: space.m,
+              paddingBottom: space.xl + insets.bottom,
+              gap: space.m,
+            }}
+          >
+            {footer}
+          </View>
         </View>
       ) : null}
     </View>

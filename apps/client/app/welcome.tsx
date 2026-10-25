@@ -14,7 +14,7 @@ import { QuoteWell } from "../src/components/bits";
 import { RadioRow } from "../src/components/fields";
 import { useT } from "../src/i18n";
 import { useStore } from "../src/store";
-import { useTheme } from "../src/theme";
+import { COLUMN, useTheme } from "../src/theme";
 import { speak, stopSpeaking } from "../src/lib/speech";
 import type { TextSize } from "@parea/shared";
 
@@ -48,6 +48,7 @@ export default function Welcome() {
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
       contentContainerStyle={{
+        ...COLUMN,
         padding: space.xl,
         gap: space.xl,
         paddingTop: insets.top + space.xl,

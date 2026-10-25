@@ -15,7 +15,7 @@ import { api } from "../../src/lib/api";
 import { confirmDialog, toast } from "../../src/lib/notify";
 import { useTrustedContacts } from "../../src/lib/queries";
 import { useT, tr } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { COLUMN, useTheme } from "../../src/theme";
 import { useStore } from "../../src/store";
 
 export default function Settings() {
@@ -102,7 +102,12 @@ export default function Settings() {
   return (
     <ScrollView
       style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={{ padding: space.xl, gap: space.xl, paddingTop: insets.top + space.xl }}
+      contentContainerStyle={{
+        ...COLUMN,
+        padding: space.xl,
+        gap: space.xl,
+        paddingTop: insets.top + space.xl,
+      }}
     >
       <Title>{t("settingsTitle")}</Title>
 

@@ -5,7 +5,7 @@
 // tags, read-aloud per card, and a single action: "I can join".
 import { FlatList, Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -57,7 +57,12 @@ export default function Nearby() {
   const setCoords = useStore((s) => s.setCoords);
   const insets = useSafeAreaInsets();
   const [joining, setJoining] = useState<string | null>(null);
-  const [filter, setFilter] = useState("all");
+  // Home's activity tiles deep-link here pre-filtered (?filter=walk/coffee);
+  // anything unknown falls back to "all".
+  const { filter: filterParam } = useLocalSearchParams<{ filter?: string }>();
+  const [filter, setFilter] = useState(
+    FILTER_KEYS.find((k) => k === filterParam) ?? "all",
+  );
   const nearby = useNearbyRequests(coords);
 
   const refreshLocation = async () => {

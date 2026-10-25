@@ -207,10 +207,15 @@ The app rotates freely (`app.json` orientation `"default"`,
   identical), tablets/landscape/desktop web get a centered column instead
   of stretched content. The floating tab bar caps/centers at the same
   width; toasts cap at 480; dialogs at 420.
-- Grids **inside** the column, not layout swaps: home's two quick paths
-  go two-up at `isWide`, `ChipGrid` wraps naturally, StatPills wrap on
-  tiny widths. Nearby cards stay single-column (dense cards read better
-  stacked). No two-pane anywhere — one task per screen, elderly-first.
+- Grids **inside** the column, not layout swaps: home's four bento
+  activity tiles (walk / coffee invites, volunteers, my schedule — all
+  fed by live counts) go two-up at `isWide`, `ChipGrid` wraps naturally,
+  StatPills wrap on tiny widths. Nearby cards stay single-column (dense
+  cards read better stacked). No two-pane anywhere — one task per
+  screen, elderly-first.
+- The tab bar is a floating fully-rounded pill; the focused tab becomes
+  a solid `primary` pill with emoji + label inside (`tabBarShowLabel:
+  false`, the label lives in the icon).
 
 Safe areas: `useSafeAreaInsets` everywhere spacing meets an edge —
 `Screen` header/footer/body, tab bar + scenes, tab screens, welcome,

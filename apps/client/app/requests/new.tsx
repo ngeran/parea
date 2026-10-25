@@ -260,7 +260,6 @@ export default function NewRequest() {
           ) : null}
           <BigButton
             label={step === 3 ? t("continue_") : t("next")}
-            eyebrow={step < 3 ? t("nextEyebrow") : undefined}
             size="big"
             gradient
             disabled={!canNext}

@@ -109,6 +109,13 @@ const en = {
 
   // ── New request ─────────────────────────────────────────────────────────
   newRequestTitle: "Ask for company",
+  whatHero: "What would you like to do today?",
+  wizardGuidance: "Pick one — you can always ask for something else tomorrow.",
+  wizardReassure: "Someone nearby will see your request and can offer to join you. You choose who.",
+  nextEyebrow: "Next step",
+  stepWhat: "What",
+  stepWhen: "When",
+  stepWhere: "Where",
   whatQ: "What would you like to do?",
   whenQ: "When?",
   whereQ: "Where?",
@@ -416,6 +423,13 @@ const el: Dict = {
   locationFailed: "Δεν πήραμε την τοποθεσία σας. Επιτρέψτε την τοποθεσία στο Parea.",
 
   newRequestTitle: "Ζητήστε παρέα",
+  whatHero: "Τι θα θέλατε να κάνετε σήμερα;",
+  wizardGuidance: "Διαλέξτε ένα — μπορείτε πάντα να ζητήσετε κάτι άλλο αύριο.",
+  wizardReassure: "Κάποιος κοντά σας θα δει το αίτημά σας και μπορεί να προσφερθεί να έρθει μαζί σας. Εσείς αποφασίζετε ποιος.",
+  nextEyebrow: "Επόμενο βήμα",
+  stepWhat: "Τι",
+  stepWhen: "Πότε",
+  stepWhere: "Πού",
   whatQ: "Τι θέλετε να κάνετε;",
   whenQ: "Πότε;",
   whereQ: "Πού;",

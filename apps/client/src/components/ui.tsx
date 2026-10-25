@@ -3,28 +3,36 @@
 // and carries its accessibility roles/labels.
 import { Pressable, StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 import { Image } from "expo-image";
+import { LinearGradient } from "expo-linear-gradient";
 import { useMemo, useState } from "react";
 import type { Lang, PublicProfile } from "@parea/shared";
 import { API_BASE } from "../lib/api";
 import { BigButton } from "./BigButton";
-import { ELEVATION, useTheme } from "../theme";
+import { IconTile } from "./IconTile";
+import { CTA_GRADIENT, ELEVATION, TINT, useTheme, type TintHue } from "../theme";
 import { useStore } from "../store";
 import { useT } from "../i18n";
 import { tr } from "../i18n";
 
+/**
+ * Tinted variants wash the card with a TINT fill — body text on tints is
+ * gate-asserted in every theme; "default" stays the plain container.
+ */
 export function Card({
   children,
   style,
+  variant = "default",
 }: {
   children: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  variant?: "default" | "amber" | "danger" | "cyan";
 }) {
   const { c, space, radius, themeName } = useTheme();
   return (
     <View
       style={[
         {
-          backgroundColor: c.surface,
+          backgroundColor: variant === "default" ? c.surfaceContainer : TINT[themeName][variant],
           borderRadius: radius.lg,
           padding: space.xl,
           gap: space.m,
@@ -61,17 +69,19 @@ export function Body({ children, muted }: { children: React.ReactNode; muted?: b
   );
 }
 
-/** A tappable settings row — ≥ 88 px, icon + label always together. */
+/** A tappable settings row — ≥ 88 px, emoji tile + label always together. */
 export function SettingsRow({
   icon,
   label,
   value,
   onPress,
+  hue = "ember",
 }: {
   icon: string;
   label: string;
   value?: string;
   onPress: () => void;
+  hue?: TintHue;
 }) {
   const { c, f, touch, space, radius, themeName } = useTheme();
   // Press state as data (not just a style function) so the label color can
@@ -100,8 +110,8 @@ export function SettingsRow({
           : { borderWidth: 1, borderColor: c.hairline }),
       }}
     >
-      <Text style={{ fontSize: f.title, color: pressed ? c.onSoft : c.text }}>{icon}</Text>
-      <Text
+      {/* Decorative tile — the row's accessibilityLabel carries the meaning. */}
+      <IconTile emoji={icon} size={44} hue={hue} />      <Text
         style={{
           color: pressed ? c.onSoft : c.text,
           fontSize: f.body,
@@ -182,17 +192,23 @@ export function ProfileLine({ person, lang }: { person: PublicProfile; lang: Lan
 /**
  * Avatar — the photo lives behind the session, so the image request carries
  * the Authorization header. No photo (or a failed load) shows the initial.
+ * Optional 3 px gradient ring (white in the high-contrast theme) and a
+ * corner badge (✔ verified / 🤝 volunteer) whose meaning is folded into the
+ * accessibility label.
  */
 export function Avatar({
   photoUrl,
   name,
   size = 96,
+  badge,
 }: {
   photoUrl: string | null;
   name: string;
   size?: number;
+  badge?: "verified" | "volunteer";
 }) {
-  const { c, f } = useTheme();
+  const { c, f, themeName } = useTheme();
+  const t = useT();
   const token = useStore((s) => s.token);
   // Server photos arrive as absolute paths ("/photos/…") — prefix the API
   // base. Local file URIs (photo preview during setup) are used as-is.
@@ -200,35 +216,95 @@ export function Avatar({
     () => (photoUrl ? (photoUrl.startsWith("/") ? `${API_BASE}${photoUrl}` : photoUrl) : null),
     [photoUrl],
   );
-  if (!uri) {
-    return (
+  const label = badge
+    ? `${name}, ${badge === "verified" ? t("verified") : t("volunteerBadge")}`
+    : name;
+
+  const content = uri ? (
+    <Image
+      accessible
+      accessibilityLabel={label}
+      source={{ uri, headers: { authorization: `Bearer ${token ?? ""}` } }}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: c.surfaceContainerLowest,
+      }}
+      contentFit="cover"
+    />
+  ) : (
+    <View
+      accessible
+      accessibilityLabel={label}
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        backgroundColor: c.primarySoft,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {/* onSoft, not primary: in the high-contrast theme primarySoft is
+          white and a primary-colored (white) initial would vanish. */}
+      <Text style={{ color: c.onSoft, fontSize: size / 2.4, fontWeight: "700" }}>
+        {name.trim().charAt(0).toUpperCase() || "?"}
+      </Text>
+    </View>
+  );
+
+  // The ring: gradient stops in light/dark, a plain white 3 px ring in the
+  // high-contrast theme (no gradients there).
+  const ringed =
+    themeName === "contrast" ? (
       <View
-        accessible
-        accessibilityLabel={name}
         style={{
-          width: size,
-          height: size,
-          borderRadius: size / 2,
-          backgroundColor: c.primarySoft,
+          padding: 3,
+          borderRadius: (size + 6) / 2,
+          backgroundColor: c.border,
+          alignSelf: "flex-start",
+        }}
+      >
+        {content}
+      </View>
+    ) : (
+      <LinearGradient
+        colors={themeName === "dark" ? CTA_GRADIENT.dark : CTA_GRADIENT.light}
+        start={{ x: 0, y: 0.5 }}
+        end={{ x: 1, y: 0.5 }}
+        style={{ padding: 3, borderRadius: (size + 6) / 2, alignSelf: "flex-start" }}
+      >
+        {content}
+      </LinearGradient>
+    );
+
+  if (!badge) return ringed;
+
+  return (
+    <View style={{ width: size + 6, height: size + 6 }}>
+      {ringed}
+      <View
+        accessible={false}
+        importantForAccessibility="no-hide-descendants"
+        style={{
+          position: "absolute",
+          right: -2,
+          bottom: -2,
+          width: 26,
+          height: 26,
+          borderRadius: 13,
+          backgroundColor: c.ctaFill,
+          borderWidth: 2,
+          borderColor: c.background,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        {/* onSoft, not primary: in the high-contrast theme primarySoft is
-            white and a primary-colored (white) initial would vanish. */}
-        <Text style={{ color: c.onSoft, fontSize: size / 2.4, fontWeight: "700" }}>
-          {name.trim().charAt(0).toUpperCase() || "?"}
+        <Text style={{ fontSize: f.label - 3, color: c.ctaLabel, fontWeight: "800" }}>
+          {badge === "verified" ? "✔" : "🤝"}
         </Text>
       </View>
-    );
-  }
-  return (
-    <Image
-      accessible
-      accessibilityLabel={name}
-      source={{ uri, headers: { authorization: `Bearer ${token ?? ""}` } }}
-      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: c.surface }}
-      contentFit="cover"
-    />
+    </View>
   );
 }

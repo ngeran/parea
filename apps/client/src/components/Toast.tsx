@@ -20,7 +20,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastMessage; onDismiss: () => 
     Animated.timing(opacity, { toValue: 1, duration: 180, useNativeDriver: false }).start();
   }, [opacity, reduceMotion]);
 
-  const accent = toast.kind === "error" ? c.danger : c.success;
+  const accent = toast.kind === "error" ? c.error : c.success;
   return (
     <Animated.View style={{ opacity }}>
       <Pressable
@@ -31,10 +31,10 @@ function ToastRow({ toast, onDismiss }: { toast: ToastMessage; onDismiss: () => 
           flexDirection: "row",
           alignItems: "center",
           gap: space.m,
-          backgroundColor: c.surface,
+          backgroundColor: c.surfaceContainer,
           borderRadius: radius.pill,
           borderWidth: themeName === "contrast" ? 3 : 1,
-          borderColor: themeName === "contrast" ? c.border : c.hairline,
+          borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
           paddingHorizontal: space.xl,
           paddingVertical: space.m,
           ...(themeName === "contrast" ? {} : ELEVATION.md),
@@ -43,7 +43,7 @@ function ToastRow({ toast, onDismiss }: { toast: ToastMessage; onDismiss: () => 
         <Text style={{ color: accent, fontSize: f.label, fontWeight: "700" }}>
           {ICONS[toast.kind]}
         </Text>
-        <Text style={{ color: c.text, fontSize: f.label, fontWeight: "600", flexShrink: 1 }}>
+        <Text style={{ color: c.onSurface, fontSize: f.label, fontWeight: "600", flexShrink: 1 }}>
           {toast.text}
         </Text>
       </Pressable>

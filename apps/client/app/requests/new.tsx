@@ -21,14 +21,14 @@ import {
 import { Screen } from "../../src/components/Screen";
 import { BigButton } from "../../src/components/BigButton";
 import { StepProgress } from "../../src/components/StepProgress";
-import { Body, Card } from "../../src/components/ui";
+import { Body, Card, Title } from "../../src/components/ui";
 import { Chip, ChipGrid, RadioRow, SectionHeader } from "../../src/components/fields";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { ackDialog, confirmDialog, toast } from "../../src/lib/notify";
 import { formatDayShort, toIso } from "../../src/lib/time";
 import { activityHint, useT } from "../../src/i18n";
-import { useTheme } from "../../src/theme";
+import { useTheme, type TintHue } from "../../src/theme";
 import { useStore } from "../../src/store";
 
 const DAYS = [
@@ -52,6 +52,32 @@ const TIMES = [
 const HOURS = Array.from({ length: 18 }, (_, i) => i + 6);
 const MINUTES = [0, 30];
 const RADII = [2, 5, 15, 30];
+
+/**
+ * Tile tint per choice — pure decoration (the emoji carries the meaning),
+ * varied like the mockup's activity cards. Anything unmapped falls to ember.
+ */
+const ACTIVITY_HUES: Record<string, TintHue> = {
+  coffee: "ember",
+  meal: "amber",
+  walk: "cyan",
+  call: "success",
+  supermarket: "amber",
+  errands: "cyan",
+  tech_help: "success",
+  ride: "cyan",
+  house_help: "amber",
+  paperwork: "success",
+};
+const PLACE_HUES: Record<string, TintHue> = {
+  cafe: "ember",
+  park: "cyan",
+  walk_route: "cyan",
+  supermarket: "amber",
+  home_area: "success",
+  call: "success",
+  other: "ember",
+};
 
 /**
  * Which meeting places make sense per activity — step 3 only ever offers
@@ -234,7 +260,9 @@ export default function NewRequest() {
           ) : null}
           <BigButton
             label={step === 3 ? t("continue_") : t("next")}
+            eyebrow={step < 3 ? t("nextEyebrow") : undefined}
             size="big"
+            gradient
             disabled={!canNext}
             busy={busy}
             onPress={() => (step < 3 ? setStep(step + 1) : confirmSend())}
@@ -243,23 +271,36 @@ export default function NewRequest() {
               peaks (before the first send). */}
           <Text
             accessible
-            style={{ color: c.textSecondary, fontSize: f.label, textAlign: "center" }}
+            style={{ color: c.onSurfaceVariant, fontSize: f.label, textAlign: "center" }}
           >
             🔒 {t("noCharge")}
           </Text>
         </View>
       }
     >
-      <StepProgress step={step} total={3} label={t("stepN", { n: step })} />
+      <StepProgress
+        step={step}
+        total={3}
+        label={t("stepN", { n: step })}
+        steps={[t("stepWhat"), t("stepWhen"), t("stepWhere")]}
+      />
 
       {step === 1 ? (
         <View style={{ gap: space.m }}>
-          <SectionHeader>{t("whatQ")}</SectionHeader>
+          {/* The mockup's big opening question + one line of guidance. */}
+          <Title>{t("whatHero")}</Title>
+          <Body muted>{t("wizardGuidance")}</Body>
+          {/* Amber reassurance card — honest, no counts: what happens after
+              the send and who decides. */}
+          <Card variant="amber">
+            <Body>💛 {t("wizardReassure")}</Body>
+          </Card>
           <View style={{ gap: space.m }}>
             {ACTIVITIES.filter((a) => !HELP_ACTIVITY_KEYS.includes(a.key)).map((a) => (
               <RadioRow
                 key={a.key}
                 emoji={a.emoji}
+                hue={ACTIVITY_HUES[a.key] ?? "ember"}
                 label={activityLabel(a.key, language)}
                 subtitle={activityHint(a.key, language)}
                 selected={activity === a.key}
@@ -274,6 +315,7 @@ export default function NewRequest() {
               <RadioRow
                 key={a.key}
                 emoji={a.emoji}
+                hue={ACTIVITY_HUES[a.key] ?? "ember"}
                 label={activityLabel(a.key, language)}
                 subtitle={activityHint(a.key, language)}
                 selected={activity === a.key}
@@ -421,6 +463,7 @@ export default function NewRequest() {
                   <RadioRow
                     key={p.key}
                     emoji={p.emoji}
+                    hue={PLACE_HUES[p.key] ?? "ember"}
                     label={placeTypeLabel(p.key, language)}
                     selected={placeType === p.key}
                     onSelect={() => setPlaceType(p.key)}

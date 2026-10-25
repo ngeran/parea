@@ -32,10 +32,10 @@ export function Screen({
   const [reading, setReading] = useState(false);
   // High contrast keeps the strong white separator; other themes use the
   // subtle hairline so the header reads as a surface, not a boxed layout.
-  const separator = themeName === "contrast" ? c.border : c.hairline;
+  const separator = themeName === "contrast" ? c.outline : c.outlineVariant;
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.bg }}>
+    <View style={{ flex: 1, backgroundColor: c.background }}>
       <View
         style={{
           paddingHorizontal: space.xl,
@@ -62,12 +62,12 @@ export function Screen({
                 borderRadius: touch.min / 2,
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: pressed ? c.surfaceHigh : c.surface,
-                borderWidth: themeName === "contrast" ? 3 : 1,
-                borderColor: themeName === "contrast" ? c.border : c.hairline,
+                backgroundColor: pressed ? c.surfaceContainerHighest : c.surfaceContainerHigh,
+                borderWidth: themeName === "contrast" ? 3 : 0,
+                borderColor: c.outline,
               })}
             >
-              <Text style={{ color: c.text, fontSize: f.button }}>
+              <Text style={{ color: c.onSurface, fontSize: f.button }}>
                 {back ? "←" : "🏠"}
               </Text>
             </Pressable>
@@ -75,7 +75,7 @@ export function Screen({
           <Text
             accessible
             accessibilityRole="header"
-            style={{ color: c.text, fontSize: f.title, fontWeight: "700", flex: 1, lineHeight: f.title * 1.25 }}
+            style={{ color: c.onSurface, fontSize: f.title, fontWeight: "800", flex: 1, lineHeight: f.title * 1.25 }}
           >
             {title}
           </Text>
@@ -111,7 +111,7 @@ export function Screen({
             paddingTop: space.m,
             borderTopWidth: 1,
             borderTopColor: separator,
-            backgroundColor: c.bg,
+            backgroundColor: c.surfaceContainerLowest,
             gap: space.m,
           }}
         >

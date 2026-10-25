@@ -1,28 +1,32 @@
 // Bottom tab bar: 4 labeled tabs, always visible, icons with text (never
 // icons alone), big labels. The bar floats — inset from the screen edges on
 // a soft shadow — so it reads as part of the app, not a system chrome bar.
-// Fade-free instant switching.
+// Fade-free instant switching. The focused tab's emoji sits in a soft pill
+// tile; selection is carried by the tile + tint (never color alone).
 import { Tabs } from "expo-router";
 import { Text, View } from "react-native";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme } from "../../src/theme";
 
-// Emoji + label, plus the active dot the mockups show above the icon. The
-// dot reserves its slot (transparent when inactive) so tabs never reflow.
 function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
-  const { c } = useTheme();
+  const { c, themeName } = useTheme();
   return (
-    <View style={{ alignItems: "center", minWidth: 48 }}>
-      <View
-        style={{
-          width: 18,
-          height: 3,
-          borderRadius: 2,
-          marginBottom: 2,
-          backgroundColor: focused ? c.primary : "transparent",
-        }}
-      />
-      <Text accessible accessibilityLabel={label} style={{ fontSize: 22 }}>{emoji}</Text>
+    <View
+      accessible
+      accessibilityLabel={label}
+      style={{
+        minWidth: 52,
+        minHeight: 36,
+        alignItems: "center",
+        justifyContent: "center",
+        borderRadius: 18,
+        paddingHorizontal: 10,
+        backgroundColor: focused ? c.primarySoft : "transparent",
+        borderWidth: focused && themeName === "contrast" ? 3 : 0,
+        borderColor: c.outline,
+      }}
+    >
+      <Text accessible={false} style={{ fontSize: 22 }}>{emoji}</Text>
     </View>
   );
 }
@@ -36,10 +40,10 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: c.primary,
-        tabBarInactiveTintColor: c.textSecondary,
+        tabBarInactiveTintColor: c.onSurfaceVariant,
         tabBarStyle: {
           position: "absolute",
-          backgroundColor: c.surface,
+          backgroundColor: c.surfaceContainer,
           marginHorizontal: 16,
           marginBottom: 10,
           borderRadius: 24,
@@ -47,8 +51,8 @@ export default function TabsLayout() {
           // High contrast: the white bar on black bg is its own outline;
           // no shadow decoration there (plan §4.3 keeps shadows out).
           ...(themeName === "contrast"
-            ? { borderWidth: 3, borderColor: c.border }
-            : { borderWidth: 1, borderColor: c.hairline, ...ELEVATION.md }),
+            ? { borderWidth: 3, borderColor: c.outline }
+            : { borderWidth: 1, borderColor: c.outlineVariant, ...ELEVATION.md }),
           // Room for the 22 px emoji plus a 15 px+ label (the label follows
           // the user's text size, so the bar grows with it).
           height: 72,
@@ -62,13 +66,15 @@ export default function TabsLayout() {
         },
         // The floating bar overlays the screen, so every tab's content gets
         // bottom room to stay clear of it (bar 72 + margin 10 + gap).
-        sceneStyle: { backgroundColor: c.bg, marginBottom: 86 },
+        sceneStyle: { backgroundColor: c.background, marginBottom: 86 },
       }}
     >
       <Tabs.Screen
         name="home"
         options={{ title: t("home"), tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" label={t("home")} focused={focused} /> }}
       />
+      {/* No unread dot on chats: the API has no read-state, so any dot would
+          be a fake signal — honest data only. */}
       <Tabs.Screen
         name="chats"
         options={{ title: t("chatsTab"), tabBarIcon: ({ focused }) => <TabIcon emoji="💬" label={t("chatsTab")} focused={focused} /> }}

@@ -59,11 +59,11 @@ export function DialogHost() {
           width: "100%",
           maxWidth: 420,
           gap: space.m,
-          backgroundColor: c.surface,
+          backgroundColor: c.surfaceContainer,
           borderRadius: radius.lg,
           padding: space.xl,
           borderWidth: themeName === "contrast" ? 3 : 1,
-          borderColor: themeName === "contrast" ? c.border : c.hairline,
+          borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
           ...(themeName === "contrast" ? {} : ELEVATION.md),
         }}
       >

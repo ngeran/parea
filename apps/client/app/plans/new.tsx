@@ -3,6 +3,7 @@
 // screen this creates.
 import { View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import { useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import type { PlanDTO } from "@parea/shared";
 import { Screen } from "../../src/components/Screen";
@@ -30,6 +31,7 @@ const TIMES = [
 export default function NewPlan() {
   const t = useT();
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { matchId } = useLocalSearchParams<{ matchId: string }>();
   const [place, setPlace] = useState("");
   const [dayOffset, setDayOffset] = useState<number | null>(null);
@@ -62,6 +64,9 @@ export default function NewPlan() {
       const result = await api<{ plan: PlanDTO }>(`/plans/${matchId}/plan`, {
         body: { place_name: place.trim(), starts_at },
       });
+      // The Plans tab stays mounted underneath — drop its cached (now stale)
+      // list so the new plan is there when the user comes back.
+      await queryClient.invalidateQueries({ queryKey: ["plans"] });
       // OK moves the screen — never navigate underneath an alert.
       ackDialog(t("planCreated"), t("ok"), () => router.replace(`/plans/${result.plan.id}`));
     } catch (e) {

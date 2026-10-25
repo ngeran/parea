@@ -66,6 +66,7 @@ export default function MyDetails() {
   return (
     <Screen
       title={t("detailsTitle")}
+      avoidKeyboard
       footer={<BigButton label={t("save")} size="big" busy={busy} onPress={() => void save()} />}
     >
       <View style={{ alignItems: "center", gap: 16 }}>

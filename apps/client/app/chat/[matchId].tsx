@@ -264,6 +264,7 @@ export default function Chat() {
           renderItem={({ item }) => bubble(item)}
           keyExtractor={(m) => m.id}
           inverted
+          keyboardShouldPersistTaps="handled"
           contentContainerStyle={{
             padding: space.xl,
             paddingLeft: space.xl + insets.left,

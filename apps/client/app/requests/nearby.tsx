@@ -3,11 +3,12 @@
 // filter pills, and one card per neighbor: activity + distance badges,
 // face with verification badge, their own words in a quote well, interest
 // tags, read-aloud per card, and a single action: "I can join".
-import { Pressable, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ACTIVITIES,
   INTEREST_CHIPS,
@@ -20,7 +21,7 @@ import { StatPill, StatusBadge, FilterPills, QuoteWell, TrustNote } from "../../
 import { Avatar, Body, EmptyState, ErrorState } from "../../src/components/ui";
 import { Chip } from "../../src/components/fields";
 import { Screen } from "../../src/components/Screen";
-import { CTA_GRADIENT, ELEVATION, useTheme, withAlpha, type TintHue } from "../../src/theme";
+import { COLUMN, CTA_GRADIENT, ELEVATION, useTheme, withAlpha, type TintHue } from "../../src/theme";
 import { api, ApiError } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
 import { toast } from "../../src/lib/notify";
@@ -55,6 +56,7 @@ export default function Nearby() {
   const language = useStore((s) => s.language);
   const coords = useStore((s) => s.coords);
   const setCoords = useStore((s) => s.setCoords);
+  const insets = useSafeAreaInsets();
   const [joining, setJoining] = useState<string | null>(null);
   const [filter, setFilter] = useState("all");
   const nearby = useNearbyRequests(coords);
@@ -112,7 +114,6 @@ export default function Nearby() {
     const summary = `${request.owner.first_name}. ${activityLabel(request.activity, language)}, ${formatWhen(request.starts_at, language)}, ${placeTypeLabel(request.place_type, language)}${request.owner.about ? `. ${request.owner.about}` : ""}`;
     return (
       <View
-        key={request.id}
         style={{
           backgroundColor: c.surfaceContainer,
           borderRadius: radius.lg,
@@ -146,6 +147,7 @@ export default function Nearby() {
             photoUrl={request.owner.photo_url ?? null}
             name={request.owner.first_name}
             size={52}
+            imageKey={request.owner.id}
             badge={request.owner.volunteer ? "volunteer" : request.owner.verified ? "verified" : undefined}
           />
           <View style={{ flex: 1, gap: 2 }}>
@@ -213,8 +215,11 @@ export default function Nearby() {
     );
   };
 
-  return (
-    <Screen title={t("nearbyTitle")} speakText={nearby.isLoading ? undefined : speakAll}>
+  // The list header (hero + states + filters) and footer ride inside the
+  // FlatList so everything scrolls together — nearby is the one unbounded
+  // list in the app, so it virtualizes instead of mapping into a ScrollView.
+  const listHeader = (
+    <View style={{ gap: space.xl, paddingBottom: space.xl }}>
       {/* The hero banner — count only when the real list says so. */}
       <LinearGradient
         colors={themeName === "dark" ? CTA_GRADIENT.dark : CTA_GRADIENT.light}
@@ -284,13 +289,12 @@ export default function Nearby() {
         </View>
       ) : null}
       {nearby.isLoading ? <Body muted>{t("loading")}</Body> : null}
+    </View>
+  );
 
-      <View style={{ gap: space.xl }}>{visible.map(card)}</View>
-
-      {requests.length > 0 ? (
-        <TrustNote emoji="💚">{t("nearbyTrust")}</TrustNote>
-      ) : null}
-
+  const listFooter = (
+    <View style={{ gap: space.xl, paddingTop: space.xl }}>
+      {requests.length > 0 ? <TrustNote emoji="💚">{t("nearbyTrust")}</TrustNote> : null}
       {!coords ? (
         <BigButton label={t("shareLocation")} icon="📍" onPress={() => void refreshLocation()} />
       ) : (
@@ -301,6 +305,27 @@ export default function Nearby() {
           onPress={() => router.push("/requests/new")}
         />
       )}
+    </View>
+  );
+
+  return (
+    <Screen title={t("nearbyTitle")} speakText={nearby.isLoading ? undefined : speakAll} scroll={false}>
+      <FlatList
+        data={visible}
+        renderItem={({ item }) => card(item)}
+        keyExtractor={(r) => r.id}
+        keyboardShouldPersistTaps="handled"
+        ListHeaderComponent={listHeader}
+        ListFooterComponent={listFooter}
+        ItemSeparatorComponent={() => <View style={{ height: space.xl }} />}
+        contentContainerStyle={{
+          ...COLUMN,
+          padding: space.xl,
+          paddingLeft: space.xl + insets.left,
+          paddingRight: space.xl + insets.right,
+          paddingBottom: space.xxxl + insets.bottom,
+        }}
+      />
     </Screen>
   );
 }

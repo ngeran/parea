@@ -9,7 +9,7 @@ import type { Lang, PublicProfile } from "@parea/shared";
 import { API_BASE } from "../lib/api";
 import { BigButton } from "./BigButton";
 import { IconTile } from "./IconTile";
-import { CTA_GRADIENT, ELEVATION, TINT, useTheme, type TintHue } from "../theme";
+import { CTA_GRADIENT, ELEVATION, TINT, useReduceMotion, useTheme, type TintHue } from "../theme";
 import { useStore } from "../store";
 import { useT } from "../i18n";
 import { tr } from "../i18n";
@@ -224,15 +224,22 @@ export function Avatar({
   name,
   size = 96,
   badge,
+  imageKey,
 }: {
   photoUrl: string | null;
   name: string;
   size?: number;
   badge?: "verified" | "volunteer";
+  /** Stable per-person key — lets a recycled list cell reuse the image (nearby). */
+  imageKey?: string;
 }) {
   const { c, f, themeName } = useTheme();
   const t = useT();
   const token = useStore((s) => s.token);
+  const reduceMotion = useReduceMotion();
+  // A failed download (404, offline) falls back to the initials instead of
+  // leaving an empty circle.
+  const [failed, setFailed] = useState(false);
   // Server photos arrive as absolute paths ("/photos/…") — prefix the API
   // base. Local file URIs (photo preview during setup) are used as-is.
   const uri = useMemo(
@@ -243,7 +250,8 @@ export function Avatar({
     ? `${name}, ${badge === "verified" ? t("verified") : t("volunteerBadge")}`
     : name;
 
-  const content = uri ? (
+  const showImage = uri && !failed;
+  const content = showImage ? (
     <Image
       accessible
       accessibilityLabel={label}
@@ -255,6 +263,12 @@ export function Avatar({
         backgroundColor: c.surfaceContainerLowest,
       }}
       contentFit="cover"
+      // Reused avatars fade in (instant under reduce-motion) and cache on
+      // disk — scrolling nearby re-shows faces without refetching.
+      transition={reduceMotion ? 0 : 150}
+      cachePolicy="memory-disk"
+      recyclingKey={imageKey}
+      onError={() => setFailed(true)}
     />
   ) : (
     <View

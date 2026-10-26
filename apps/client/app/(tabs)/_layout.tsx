@@ -8,7 +8,7 @@
 // does in a quarter of a narrow phone, and the bar has no fixed height —
 // it grows with the user's text size instead of clipping it.
 import { Tabs } from "expo-router";
-import { Text, View } from "react-native";
+import { Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme } from "../../src/theme";
@@ -16,15 +16,21 @@ import { ELEVATION, useTheme } from "../../src/theme";
 function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
   const { c, f, themeName } = useTheme();
   const contrast = themeName === "contrast";
+  // Numeric width, not "100%": the tab bar's icon wrapper is content-sized,
+  // so a percentage here resolved against nothing — the cell collapsed to
+  // content width and iOS measured the label against an indefinite width,
+  // which Fabric "solved" by truncating to the first letter ("H.", "C.").
+  // Slot math: the bar insets 16 pt per side and splits into 4 cells,
+  // capped at 120 so the selected pill stays a pill on wide screens (the
+  // bar centers over the reading column on tablets).
+  const { width: screenWidth } = useWindowDimensions();
+  const cellWidth = Math.min((screenWidth - 32) / 4, 120);
   return (
     <View
       accessible
       accessibilityLabel={label}
       style={{
-        // Capped so the selected pill stays a pill on wide screens (the bar
-        // centers over the reading column on tablets).
-        width: "100%",
-        maxWidth: 120,
+        width: cellWidth,
         alignSelf: "center",
         minHeight: 56,
         alignItems: "center",

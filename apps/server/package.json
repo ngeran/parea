@@ -14,6 +14,7 @@
     "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed && npm run db:avatars",
     "db:avatars": "node scripts/avatars.mjs",
     "db:avatars:remote": "node scripts/avatars.mjs --remote",
+    "db:avatars:remove": "node scripts/avatars.mjs --remove --remote",
     "db:seed:remote": "wrangler d1 execute parea --remote --file=seed-demo.sql",
     "deploy": "wrangler deploy"
   },

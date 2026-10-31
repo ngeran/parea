@@ -6,12 +6,16 @@
 //
 //   npm run db:avatars           → local .wrangler state (wrangler dev reads it)
 //   npm run db:avatars:remote    → the deployed R2 bucket
+//   npm run db:avatars:remove    → delete them from the deployed R2 bucket
 //
 // SVG is rendered to PNG with ImageMagick (RN's Image can't read SVG).
 import { execFileSync } from "node:child_process";
 import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+
+const REMOTE = process.argv.includes("--remote");
+const REMOVE = process.argv.includes("--remove");
 
 // 8.4:1+ text contrast on every fill (same ember the theme darkened for
 // labels), admin inverted. Order mirrors seed.sql.
@@ -29,6 +33,24 @@ const PROFILES = [
 ];
 
 const remote = process.argv.includes("--remote");
+
+// Removal mode (docs/DEPLOY.md §1b): drop the 10 demo objects from the
+// deployed bucket. Renders nothing; requires no ImageMagick.
+if (REMOVE) {
+  if (!remote) {
+    console.error("--remove only works against the deployed bucket (add --remote).");
+    process.exit(1);
+  }
+  for (const p of PROFILES) {
+    const key = `photos/${p.uuid}.png`;
+    execFileSync("wrangler", ["r2", "object", "delete", `parea-photos/${key}`, "--remote"], {
+      stdio: "pipe",
+    });
+    console.log(`deleted ${key}  (${p.id})`);
+  }
+  console.log("done — demo avatars removed from the remote bucket");
+  process.exit(0);
+}
 
 try {
   execFileSync("which", ["magick"]);

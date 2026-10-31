@@ -58,6 +58,13 @@ npx wrangler d1 execute parea --remote \
   --command "UPDATE profiles SET lat=<lat>, lng=<lng> WHERE id LIKE 'seed-%'"
 ```
 
+To remove the demo data entirely (e.g. before testing with real people):
+
+```bash
+npx wrangler d1 execute parea --remote --command "DELETE FROM messages WHERE match_id IN (SELECT id FROM matches WHERE user_a LIKE 'seed-%' OR user_b LIKE 'seed-%'); DELETE FROM plans WHERE match_id IN (SELECT id FROM matches WHERE user_a LIKE 'seed-%' OR user_b LIKE 'seed-%'); DELETE FROM matches WHERE user_a LIKE 'seed-%' OR user_b LIKE 'seed-%'; DELETE FROM pings WHERE from_id LIKE 'seed-%' OR to_id LIKE 'seed-%'; DELETE FROM responses WHERE responder_id LIKE 'seed-%' OR request_id LIKE 'seed-req-%'; DELETE FROM requests WHERE user_id LIKE 'seed-%'; DELETE FROM discover_decisions WHERE viewer_id LIKE 'seed-%' OR target_id LIKE 'seed-%'; DELETE FROM blocks WHERE blocker_id LIKE 'seed-%' OR blocked_id LIKE 'seed-%'; DELETE FROM verification_submissions WHERE user_id LIKE 'seed-%'; DELETE FROM devices WHERE user_id LIKE 'seed-%'; DELETE FROM sessions WHERE user_id LIKE 'seed-%'; DELETE FROM trusted_contacts WHERE user_id LIKE 'seed-%'; DELETE FROM profiles WHERE id LIKE 'seed-%'"
+npm run db:avatars:remove   # delete the 10 demo avatar PNGs from R2
+```
+
 Note the deployed API runs with `OTP_MOCK=1` until the live switch (step 3),
 so any demo phone (`+3069000000xx`) can sign in with the `dev_code` returned
 by `/otp/request`.

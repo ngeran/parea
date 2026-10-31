@@ -4,13 +4,14 @@ import { Pressable, ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import type { PlanListItem } from "@parea/shared";
+import { activityLabel, placeTypeLabel } from "@parea/shared";
 import { Avatar, Body, EmptyState, ErrorState, Title } from "../../src/components/ui";
 import { formatWhen } from "../../src/lib/time";
 import { useRefreshOnFocus } from "../../src/lib/useRefreshOnFocus";
 import { useT } from "../../src/i18n";
 import { COLUMN, ELEVATION, useTheme, withAlpha } from "../../src/theme";
 import { useStore } from "../../src/store";
-import { usePlans } from "../../src/lib/queries";
+import { useMyRequests, usePlans } from "../../src/lib/queries";
 
 export default function Plans() {
   const t = useT();
@@ -19,9 +20,12 @@ export default function Plans() {
   const language = useStore((s) => s.language);
   const insets = useSafeAreaInsets();
   const plans = usePlans();
+  // The open/matched requests this user created — plans only lists matched
+  // meetings, so requests still collecting offers (or just matched) live here.
+  const myRequests = useMyRequests();
 
   // Tab screens never remount — refetch stale data when the tab is revisited.
-  useRefreshOnFocus(["plans"]);
+  useRefreshOnFocus(["plans", "requests", "mine"]);
 
   // Soonest meeting is the hero (the mockup's featured RSVP card); the rest
   // are compact avatar rows below it.
@@ -81,6 +85,57 @@ export default function Plans() {
       }}
     >
       <Title>{t("plansTitle")}</Title>
+
+      {/* My open/matched requests — same cards as Home's "My requests", so a
+          request stays reachable from Plans until it becomes a plan. */}
+      {myRequests.isError ? (
+        <ErrorState
+          text={t("networkError")}
+          retryLabel={t("tryAgain")}
+          onRetry={() => void myRequests.refetch()}
+        />
+      ) : null}
+
+      {myRequests.data && myRequests.data.requests.length > 0 ? (
+        <View style={{ gap: space.m }}>
+          <Text
+            accessible
+            accessibilityRole="header"
+            style={{ color: c.text, fontSize: f.body + 2, fontWeight: "700" }}
+          >
+            {t("myRequests")}
+          </Text>
+          {myRequests.data.requests.map((request) => (
+            <Pressable
+              key={request.id}
+              accessibilityRole="button"
+              accessibilityLabel={`${activityLabel(request.activity, language)}, ${formatWhen(request.starts_at, language)}`}
+              onPress={() => router.push(`/requests/${request.id}`)}
+              style={({ pressed }) => ({
+                backgroundColor: pressed ? c.primarySoft : c.surfaceContainer,
+                borderRadius: radius.md,
+                padding: space.xl,
+                gap: space.s,
+                minHeight: touch.row,
+                borderWidth: themeName === "contrast" ? 3 : 1,
+                borderColor: themeName === "contrast" ? c.outline : c.outlineVariant,
+              })}
+            >
+              <Text style={{ color: c.text, fontSize: f.body, fontWeight: "700" }}>
+                {activityLabel(request.activity, language)} · {formatWhen(request.starts_at, language)}
+              </Text>
+              <Text style={{ color: c.textSecondary, fontSize: f.label }}>
+                {placeTypeLabel(request.place_type, language)}
+              </Text>
+              {request.offered_count > 0 ? (
+                <Text style={{ color: c.accent, fontSize: f.label, fontWeight: "700" }}>
+                  👋 {t("offersCount", { n: request.offered_count })}
+                </Text>
+              ) : null}
+            </Pressable>
+          ))}
+        </View>
+      ) : null}
 
       {plans.isLoading ? <Body muted>{t("loading")}</Body> : null}
 

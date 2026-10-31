@@ -42,6 +42,7 @@ app.patch("/", async (c) => {
     interests: (v) => JSON.stringify(v),
     languages: (v) => JSON.stringify(v),
     push_enabled: (v) => (v ? 1 : 0),
+    discoverable: (v) => (v ? 1 : 0),
   };
   const sets: string[] = [];
   const values: unknown[] = [];
@@ -197,7 +198,7 @@ app.delete("/trusted-contacts/:id", async (c) => {
 app.get("/export", async (c) => {
   const uid = c.get("user").id;
   const db = c.env.DB;
-  const [profile, contacts, requests, responses, matches, messages, plans, decisions, blocks, reports, feedback] =
+  const [profile, contacts, requests, responses, matches, messages, plans, decisions, pings, blocks, reports, feedback] =
     await Promise.all([
       db.prepare("SELECT * FROM profiles WHERE id = ?").bind(uid).first(),
       db.prepare("SELECT * FROM trusted_contacts WHERE user_id = ?").bind(uid).all(),
@@ -211,6 +212,7 @@ app.get("/export", async (c) => {
         .bind(uid, uid)
         .all(),
       db.prepare("SELECT * FROM discover_decisions WHERE viewer_id = ?").bind(uid).all(),
+      db.prepare("SELECT * FROM pings WHERE from_id = ? OR to_id = ?").bind(uid, uid).all(),
       db.prepare("SELECT * FROM blocks WHERE blocker_id = ?").bind(uid).all(),
       db.prepare("SELECT * FROM reports WHERE reporter_id = ?").bind(uid).all(),
       db.prepare("SELECT message, created_at FROM feedback WHERE user_id = ?").bind(uid).all(),
@@ -225,6 +227,7 @@ app.get("/export", async (c) => {
     my_messages: messages.results,
     my_plans: plans.results,
     discover_decisions: decisions.results,
+    pings: pings.results,
     blocks: blocks.results,
     reports_filed: reports.results,
     feedback_sent: feedback.results,
@@ -263,6 +266,7 @@ app.delete("/", async (c) => {
     db.prepare("DELETE FROM devices WHERE user_id = ?").bind(uid),
     db.prepare("DELETE FROM trusted_contacts WHERE user_id = ?").bind(uid),
     db.prepare("DELETE FROM discover_decisions WHERE viewer_id = ? OR target_id = ?").bind(uid, uid),
+    db.prepare("DELETE FROM pings WHERE from_id = ? OR to_id = ?").bind(uid, uid),
     db.prepare("DELETE FROM blocks WHERE blocker_id = ? OR blocked_id = ?").bind(uid, uid),
     db.prepare("DELETE FROM verification_submissions WHERE user_id = ?").bind(uid),
     db.prepare("DELETE FROM messages WHERE sender_id = ?").bind(uid),

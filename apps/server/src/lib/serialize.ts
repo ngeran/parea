@@ -54,6 +54,7 @@ export function selfProfile(row: ProfileRow): SelfProfile {
     theme: row.theme,
     language: row.language,
     push_enabled: row.push_enabled === 1,
+    discoverable: row.discoverable === 1,
     volunteer_requested: row.volunteer_requested === 1,
     // Rounded to the ~500 m grid, like everything in D1 — exact positions
     // never exist anywhere in the system.

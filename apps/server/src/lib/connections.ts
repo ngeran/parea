@@ -18,7 +18,7 @@ export async function createMatchIfNew(
   env: Env,
   userIdA: string,
   userIdB: string,
-  source: "discover" | "request",
+  source: "discover" | "request" | "ping",
 ): Promise<MatchOutcome> {
   const [a, b] = [userIdA, userIdB].sort();
   const id = crypto.randomUUID();

@@ -8,6 +8,18 @@ function pick(lang: Lang, en: string, el: string): string {
 
 /** Push notifications shown in the OS notification tray. */
 export const pushText = {
+  pingReceived: (lang: Lang, otherName: string): string =>
+    pick(
+      lang,
+      `👋 ${otherName} waved at you. Wave back to start a chat.`,
+      `👋 Ο/Η ${otherName} σας χαιρέτησε. Χαιρετίστε κι εσείς για να ανοίξει συνομιλία.`,
+    ),
+  pingAccepted: (lang: Lang, otherName: string): string =>
+    pick(
+      lang,
+      `${otherName} accepted — say hello!`,
+      `Ο/Η ${otherName} δέχτηκε — πείτε ένα γεια!`,
+    ),
   matchCreated: (lang: Lang, otherName: string): string =>
     pick(
       lang,

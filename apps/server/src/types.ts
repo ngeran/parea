@@ -30,6 +30,8 @@ export interface ProfileRow {
   theme: "light" | "dark" | "contrast";
   language: "el" | "en";
   push_enabled: number;
+  /** 0 = hidden from other people's Nearby list (migration 0003). */
+  discoverable: number;
   status: "active" | "disabled";
   consent_version: string | null;
   consent_at: string | null;
@@ -86,8 +88,17 @@ export interface MatchRow {
   id: string;
   user_a: string;
   user_b: string;
-  source: "discover" | "request";
+  source: "discover" | "request" | "ping";
   status: "active" | "ended";
+  created_at: string;
+}
+
+/** A row from the pings table (a one-way "wave", migration 0003). */
+export interface PingRow {
+  id: string;
+  from_id: string;
+  to_id: string;
+  status: "pending" | "accepted" | "declined";
   created_at: string;
 }
 

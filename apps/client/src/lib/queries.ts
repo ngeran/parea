@@ -3,8 +3,10 @@
 // by the next refetch because D1 is the source of truth.
 import { useQuery } from "@tanstack/react-query";
 import type {
+  IncomingPingDTO,
   MatchDTO,
   MessageDTO,
+  NearbyPersonDTO,
   PlanListItem,
   PublicProfile,
   RequestDTO,
@@ -84,16 +86,27 @@ export function useOffers(requestId: string) {
   });
 }
 
-export function useDiscover(coords: Coords | null) {
+/** People around me within my radius, annotated with the ping state between us. */
+export function useNearbyPeople(coords: Coords | null) {
   const token = useToken();
   return useQuery({
-    queryKey: ["discover", coords?.lat, coords?.lng],
+    queryKey: ["nearby", "people", coords?.lat, coords?.lng],
     queryFn: () =>
-      api<{ profile: PublicProfile | null }>("/discover", {
+      api<{ people: NearbyPersonDTO[] }>("/nearby/profiles", {
         token: token!,
         query: coords ? { lat: coords.lat, lng: coords.lng } : undefined,
       }),
     enabled: !!token && !!coords,
+  });
+}
+
+/** Waves I've received that are still waiting for my accept/decline. */
+export function useIncomingPings() {
+  const token = useToken();
+  return useQuery({
+    queryKey: ["pings", "incoming"],
+    queryFn: () => api<{ pings: IncomingPingDTO[] }>("/pings/incoming", { token: token! }),
+    enabled: !!token,
   });
 }
 

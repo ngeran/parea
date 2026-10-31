@@ -8,6 +8,7 @@
 import { Stack, useRouter } from "expo-router";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { StatusBar } from "expo-status-bar";
+import * as Notifications from "expo-notifications";
 import { useEffect } from "react";
 import { Platform } from "react-native";
 import type { ServerEvent } from "@parea/shared";
@@ -76,6 +77,14 @@ function LiveBridge() {
           queryClient.invalidateQueries({ queryKey: ["plans"] });
           queryClient.invalidateQueries({ queryKey: ["plan", event.payload.plan_id] });
           break;
+        case "ping.new":
+          queryClient.invalidateQueries({ queryKey: ["pings"] });
+          break;
+        case "ping.updated":
+          queryClient.invalidateQueries({ queryKey: ["pings"] });
+          queryClient.invalidateQueries({ queryKey: ["nearby"] });
+          queryClient.invalidateQueries({ queryKey: ["matches"] });
+          break;
       }
     });
   }, [token, queryClient]);
@@ -97,14 +106,30 @@ function Gate() {
   return null;
 }
 
+/** Native only: tapping a push routes to the conversation or tab it names. */
+function PushTapBridge() {
+  const router = useRouter();
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    const route = (data: Record<string, unknown> | undefined) => {
+      if (data?.match_id) router.push(`/chat/${data.match_id}`);
+      else if (data?.ping_id || data?.request_id) router.push("/nearby");
+    };
+    const sub = Notifications.addNotificationResponseReceivedListener((res) =>
+      route(res.notification.request.content.data as Record<string, unknown>),
+    );
+    return () => sub.remove();
+  }, [router]);
+  return null;
+}
+
 /**
  * Web only: keeps the browser chrome (status bar on Android standalone,
  * title bar colors) in sync with the app theme. Replaces the static
  * media-query metas from public/index.html so an explicit app choice
  * beats the OS setting, exactly like the in-app surfaces.
  */
-function ThemeColorBridge() {
-  const themeName = useResolvedThemeName();
+function ThemeColorBridge() {  const themeName = useResolvedThemeName();
   useEffect(() => {
     if (Platform.OS !== "web" || typeof document === "undefined") return;
     document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
@@ -133,6 +158,7 @@ function RootLayout() {
       <StatusBar style={themeName === "light" ? "dark" : "light"} />
       <Gate />
       <LiveBridge />
+      <PushTapBridge />
       <ThemeColorBridge />
       <Toaster />
       <Stack
@@ -152,7 +178,6 @@ function RootLayout() {
         <Stack.Screen name="welcome" />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="discover" />
         <Stack.Screen name="requests" />
         <Stack.Screen name="chat/[matchId]" />
         <Stack.Screen name="plans" />

@@ -32,6 +32,7 @@ app.get("/", async (c) => {
       limit: 1,
       extraExclusions: {
         sql: `
+    AND p.discoverable = 1
     AND NOT EXISTS (
       SELECT 1 FROM discover_decisions d
       WHERE (d.viewer_id = ? AND d.target_id = p.id)

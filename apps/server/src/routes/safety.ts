@@ -84,6 +84,15 @@ app.post("/blocks", async (c) => {
     c.executionCtx.waitUntil(chatRoomStub(c.env, match.id).closeAll());
   }
 
+  // A blocked person's pending wave must not sit in the inbox — silently
+  // decline it (accept would be rejected by areBlocked anyway).
+  await c.env.DB.prepare(
+    `UPDATE pings SET status = 'declined' WHERE status = 'pending'
+       AND ((from_id = ? AND to_id = ?) OR (from_id = ? AND to_id = ?))`,
+  )
+    .bind(me.id, blockedId, blockedId, me.id)
+    .run();
+
   return c.json({ ok: true });
 });
 

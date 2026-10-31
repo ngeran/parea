@@ -36,6 +36,8 @@ export const profilePatchSchema = z
     theme: z.enum(["light", "dark", "contrast"]).optional(),
     language: z.enum(["el", "en"]).optional(),
     push_enabled: z.boolean().optional(),
+    /** Nearby visibility opt-out: false hides me from other people's lists. */
+    discoverable: z.boolean().optional(),
     /**
      * Volunteer flag. Turning it on files an application for the admin
      * queue (`volunteer_requested`); the approved `is_volunteer` badge is

@@ -18,6 +18,8 @@ describe("authorization matrix", () => {
       "/me/device",
       "/requests/nearby",
       "/discover",
+      "/nearby/profiles",
+      "/pings/incoming",
       "/matches",
       "/photos/photos/x.jpg",
     ]) {

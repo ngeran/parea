@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { activityLabel, placeTypeLabel } from "@parea/shared";
 import { BigButton } from "../../src/components/BigButton";
 import { IconTile } from "../../src/components/IconTile";
-import { StatPill, StatusBadge } from "../../src/components/bits";
+import { StatPill } from "../../src/components/bits";
 import { Avatar, Body, Card, EmptyState, ErrorState } from "../../src/components/ui";
 import { localeOf } from "../../src/lib/api";
 import { ensureCoords } from "../../src/lib/location";
@@ -340,13 +340,13 @@ export default function Home() {
           () => router.push("/requests/nearby?filter=coffee"),
         )}
         {tile(
-          "🤝",
+          "👋",
           "success",
-          t("tileVolunteers"),
-          t("volunteersHint"),
+          t("nearbyTab"),
+          t("seeNearby"),
           "neutral",
-          <StatusBadge emoji="💛" label={t("freeBadge")} hue="success" />,
-          () => router.push("/discover"),
+          null,
+          () => router.push("/nearby"),
         )}
         {tile(
           "📅",

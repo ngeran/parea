@@ -17,7 +17,9 @@ import discoverRoutes from "./routes/discover";
 import feedbackRoutes from "./routes/feedback";
 import matchesRoutes from "./routes/matches";
 import meRoutes from "./routes/me";
+import nearbyRoutes from "./routes/nearby";
 import photosRoutes from "./routes/photos";
+import pingsRoutes from "./routes/pings";
 import plansRoutes from "./routes/plans";
 import requestsRoutes from "./routes/requests";
 import safetyRoutes from "./routes/safety";
@@ -48,6 +50,8 @@ app.route("/", authRoutes); // /otp/request · /otp/verify · /logout
 app.route("/me", meRoutes);
 app.route("/requests", requestsRoutes);
 app.route("/discover", discoverRoutes);
+app.route("/nearby", nearbyRoutes);
+app.route("/pings", pingsRoutes);
 app.route("/matches", matchesRoutes);
 app.route("/plans", plansRoutes);
 app.route("/safety", safetyRoutes);

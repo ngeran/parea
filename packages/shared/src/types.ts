@@ -34,6 +34,8 @@ export interface SelfProfile extends PublicProfile {
   theme: ThemeName;
   language: Lang;
   push_enabled: boolean;
+  /** False = hidden from other people's Nearby list (I can still browse). */
+  discoverable: boolean;
   /** True while the volunteer application awaits admin review. */
   volunteer_requested: boolean;
   /** The owner's own (rounded) grid point — others never see it. */
@@ -66,10 +68,35 @@ export interface MessageDTO {
 
 export interface MatchDTO {
   id: string;
-  source: "discover" | "request";
+  source: "discover" | "request" | "ping";
   created_at: string;
   other: PublicProfile;
   last_message: MessageDTO | null;
+}
+
+// ── Nearby people + pings ───────────────────────────────────────────────────
+
+/** The lifecycle of one ping row (a "wave"). */
+export type PingStatus = "pending" | "accepted" | "declined";
+
+/**
+ * How I relate to a person in the nearby list:
+ * none — no ping between us yet; outgoing — I waved, waiting on them;
+ * incoming — they waved, I can accept; accepted — we matched via ping.
+ */
+export type NearbyPingState = "none" | "outgoing" | "incoming" | "accepted";
+
+export interface IncomingPingDTO {
+  /** The ping id — POST /pings/:id/accept or /pings/:id/decline with it. */
+  id: string;
+  created_at: string;
+  from: PublicProfile;
+}
+
+export interface NearbyPersonDTO extends PublicProfile {
+  ping: NearbyPingState;
+  /** Present only when `ping === "incoming"` — the id to accept/decline. */
+  ping_id?: string;
 }
 
 export interface PlanDTO {
@@ -127,4 +154,10 @@ export type ServerEvent =
   | { type: "match.created"; at: string; payload: { match_id: string; other: PublicProfile } }
   | { type: "message.new"; at: string; payload: { message: MessageDTO } }
   | { type: "plan.updated"; at: string; payload: { plan: PlanDTO } }
-  | { type: "checkin.confirmed"; at: string; payload: { plan_id: string } };
+  | { type: "checkin.confirmed"; at: string; payload: { plan_id: string } }
+  | { type: "ping.new"; at: string; payload: { ping_id: string; from: PublicProfile } }
+  | {
+      type: "ping.updated";
+      at: string;
+      payload: { ping_id: string; status: "accepted" | "declined" };
+    };

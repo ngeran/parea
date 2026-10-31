@@ -34,13 +34,13 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
   // so a percentage here resolved against nothing — the cell collapsed to
   // content width and iOS measured the label against an indefinite width,
   // which Fabric "solved" by truncating to the first letter ("H.", "C.").
-  // Slot math: the bar insets 16 pt per side and splits into 4 cells,
+  // Slot math: the bar insets 16 pt per side and splits into 5 cells,
   // capped at 120 so the selected pill stays a pill on wide screens (the
   // bar centers over the reading column on tablets). The 5 pt button
   // padding each side (tabVerticalUiKit) is intentionally overdrawn so the
   // pill spans the full slot like the rest of the bar's geometry.
   const { width: screenWidth } = useWindowDimensions();
-  const cellWidth = Math.min((screenWidth - 32) / 4, 120);
+  const cellWidth = Math.min((screenWidth - 32) / 5, 120);
   return (
     // The pill IS the cell: the icon wrapper (overridden to fill the button,
     // see tabBarIconStyle) centers it on both axes and it hugs its content —
@@ -73,9 +73,10 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
         accessible={false}
         numberOfLines={1}
         // Long localized words shrink instead of ellipsizing ("Ρυθμίσεις" at
-        // xlarge text in a 360 px phone).
+        // xlarge text in a 360 px phone — five cells need the extra room,
+        // hence 0.7 rather than 0.75).
         adjustsFontSizeToFit
-        minimumFontScale={0.75}
+        minimumFontScale={0.7}
         style={{
           color: focused ? (contrast ? c.onPrimary : c.onSoft) : c.onSurfaceVariant,
           fontSize: f.label,
@@ -146,6 +147,10 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="home"
         options={{ title: t("home"), tabBarIcon: ({ focused }) => <TabIcon emoji="🏠" label={t("home")} focused={focused} /> }}
+      />
+      <Tabs.Screen
+        name="nearby"
+        options={{ title: t("nearbyTab"), tabBarIcon: ({ focused }) => <TabIcon emoji="👋" label={t("nearbyTab")} focused={focused} /> }}
       />
       {/* No unread dot on chats: the API has no read-state, so any dot would
           be a fake signal — honest data only. */}

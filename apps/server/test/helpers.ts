@@ -120,6 +120,7 @@ export async function resetDb(): Promise<void> {
     env.DB.prepare("DELETE FROM requests"),
     env.DB.prepare("DELETE FROM matches"),
     env.DB.prepare("DELETE FROM discover_decisions"),
+    env.DB.prepare("DELETE FROM pings"),
     env.DB.prepare("DELETE FROM blocks"),
     env.DB.prepare("DELETE FROM verification_submissions"),
     env.DB.prepare("DELETE FROM devices"),

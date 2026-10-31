@@ -36,6 +36,14 @@ accounts. For the deployed environment use the additive demo seed: only
 writes `seed-`-prefixed rows, never deletes or modifies anything else, and
 is safe to re-run.
 
+On a deployment that predates a schema change, apply pending migrations
+first (e.g. `0003_pings_discoverable.sql`, which also defaults every
+existing profile to `discoverable = 1` — visible in Nearby):
+
+```bash
+npx wrangler d1 migrations apply parea --remote
+```
+
 ```bash
 cd apps/server
 npm run db:avatars:remote   # upload the 10 demo avatar PNGs to R2 (once)

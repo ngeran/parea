@@ -33,6 +33,7 @@ export default function Settings() {
   const insets = useSafeAreaInsets();
   const [pushBusy, setPushBusy] = useState(false);
   const [volunteerBusy, setVolunteerBusy] = useState(false);
+  const [discoverableBusy, setDiscoverableBusy] = useState(false);
 
   const sizeLabel =
     textSize === "normal" ? t("sizeNormal") : textSize === "large" ? t("sizeLarge") : t("sizeXLarge");
@@ -56,6 +57,23 @@ export default function Settings() {
       toast(t("networkError"), "error");
     } finally {
       setPushBusy(false);
+    }
+  };
+
+  const toggleDiscoverable = async (on: boolean) => {
+    if (discoverableBusy) return;
+    setDiscoverableBusy(true);
+    try {
+      const updated = await api<SelfProfile>("/me", {
+        method: "PATCH",
+        body: { discoverable: on },
+        token: useStore.getState().token ?? undefined,
+      });
+      setProfile(updated);
+    } catch {
+      toast(t("networkError"), "error");
+    } finally {
+      setDiscoverableBusy(false);
     }
   };
 
@@ -274,6 +292,36 @@ export default function Settings() {
             value={(profile?.volunteer ?? false) || (profile?.volunteer_requested ?? false)}
             onValueChange={(v) => void toggleVolunteer(v)}
             disabled={volunteerBusy}
+            trackColor={{ false: c.outlineVariant, true: c.success }}
+          />
+        </View>
+      </Card>
+
+      {/* Nearby visibility: off means new people can't see me in Nearby —
+          existing conversations (and my own browsing) stay untouched. */}
+      <Card>
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            minHeight: touch.min,
+            gap: space.m,
+          }}
+        >
+          <Text style={{ fontSize: f.title, color: c.onSurface }}>👀</Text>
+          <View style={{ flex: 1, gap: 4 }}>
+            <Text style={{ color: c.onSurface, fontSize: f.body, fontWeight: "600" }}>
+              {t("discoverableSetting")}
+            </Text>
+            <Text style={{ color: c.onSurfaceVariant, fontSize: f.label, lineHeight: f.label * 1.3 }}>
+              {t("discoverableHint")}
+            </Text>
+          </View>
+          <Switch
+            accessibilityLabel={t("discoverableSetting")}
+            value={profile?.discoverable ?? true}
+            onValueChange={(v) => void toggleDiscoverable(v)}
+            disabled={discoverableBusy}
             trackColor={{ false: c.outlineVariant, true: c.success }}
           />
         </View>

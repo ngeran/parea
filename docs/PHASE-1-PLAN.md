@@ -499,6 +499,13 @@ Confirm dialog: "Send this request? Maria, 68, within 10 km will see it."
 
 ### 7.7 Discover (one card, two huge buttons; swipe optional)
 
+> **Update (2026-10-31):** the app now ships a **Nearby tab** instead — a list
+> of people within your radius with ping-first contact ("wave at someone;
+> they accept before a chat opens") and a "Show me in Nearby" visibility
+> toggle (`profiles.discoverable`, `pings` table, migration 0003). The
+> `GET /discover` + `POST /discover/:userId/decision` endpoints remain for
+> already-shipped app versions.
+
 ```
 ┌──────────────────────────────────┐
 │  ← Back        Discover    3 km  │

@@ -11,7 +11,10 @@
     "test:watch": "vitest",
     "db:migrate": "wrangler d1 migrations apply parea --local",
     "db:seed": "wrangler d1 execute parea --local --file=seed.sql",
-    "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed",
+    "db:reset": "rm -rf .wrangler/state && npm run db:migrate && npm run db:seed && npm run db:avatars",
+    "db:avatars": "node scripts/avatars.mjs",
+    "db:avatars:remote": "node scripts/avatars.mjs --remote",
+    "db:seed:remote": "wrangler d1 execute parea --remote --file=seed-demo.sql",
     "deploy": "wrangler deploy"
   },
   "dependencies": {

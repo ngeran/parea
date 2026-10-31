@@ -5,13 +5,25 @@
 // sits in a primarySoft pill (the fill carries selection; in the contrast
 // theme that's a white pill with a black label). Cells stack emoji over
 // label so long localized words never truncate the way a side-by-side row
-// does in a quarter of a narrow phone, and the bar has no fixed height —
-// it grows with the user's text size instead of clipping it.
+// does in a quarter of a narrow phone.
+//
+// All heights here are explicit, not content/min-height driven: measured on
+// device (pixel scan of a real screenshot), the navigation bar's own layout
+// top-aligned its children and ignored both minHeight and paddingVertical —
+// emoji ink sat on the bar's very first pixel row with a ~20 pt dead void
+// below the labels. A fixed bar height + full-height cells + a fixed-height
+// pill centered inside make the vertical centering deterministic no matter
+// how the bar positions its children.
 import { Tabs } from "expo-router";
 import { Text, useWindowDimensions, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useT } from "../../src/i18n";
 import { ELEVATION, useTheme } from "../../src/theme";
+
+// Keep sceneStyle's clearance below in sync with these.
+const TAB_BAR_HEIGHT = 72;
+const ICON_SLOT = 28;
+const PILL_HEIGHT = 58;
 
 function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focused: boolean }) {
   const { c, f, themeName } = useTheme();
@@ -26,44 +38,61 @@ function TabIcon({ emoji, label, focused }: { emoji: string; label: string; focu
   const { width: screenWidth } = useWindowDimensions();
   const cellWidth = Math.min((screenWidth - 32) / 4, 120);
   return (
+    // Full bar height: whatever alignment the bar's internal layout applies
+    // (it top-aligns), this cell spans it, so the pill centers from here.
     <View
       accessible
       accessibilityLabel={label}
       style={{
         width: cellWidth,
-        alignSelf: "center",
-        minHeight: 56,
+        // The bar's border sits inside its height (contrast adds 3 px per
+        // edge, light/dark 1 px) — subtract it so the cell exactly fills the
+        // bar's inner box even there.
+        height: TAB_BAR_HEIGHT - (contrast ? 6 : 2),
         alignItems: "center",
         justifyContent: "center",
-        gap: 2,
-        borderRadius: 999,
-        paddingHorizontal: 8,
-        paddingVertical: 6,
-        backgroundColor: focused ? c.primarySoft : "transparent",
-        // Contrast: the white pill needs its own 3 px edge on the black bar.
-        // The border is always reserved (transparent when unfocused) so the
-        // cell doesn't jump 3 px when selection moves.
-        borderWidth: contrast ? 3 : 0,
-        borderColor: focused ? c.outline : "transparent",
       }}
     >
-      <Text accessible={false} style={{ fontSize: 22, lineHeight: 26 }}>{emoji}</Text>
-      <Text
+      <View
         accessible={false}
-        numberOfLines={1}
-        // Long localized words shrink instead of ellipsizing ("Ρυθμίσεις" at
-        // xlarge text in a 360 px phone).
-        adjustsFontSizeToFit
-        minimumFontScale={0.75}
         style={{
-          color: focused ? (contrast ? c.onPrimary : c.onSoft) : c.onSurfaceVariant,
-          fontSize: f.label,
-          lineHeight: f.label * 1.3,
-          fontWeight: focused ? "800" : "600",
+          alignSelf: "stretch",
+          height: PILL_HEIGHT,
+          borderRadius: 999,
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 2,
+          backgroundColor: focused ? c.primarySoft : "transparent",
+          // Contrast: the white pill needs its own 3 px edge on the black bar.
+          // The border is always reserved (transparent when unfocused) so the
+          // pill doesn't jump 3 px when selection moves.
+          borderWidth: contrast ? 3 : 0,
+          borderColor: focused ? c.outline : "transparent",
         }}
       >
-        {label}
-      </Text>
+        {/* Fixed slot: every emoji occupies the same box regardless of the
+            glyph's own ink size (💬 renders ~10 pt tall, 🏠 ~19 pt), so the
+            four icons share one optical center line and one icon→label gap. */}
+        <View accessible={false} style={{ height: ICON_SLOT, alignItems: "center", justifyContent: "center" }}>
+          <Text accessible={false} style={{ fontSize: 22, lineHeight: 26 }}>{emoji}</Text>
+        </View>
+        <Text
+          accessible={false}
+          numberOfLines={1}
+          // Long localized words shrink instead of ellipsizing ("Ρυθμίσεις" at
+          // xlarge text in a 360 px phone).
+          adjustsFontSizeToFit
+          minimumFontScale={0.75}
+          style={{
+            color: focused ? (contrast ? c.onPrimary : c.onSoft) : c.onSurfaceVariant,
+            fontSize: f.label,
+            lineHeight: f.label * 1.3,
+            fontWeight: focused ? "800" : "600",
+          }}
+        >
+          {label}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -100,11 +129,13 @@ export default function TabsLayout() {
           ...(themeName === "contrast"
             ? { borderWidth: 3, borderColor: c.outline }
             : { borderWidth: 1, borderColor: c.outlineVariant, ...ELEVATION.md }),
-          // No fixed height: the 56 px cells (emoji over label, built-in
-          // label off) size the bar, so it grows with the user's text size
-          // instead of clipping it.
-          minHeight: 72,
-          paddingVertical: 8,
+          // Explicit height, not minHeight + paddingVertical: on device the
+          // bar's internal layout top-aligned its children and dropped the
+          // padding, so slack piled up under the labels. Fixed height makes
+          // the full-height cells in TabIcon center the pill deterministically.
+          // Labels still shrink to fit (minimumFontScale 0.75), so 72 pt holds
+          // up to xlarge text.
+          height: TAB_BAR_HEIGHT,
           overflow: "hidden",
         },
         tabBarShowLabel: false,

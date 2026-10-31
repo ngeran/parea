@@ -24,17 +24,20 @@ DELETE FROM profiles;
 
 -- ── Profiles ────────────────────────────────────────────────────────────────
 -- Coordinates are already snapped to the ~500 m grid (see src/lib/geo.ts).
-INSERT INTO profiles (id, phone, first_name, about, interests, languages, mobility, birth_year, verified, role, lat, lng, radius_km, language) VALUES
-  ('seed-maria',    '+306900000001', 'Μαρία',    'Αγαπώ τους κήπους και τη θάλασσα. Φτιάχνω ωραίο ψωμί.', '["garden","sea","cooking"]', '["el"]',        'walk', 1957, 1, 'user', 40.640, 22.945, 10, 'el'),
-  ('seed-nikos',    '+306900000002', 'Νίκος',    'Συλλέγω βιβλία και παίζω σκάκι στο πάρκο.',             '["books","chess","walks"]',  '["el","en"]',   'walk', 1954, 1, 'user', 40.645, 22.940, 10, 'el'),
-  ('seed-eleni',    '+306900000003', 'Ελένη',    'Χορεύω παραδοσιακά και μαγειρεύω για τα εγγόνια.',      '["cooking","grandchildren","music"]', '["el"]', 'home', 1949, 0, 'user', 40.635, 22.950, 15, 'el'),
-  ('seed-dimitris', '+306900000004', 'Δημήτρης', 'Πρώτος ναυτικός. Τώρα περπατάω κάθε μέρα.',             '["walks","sea","movies"]',   '["el","en"]',   'walk', 1952, 1, 'user', 40.650, 22.945, 10, 'el'),
-  ('seed-sofia',    '+306900000005', 'Σοφία',    'Ζωγραφίζω με ακουαρέλα. Δύο εγγόνια, δύο ήλιοι.',       '["crafts","grandchildren","garden"]', '["el"]', 'ride', 1960, 0, 'user', 40.630, 22.940, 5, 'el'),
-  ('seed-giorgos',  '+306900000006', 'Γιώργος',  'Τραγουδώ στο χορωδιακό της γειτονιάς.',                 '["music","church","walks"]', '["el"]',        'walk', 1945, 1, 'user', 40.660, 22.970, 20, 'el'),
-  ('seed-katerina', '+306900000007', 'Κατερίνη', 'Διαβάζω αστυνομικά και φροντίζω βασιλικούς.',           '["books","garden","coffee"]','["el","en"]',   'home', 1958, 0, 'user', 40.700, 22.900, 10, 'en'),
-  ('seed-vasilis',  '+306900000008', 'Βασίλης',  'Μένω λίγο έξω από την πόλη. Καλή παρέα στο μαγαζί.',    '["coffee","movies","chess"]','["el"]',        'ride', 1951, 0, 'user', 40.900, 22.500, 50, 'el'),
-  ('seed-admin',    '+306900000009', 'Διαχειριστής', 'Λογαριασμός συντονιστή.', '[]', '["el","en"]', 'walk', 1970, 1, 'admin', 40.640, 22.945, 10, 'el'),
-  ('seed-anna',     '+306900000010', 'Άννα',     'Οδοντίατρος παλιά. Τώρα βόλτα και καφεδάκια.',          '["coffee","walks","books"]', '["el","en"]',   'walk', 1959, 1, 'user', 40.642, 22.948, 10, 'en');
+-- photo_r2_key uses the fixed demo UUIDs from scripts/avatars.mjs (they must
+-- match photos.ts KEY_RE) — run `npm run db:avatars` after seeding so the R2
+-- objects exist locally, or Discover (which requires a photo) stays empty.
+INSERT INTO profiles (id, phone, first_name, about, interests, languages, mobility, birth_year, verified, role, lat, lng, radius_km, language, photo_r2_key) VALUES
+  ('seed-maria',    '+306900000001', 'Μαρία',    'Αγαπώ τους κήπους και τη θάλασσα. Φτιάχνω ωραίο ψωμί.', '["garden","sea","cooking"]', '["el"]',        'walk', 1957, 1, 'user', 40.640, 22.945, 10, 'el', 'photos/5eed0001-0000-4000-8000-000000000001.png'),
+  ('seed-nikos',    '+306900000002', 'Νίκος',    'Συλλέγω βιβλία και παίζω σκάκι στο πάρκο.',             '["books","chess","walks"]',  '["el","en"]',   'walk', 1954, 1, 'user', 40.645, 22.940, 10, 'el', 'photos/5eed0002-0000-4000-8000-000000000002.png'),
+  ('seed-eleni',    '+306900000003', 'Ελένη',    'Χορεύω παραδοσιακά και μαγειρεύω για τα εγγόνια.',      '["cooking","grandchildren","music"]', '["el"]', 'home', 1949, 0, 'user', 40.635, 22.950, 15, 'el', 'photos/5eed0003-0000-4000-8000-000000000003.png'),
+  ('seed-dimitris', '+306900000004', 'Δημήτρης', 'Πρώτος ναυτικός. Τώρα περπατάω κάθε μέρα.',             '["walks","sea","movies"]',   '["el","en"]',   'walk', 1952, 1, 'user', 40.650, 22.945, 10, 'el', 'photos/5eed0004-0000-4000-8000-000000000004.png'),
+  ('seed-sofia',    '+306900000005', 'Σοφία',    'Ζωγραφίζω με ακουαρέλα. Δύο εγγόνια, δύο ήλιοι.',       '["crafts","grandchildren","garden"]', '["el"]', 'ride', 1960, 0, 'user', 40.630, 22.940, 5, 'el', 'photos/5eed0005-0000-4000-8000-000000000005.png'),
+  ('seed-giorgos',  '+306900000006', 'Γιώργος',  'Τραγουδώ στο χορωδιακό της γειτονιάς.',                 '["music","church","walks"]', '["el"]',        'walk', 1945, 1, 'user', 40.660, 22.970, 20, 'el', 'photos/5eed0006-0000-4000-8000-000000000006.png'),
+  ('seed-katerina', '+306900000007', 'Κατερίνη', 'Διαβάζω αστυνομικά και φροντίζω βασιλικούς.',           '["books","garden","coffee"]','["el","en"]',   'home', 1958, 0, 'user', 40.700, 22.900, 10, 'en', 'photos/5eed0007-0000-4000-8000-000000000007.png'),
+  ('seed-vasilis',  '+306900000008', 'Βασίλης',  'Μένω λίγο έξω από την πόλη. Καλή παρέα στο μαγαζί.',    '["coffee","movies","chess"]','["el"]',        'ride', 1951, 0, 'user', 40.900, 22.500, 50, 'el', 'photos/5eed0008-0000-4000-8000-000000000008.png'),
+  ('seed-admin',    '+306900000009', 'Διαχειριστής', 'Λογαριασμός συντονιστή.', '[]', '["el","en"]', 'walk', 1970, 1, 'admin', 40.640, 22.945, 10, 'el', 'photos/5eed0009-0000-4000-8000-000000000009.png'),
+  ('seed-anna',     '+306900000010', 'Άννα',     'Οδοντίατρος παλιά. Τώρα βόλτα και καφεδάκια.',          '["coffee","walks","books"]', '["el","en"]',   'walk', 1959, 1, 'user', 40.642, 22.948, 10, 'en', 'photos/5eed000a-0000-4000-8000-00000000000a.png');
 
 -- ── Open requests (tomorrow / later today) ──────────────────────────────────
 INSERT INTO requests (id, user_id, activity, starts_at, place_type, lat, lng, radius_km, status) VALUES

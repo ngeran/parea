@@ -29,6 +29,31 @@ the zero placeholder), then apply the schema:
 npx wrangler d1 migrations apply parea --remote
 ```
 
+## 1b. Demo data on the deployed API
+
+`seed.sql` is dev-only — it truncates every table and would wipe real
+accounts. For the deployed environment use the additive demo seed: only
+writes `seed-`-prefixed rows, never deletes or modifies anything else, and
+is safe to re-run.
+
+```bash
+cd apps/server
+npm run db:avatars:remote   # upload the 10 demo avatar PNGs to R2 (once)
+npm run db:seed:remote      # insert demo profiles + open requests into D1
+```
+
+The demo cluster lives in Thessaloniki (matching the Greek profile texts).
+To point it at a tester's stored location instead, run a one-off:
+
+```bash
+npx wrangler d1 execute parea --remote \
+  --command "UPDATE profiles SET lat=<lat>, lng=<lng> WHERE id LIKE 'seed-%'"
+```
+
+Note the deployed API runs with `OTP_MOCK=1` until the live switch (step 3),
+so any demo phone (`+3069000000xx`) can sign in with the `dev_code` returned
+by `/otp/request`.
+
 ## 2. Secrets (Worker)
 
 ```bash

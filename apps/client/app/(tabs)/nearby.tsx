@@ -3,7 +3,7 @@
 // so nobody gets messages from strangers. Incoming waves surface at the top
 // ("They waved at you"); outgoing ones show "Waiting…" — a silent decline
 // looks the same, by design. The 💛 filter narrows the list to volunteers.
-import { FlatList, Text, View } from "react-native";
+import { FlatList, Pressable, Text, View } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -136,7 +136,17 @@ export default function NearbyPeople() {
       >
         👋 {t("theyWaved")}
       </Text>
-      <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={t("viewProfile", { name: wave.from.first_name })}
+        onPress={() => router.push(`/person/${wave.from.id}`)}
+        style={({ pressed }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: space.m,
+          opacity: pressed ? 0.7 : 1,
+        })}
+      >
         <Avatar
           photoUrl={wave.from.photo_url}
           name={wave.from.first_name}
@@ -150,7 +160,8 @@ export default function NearbyPeople() {
             ? `, ${t("yearsOld", { age: new Date().getFullYear() - wave.from.birth_year })}`
             : ""}
         </Text>
-      </View>
+        <Text style={{ color: c.primary, fontSize: f.title }}>›</Text>
+      </Pressable>
       {wave.from.about ? <QuoteWell>{wave.from.about}</QuoteWell> : null}
       <View style={{ flexDirection: "row", gap: space.l }}>
         <View style={{ flex: 1 }}>
@@ -214,7 +225,18 @@ export default function NearbyPeople() {
           ) : null}
         </View>
 
-        <View style={{ flexDirection: "row", alignItems: "center", gap: space.m }}>
+        {/* The identity row opens the full profile page. */}
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={t("viewProfile", { name: person.first_name })}
+          onPress={() => router.push(`/person/${person.id}`)}
+          style={({ pressed }) => ({
+            flexDirection: "row",
+            alignItems: "center",
+            gap: space.m,
+            opacity: pressed ? 0.7 : 1,
+          })}
+        >
           <Avatar
             photoUrl={person.photo_url}
             name={person.first_name}
@@ -231,7 +253,8 @@ export default function NearbyPeople() {
               ? `, ${t("yearsOld", { age: new Date().getFullYear() - person.birth_year })}`
               : ""}
           </Text>
-        </View>
+          <Text style={{ color: c.primary, fontSize: f.title }}>›</Text>
+        </Pressable>
 
         {person.about ? <QuoteWell>{person.about}</QuoteWell> : null}
 

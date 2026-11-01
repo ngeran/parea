@@ -99,6 +99,29 @@ export interface NearbyPersonDTO extends PublicProfile {
   ping_id?: string;
 }
 
+/**
+ * One person's full profile page: the public fields, the wave/match state
+ * between us, and their open invites I am allowed to see (same radius rules
+ * as the nearby list).
+ */
+export interface PersonProfileDTO {
+  person: PublicProfile;
+  /** When the member joined — shown as "member since" (real, never a count). */
+  member_since: string;
+  connection: NearbyPingState;
+  /** Present when connection === "incoming" — the ping to accept/decline. */
+  ping_id?: string;
+  /** Present when connection === "accepted" — the chat to open. */
+  match_id?: string;
+  /** Their open invites visible to me, soonest first. */
+  requests: PersonRequestDTO[];
+}
+
+/** Another member's open invite, plus my own response on it if I made one. */
+export interface PersonRequestDTO extends RequestDTO {
+  my_response: string | null;
+}
+
 export interface PlanDTO {
   id: string;
   match_id: string;

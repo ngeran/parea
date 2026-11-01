@@ -1,6 +1,6 @@
 // One request. The owner sees who offered and accepts one person; a joiner
 // sees "waiting for their answer"; a newcomer sees "I can join".
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
@@ -155,13 +155,24 @@ export default function RequestDetail() {
           <View style={{ gap: space.xl }}>
             {offers.data?.responses.map((offer) => (
               <Card key={offer.id}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: space.l }}>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={t("viewProfile", { name: offer.responder.first_name })}
+                  onPress={() => router.push(`/person/${offer.responder.id}`)}
+                  style={({ pressed }) => ({
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: space.l,
+                    opacity: pressed ? 0.7 : 1,
+                  })}
+                >
                   <Avatar photoUrl={offer.responder.photo_url} name={offer.responder.first_name} size={56} />
                   <View style={{ flex: 1 }}>
                     <ProfileLine person={offer.responder} lang={language} />
                     <Body muted>{offer.responder.about}</Body>
                   </View>
-                </View>
+                  <Text style={{ color: c.primary, fontSize: f.title }}>›</Text>
+                </Pressable>
                 {offer.status === "offered" ? (
                   <BigButton
                     label={t("accept")}

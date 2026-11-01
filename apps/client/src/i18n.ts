@@ -202,6 +202,17 @@ const en = {
   yearsOld: "{age} years old",
   verified: "Verified",
   mutualToast: "It's a match! Say hello.",
+  viewProfile: "View {name}'s profile",
+
+  // ── Person profile ──────────────────────────────────────────────────────
+  personAbout: "About",
+  personInterests: "Interests",
+  personLanguages: "Languages",
+  memberSince: "Member since {date}",
+  lookingFor: "Looking for company",
+  openChat: "Message",
+  mobilityLabel: "Gets around",
+  speaksLabel: "Speaks",
 
   // ── Chats ───────────────────────────────────────────────────────────────
   chatsTab: "Chats",
@@ -551,6 +562,17 @@ const el: Dict = {
   yearsOld: "{age} ετών",
   verified: "Επαληθευμένο μέλος",
   mutualToast: "Τα βρήκατε! Πείτε γεια.",
+  viewProfile: "Προβολή προφίλ του {name}",
+
+  // ── Προφίλ άλλου μέλους ───────────────────────────────────────────────
+  personAbout: "Λίγα λόγια",
+  personInterests: "Ενδιαφέροντα",
+  personLanguages: "Γλώσσες",
+  memberSince: "Μέλος από {date}",
+  lookingFor: "Θέλει παρέα για…",
+  openChat: "Μήνυμα",
+  mobilityLabel: "Μετακίνηση",
+  speaksLabel: "Μιλάει",
 
   chatsTab: "Συζητήσεις",
   chatsTitle: "Οι συζητήσεις μου",

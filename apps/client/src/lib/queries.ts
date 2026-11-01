@@ -7,6 +7,7 @@ import type {
   MatchDTO,
   MessageDTO,
   NearbyPersonDTO,
+  PersonProfileDTO,
   PlanListItem,
   PublicProfile,
   RequestDTO,
@@ -107,6 +108,16 @@ export function useIncomingPings() {
     queryKey: ["pings", "incoming"],
     queryFn: () => api<{ pings: IncomingPingDTO[] }>("/pings/incoming", { token: token! }),
     enabled: !!token,
+  });
+}
+
+/** One person's full profile: public fields, our wave/match state, their open invites. */
+export function usePerson(personId: string) {
+  const token = useToken();
+  return useQuery({
+    queryKey: ["person", personId],
+    queryFn: () => api<PersonProfileDTO>(`/nearby/profiles/${personId}`, { token: token! }),
+    enabled: !!token && !!personId,
   });
 }
 

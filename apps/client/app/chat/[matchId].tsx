@@ -159,14 +159,25 @@ export default function Chat() {
         >
           <Text style={{ color: c.primary, fontSize: f.button, fontWeight: "700" }}>←</Text>
         </Pressable>
-        <Text
-          accessible
-          accessibilityRole="header"
-          style={{ color: c.text, fontSize: f.title, fontWeight: "700", flex: 1 }}
-          numberOfLines={1}
-        >
-          {other?.first_name ?? ""}
-        </Text>
+        {other ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={t("viewProfile", { name: other.first_name })}
+            onPress={() => router.push(`/person/${other.id}`)}
+            style={({ pressed }) => ({ flex: 1, opacity: pressed ? 0.7 : 1, justifyContent: "center" })}
+          >
+            <Text
+              accessible
+              accessibilityRole="header"
+              style={{ color: c.text, fontSize: f.title, fontWeight: "700" }}
+              numberOfLines={1}
+            >
+              {other.first_name}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={{ flex: 1 }} />
+        )}
         {other ? (
           <>
             <Pressable
